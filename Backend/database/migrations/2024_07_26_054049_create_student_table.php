@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('MSHS',10)->primary();
             $table->string('Hoten');
             $table->string('Ngaysinh');
-            $table->string('Gioitinh',3);
-            $table->string('Quequan');
-            $table->string('Dantoc');
+            $table->string('GioiTinh',3);
+            $table->string('QueQuan');
+            $table->string('DanToc');
             $table->string('TonGiao');
             $table->string('DiaChi');
             $table->string('SDT',10);

@@ -2,11 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
-use App\Models\Ban;
+use App\Models\HocSinh;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class BanController extends Controller
+class HSController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,8 @@ class BanController extends Controller
      */
     public function index()
     {
-        $bans = Ban::all();
-        return response()->json($bans, Response::HTTP_OK);
+        $hocsinh = HocSinh::all();
+        return response()->json($hocsinh, Response::HTTP_OK);
     }
 
     /**
@@ -27,9 +27,9 @@ class BanController extends Controller
      */
     public function store(Request $request)
     {
-        $ban = Ban::create($request->all());
+        $hocsinh = HocSinh::create($request->all());
 
-        return response()->json($ban, Response::HTTP_CREATED);
+        return response()->json($hocsinh, Response::HTTP_CREATED);
     }
 
     /**
@@ -38,10 +38,13 @@ class BanController extends Controller
      * @param Products $product
      * @return \Illuminate\Http\Response
      */
-    public function show($MaBan)
+    public function show($mshs)
     {
-        $ban = Ban::with('HocSinh')->find($MaBan);
-        return response()->json($ban, Response::HTTP_OK);
+        $hocsinh = HocSinh::find($mshs);
+        if (!$hocsinh) {
+            return response()->json(['message' => 'Học sinh không tồn tại'], Response::HTTP::NOT_FOUND);
+        }
+        return response()->json($hocsinh, Response::HTTP_OK);
     }
 
     /**
@@ -51,14 +54,14 @@ class BanController extends Controller
      * @param Products $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $MaBan)
+    public function update(Request $request, $mshs)
     {
-        $ban = Ban::find($MaBan);
-        if (!$ban) {
+        $hocsinh = HocSinh::find($mshs);
+        if (!$hocsinh) {
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }
-        $ban->update($request->all());
-        return response()->json($ban, Response::HTTP_OK);
+        $hocsinh->update($request->all());
+        return response()->json($hocsinh, Response::HTTP_OK);
     }
 
     /**
@@ -67,9 +70,9 @@ class BanController extends Controller
      * @param Products $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy($MaBan)
+    public function destroy($mshs)
     {
-        $data = Ban::find($MaBan);
+        $data = HocSinh::find($mshs);
         if (!$data) {
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }

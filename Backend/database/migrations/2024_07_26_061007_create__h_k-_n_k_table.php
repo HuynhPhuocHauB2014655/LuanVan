@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('NienKhoa', function (Blueprint $table) {
             $table->string('MaNK',10)->primary();
             $table->string('TenNK');
+            $table->timestamps();
         });
         Schema::create('HocKi', function (Blueprint $table) {
             $table->string('MaHK',10)->primary();

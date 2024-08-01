@@ -1,0 +1,155 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+/* 
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+.header{
+  grid-area: header;
+  background-color: #4CAF50;
+  padding: 1rem;
+  text-align: center;
+  font-size: larger;
+}
+.main{
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.footer{
+  grid-area: footer;
+}
+.menu{
+  grid-area: menu;
+  border-right: 1px solid black;
+  margin-right: 10px;
+  list-style: none;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+.menu-item{
+  padding: 10px 0;
+  margin: 2px;
+  border-bottom: 1px solid transparent;
+}
+.menu-item a{
+  text-decoration: none;
+  text-align: left;
+  color: black;
+  padding: 0 20px;
+  font-size: medium;
+  display: block;
+}
+.menu-item:hover{
+  border-bottom: 1px solid rgb(81, 80, 80);
+}
+.container{
+  display: grid;
+  grid-template-columns: 15% 85%;
+  grid-template-areas: 
+    "header header"
+    "menu main"
+    "footer footer";
+}
+.footer{
+  background-color: #4CAF50;
+  padding: 1rem;
+  text-align: center;
+  font-size: larger;
+}
+.button-nav button{
+  margin: 0 2px;
+}
+.btn,
+.btn-add,
+.btn-edit,
+.btn-info,
+.btn-submit,
+.btn-delete {
+    font-family: "Roboto", sans-serif;
+    outline: 0;
+    border: 0;
+    text-decoration: none;
+    padding: 15px;
+    color: #FFFFFF;
+    font-size: 16px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    cursor: pointer;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-add,
+.btn-edit,
+.btn-info,
+.btn-submit,
+.btn-delete{
+    padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    border-radius: 4px;
+}
+.btn-add {
+    background-color: #00a762;
+}
+.btn-info {
+  background-color: #00ffff;
+}
+.btn-delete {
+    background-color: #b72424;
+}
+.btn-outline-submit{
+  padding: 0.5rem 0.75rem;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid #00a762;
+    margin: 0 5px;
+}
+.btn-outline-submit:hover{
+  background-color: #00a762;
+}
+input {
+  outline: 0;
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 5px;
+  margin-left: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+input:focus {
+  border-color: #5b08a7;
+}
+
+.add_nk_form{
+  padding: 20px;
+}
+.nk_table{
+  border-collapse: collapse;
+}
+.nk_table td,tr,th{
+  border: 1px solid;
+  padding: 10px;
+}
+.alter{
+  position: relative;
+  z-index: 2;
+  top:0;
+}
