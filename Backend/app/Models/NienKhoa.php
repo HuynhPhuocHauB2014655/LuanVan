@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class NienKhoa extends Model
 {
     use HasFactory;
@@ -15,4 +15,7 @@ class NienKhoa extends Model
         'MaNK',
         'TenNK',
     ];
+    public function hocki(){
+        return $this->hasMany(HocKi::class,'MaNK','MaNK');
+    }
 }

@@ -6,7 +6,7 @@ const StateContext = createContext({
 })
 
 export const ContextProvider = ({children}) => {
-    const [message,setMessage] = useState({});
+    const [message,setMessage] = useState("");
     return(
         <StateContext.Provider value={{
             message,

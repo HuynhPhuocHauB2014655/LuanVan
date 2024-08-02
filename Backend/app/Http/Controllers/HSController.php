@@ -15,7 +15,7 @@ class HSController extends Controller
      */
     public function index()
     {
-        $hocsinh = HocSinh::all();
+        $hocsinh = HocSinh::with('ban')->get();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
 
@@ -32,6 +32,12 @@ class HSController extends Controller
         return response()->json($hocsinh, Response::HTTP_CREATED);
     }
 
+    public function findByName($name)
+    {
+        $name = "%".$name."%";
+        $hocsinh = HocSinh::where('HoTen','like',$name)->with('ban')->get();
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
     /**
      * Display the specified resource.
      *
@@ -40,9 +46,9 @@ class HSController extends Controller
      */
     public function show($mshs)
     {
-        $hocsinh = HocSinh::find($mshs);
+        $hocsinh = HocSinh::with('ban')->find($mshs);
         if (!$hocsinh) {
-            return response()->json(['message' => 'Học sinh không tồn tại'], Response::HTTP::NOT_FOUND);
+            return response()->json(['message' => 'Học sinh không tồn tại'], Response::HTTP_NOT_FOUND);
         }
         return response()->json($hocsinh, Response::HTTP_OK);
     }
