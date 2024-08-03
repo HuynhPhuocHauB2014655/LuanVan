@@ -21,6 +21,7 @@ Route::get('/hs/show/{mshs}',[HSController::class,'show']);
 Route::put('/hs/update/{mshs}',[HSController::class,'update']);
 Route::delete('/hs/delete/{mshs}',[HSController::class,'destroy']);
 Route::get('/hs/search/{name}',[HSController::class,'findByName']);
+Route::get('/hs/last',[HSController::class,'lastStudent']);
 
 Route::post('/nk/create',[NienKhoaController::class,'store']);
 Route::get('/nk/index',[NienKhoaController::class,'index']);

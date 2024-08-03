@@ -5,7 +5,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\HocSinh;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Log;
 class HSController extends Controller
 {
     /**
@@ -52,7 +52,10 @@ class HSController extends Controller
         }
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-
+    public function lastStudent(){
+        $hocsinh = HocSinh::latest()->pluck('MSHS')->first();
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
     /**
      * Update the specified resource in storage.
      *
