@@ -16,7 +16,7 @@ class HocKi extends Model
         'TenHK',
         "MaNK"
     ];
-    public function nienkhoa(){
+    public function nienkhoa():BelongsTo{
         return $this->belongsTo(NienKhoa::class,'MaNK','MaNK');
     }
 }

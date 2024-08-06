@@ -1,10 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.main{
+.header{
+  min-height: 10vh;
+}
+.main-content{
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 80vh;
+}
+.footer{
+  min-height: 10vh;
 }
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

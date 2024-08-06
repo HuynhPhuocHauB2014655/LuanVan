@@ -63,7 +63,7 @@ export default function HK_NK() {
         }
     }
     return (
-        <div className="hk_nk">
+        <div className="main-content">
             <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Học kì - Niên khóa</h2>
             <div className="button-nav">
                 <button onClick={showForm} className="px-3 py-1 mt-2 bg-blue-500 text-white rounded shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg">Thêm niên khóa</button>

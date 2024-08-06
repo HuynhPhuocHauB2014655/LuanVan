@@ -35,7 +35,7 @@ export default function Student() {
     const handleSubmit = async (values) => {
 
         if (confirm("Bạn có chắc với hành động này?")) {
-            if (type == 1) {
+            if (showForm === 2) {
                 values.MSHS = studentForm.MSHS;
                 const updated = { ...values };
                 delete updated["MaNK"];
@@ -102,10 +102,8 @@ export default function Student() {
                 DiaChi: data.DiaChi,
                 SDT: data.SDT,
             });
-            setType(1);
         } else {
             setStudentForm({});
-            setType(2);
         }
         setShowForm(isShow);
     }
@@ -123,9 +121,9 @@ export default function Student() {
         }
     }
     return (
-        <div className="student relative">
+        <div className="main-content relative">
             {showForm != 0 &&
-                <div className="absolute z-10 top-1/2 w-[70%] left-1/2 transform -translate-x-1/2 bg-sky-300 p-5">
+                <div className="absolute z-10 w-[70%] left-[15%] top-[20%] bg-sky-300 p-5">
                     <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
                     <h1 className="text-center mb-3 text-2xl font-semibold">Thêm học sinh</h1>
                     <Formik
