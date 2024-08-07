@@ -15,7 +15,7 @@ class HSController extends Controller
      */
     public function index()
     {
-        $hocsinh = HocSinh::with('ban')->get();
+        $hocsinh = HocSinh::with(['ban', 'lop'])->get();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
 
@@ -31,7 +31,10 @@ class HSController extends Controller
 
         return response()->json($hocsinh, Response::HTTP_CREATED);
     }
-
+    public function newStudents(){
+        $hocsinh = HocSinh::with(['ban','lop'])->doesntHave('lop')->get();
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
     public function findByName($name)
     {
         $name = "%".$name."%";

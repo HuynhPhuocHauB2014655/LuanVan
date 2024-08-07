@@ -66,7 +66,6 @@ export default function Student() {
                     await axiosClient.post('/hs/create', updated);
                     setMessage('Đã thêm học sinh thành công');
                     fetchData();
-                    showFormStudent(0);
                 } catch (error) {
                     console.error('Error submitting form:', error);
                     setMessage('Có lỗi trong quá trình thêm học sinh');
@@ -123,7 +122,7 @@ export default function Student() {
     return (
         <div className="main-content relative">
             {showForm != 0 &&
-                <div className="absolute z-10 w-[70%] left-[15%] top-[20%] bg-sky-300 p-5">
+                <div className="absolute z-10 w-[70%] left-[15%] top-40 bg-sky-300 p-5">
                     <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
                     <h1 className="text-center mb-3 text-2xl font-semibold">Thêm học sinh</h1>
                     <Formik
@@ -161,7 +160,10 @@ export default function Student() {
                                         <Field type="text" name="NgaySinh" className="w-full mb-1 rounded form-input" placeholder="Ngày sinh" />
                                         <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
 
-                                        <Field type="text" name="GioiTinh" className="w-full mb-1 rounded form-input" placeholder="Giới tính" />
+                                        <Field as="select" name="GioiTinh" className="form-select w-full mb-1">
+                                            <option value="Nam" defaultChecked>Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                        </Field>
                                         <ErrorMessage className="text-red-600" name="GioiTinh" component="div" />
 
                                         <Field type="text" name="QueQuan" className="w-full mb-1 rounded form-input" placeholder="Quê quán" />
@@ -212,9 +214,10 @@ export default function Student() {
                     <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                 </div>
             </div>
-            <table className="table-fixed border-collapse mt-2 mx-auto">
+            <table className="table-fixed border-collapse mt-2 mx-auto mb-2">
                 <thead>
                     <tr>
+                        <th className="border border-gray-400 p-2">STT</th>
                         <th className="border border-gray-400 p-2">MSHS</th>
                         <th className="border border-gray-400 p-2">Tên học sinh</th>
                         <th className="border border-gray-400 p-2">Ngày Sinh</th>
@@ -225,12 +228,14 @@ export default function Student() {
                         <th className="border border-gray-400 p-2">Địa chỉ</th>
                         <th className="border border-gray-400 p-2">Số điện thoại</th>
                         <th className="border border-gray-400 p-2">Ban</th>
+                        <th className="border border-gray-400 p-2">Lớp</th>
                         <th className="border border-gray-400 p-2">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {datas.map((data, index) => (
                         <tr key={index}>
+                            <td className="border border-gray-400 p-2">{index+1}</td>
                             <td className="border border-gray-400 p-2">{data.MSHS}</td>
                             <td className="border border-gray-400 p-2">{data.HoTen}</td>
                             <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
@@ -241,9 +246,12 @@ export default function Student() {
                             <td className="border border-gray-400 p-2">{data.DiaChi}</td>
                             <td className="border border-gray-400 p-2">{data.SDT}</td>
                             <td className="border border-gray-400 p-2">{data.ban.TenBan}</td>
+                            {data.lop[0].TenLop ? 
+                                <td className="border border-gray-400 p-2">{data.lop[0].TenLop}</td> :
+                                <td className="border border-gray-400 p-2">Chưa xếp</td>}
                             <td className="border border-gray-400 p-2">
-                                <button className="px-2 py-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
-                                <button type="button" className="ms-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
+                                <button className="px-2 py-1 mx-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
+                                <button type="button" className="mx-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
                                     Xóa
                                 </button>
                             </td>

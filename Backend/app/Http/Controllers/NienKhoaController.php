@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\NienKhoa;
+use App\Models\NienKhoaHienTai;
 use Illuminate\Http\Response;
 class NienKhoaController extends Controller
 {
@@ -13,6 +14,19 @@ class NienKhoaController extends Controller
         return response()->json($nienkhoa, Response::HTTP_OK);
     }
 
+    public function setNienKhoaHienTai(Request $request){
+        NienKhoaHienTai::truncate();
+        NienKhoaHienTai::create(
+            [
+                'NienKhoa' => $request->query('nk'),
+            ]
+            );
+        return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
+    }
+    public function getNienKhoaHienTai(Request $request){
+        $nienkhoa = NienKhoaHienTai::all();
+        return response()->json($nienkhoa, Response::HTTP_OK);
+    }
     public function store(Request $request)
     {
         $nienkhoa = NienKhoa::create($request->all());

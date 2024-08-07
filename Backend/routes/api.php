@@ -8,6 +8,7 @@ use App\Http\Controllers\NienKhoaController;
 use App\Http\Controllers\HocKiController;
 use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\GiaoVienController;
+use App\Http\Controllers\LopController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -26,6 +27,7 @@ Route::put('/hs/update/{mshs}',[HSController::class,'update']);
 Route::delete('/hs/delete/{mshs}',[HSController::class,'destroy']);
 Route::get('/hs/search/{name}',[HSController::class,'findByName']);
 Route::get('/hs/last',[HSController::class,'lastStudent']);
+Route::get('/hs/new',[HSController::class,'newStudents']);
 
 //nien khoa route
 Route::post('/nk/create',[NienKhoaController::class,'store']);
@@ -33,6 +35,8 @@ Route::get('/nk/index',[NienKhoaController::class,'index']);
 Route::get('/nk/show/{maNK}',[NienKhoaController::class,'show']);
 Route::put('/nk/update/{maNK}',[NienKhoaController::class,'update']);
 Route::delete('/nk/delete/{maNK}',[NienKhoaController::class,'destroy']);
+Route::get('/nk/setNow',[NienKhoaController::class,'setNienKhoaHienTai']);
+Route::get('/nk/getNow',[NienKhoaController::class,'getNienKhoaHienTai']);
 
 //hoc ki route
 Route::post('/hk/create',[HocKiController::class,'store']);
@@ -56,3 +60,12 @@ Route::get('/gv/show/{MSGV}',[GiaoVienController::class,'show']);
 Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
 Route::get('/gv/last',[GiaoVienController::class,'lastStudent']);
+
+//lop route
+Route::post('/lop/create',[LopController::class,'store']);
+Route::get('/lop/index',[LopController::class,'index']);
+Route::get('/lop/list',[LopController::class,'indexWithStudent']);
+Route::get('/lop/show/{MaLop}',[LopController::class,'show']);
+Route::put('/lop/update/{MaLop}',[LopController::class,'update']);
+Route::delete('/lop/delete/{MaLop}',[LopController::class,'destroy']);
+Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);

@@ -5,6 +5,7 @@ import Layout from "./components/Layout.jsx";
 import HK_NK from "./views/HK_NK.jsx";
 import Subject from "./views/Subject.jsx";
 import Teacher from "./views/Teacher.jsx";
+import Class from "./views/Class.jsx";
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: "/teacher",
                 element: <Teacher/>,
+            },
+            {
+                path: "/class",
+                element: <Class/>,
             },
             {
                 path: "*",
