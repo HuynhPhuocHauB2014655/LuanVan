@@ -15,7 +15,7 @@ class HSController extends Controller
      */
     public function index()
     {
-        $hocsinh = HocSinh::with(['ban', 'lop'])->get();
+        $hocsinh = HocSinh::with(['ban', 'lop'])->paginate(10);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
 

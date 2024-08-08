@@ -1,29 +1,62 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../axios-client";
-import { useStateContext } from "../context/alterContext";
+import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 export default function Teacher() {
     const [teachersData, setTeachersData] = useState([]);
     const [subjectsData,setSubjectsData] = useState([]);
     const [showForm, setShowForm] = useState(0);
     const [teacherForm, setTeacherForm] = useState({});
     const { setMessage } = useStateContext();
-    const fetchData = async () => {
-        const teachers = await axiosClient.get("/gv/index");
-        setTeachersData(teachers.data);
+    const [pages, setPages] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [startPage, setStartPage] = useState(0);
+    const [endPage, setEndPage] = useState(0);
+    const fetchData = async (page) => {
+        const teachers = await axiosClient.get(`/gv/index?page=${page}`);
+        setTeachersData(teachers.data.data);
+        setTotalPages(teachers.data.last_page); 
+        totalPages < 5 ? setEndPage(totalPages) : setEndPage(5);
+        setCurrentPage(teachers.data.current_page); 
         const subjects = await axiosClient.get("/mh/index");
         setSubjectsData(subjects.data);
     };
     useEffect(() => {
-        fetchData();
+        fetchData(1);
+        setStartPage(1);
     }, []);
+    useEffect(() => {
+        if (currentPage > endPage) {
+            const newStart = currentPage;
+            const newEnd = newStart + 4 > totalPages ? totalPages : currentPage + 4;
+            setStartPage(newStart);
+            setEndPage(newEnd);
+            console.log(newStart, newEnd, startPage, endPage);
+        }
+        if (currentPage < startPage) {
+            const newEnd = currentPage;
+            const newStart = currentPage - 4 > 0 ? currentPage - 4 : 1;
+            setStartPage(newStart);
+            setEndPage(newEnd);
+            console.log(newStart, newEnd, startPage, endPage);
+        }
+    }, [currentPage]);
+    useEffect(() => {
+        if (startPage !== undefined && endPage !== undefined) {
+            const generatedPages = Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
+            setPages(generatedPages);
+        }
+    }, [endPage]);
     const validationSchema = Yup.object({
         TenGV: Yup.string().required('Tên giáo viên không được bỏ trống'),
         NgaySinh: Yup.string().required('Ngày sinh không được bỏ trống'),
         GioiTinh: Yup.string().required('Giới tính không được bỏ trống'),
         DiaChi: Yup.string().required('Địa chỉ không được bỏ trống'),
-        SDT: Yup.string().required('Số điện thoại không được bỏ trống'),
+        SDT: Yup.string().matches(/^\d{10}$/, 'Số điện thoại phải có 10 chữ số.').required('Số điện thoại không được bỏ trống'),
         ChuyenMon: Yup.string().required('Chuyên môn không được để trống'),
     });
     const handleSubmit = async (value) => {
@@ -35,12 +68,11 @@ export default function Teacher() {
             }
             else{
                 const lastGV = await axiosClient.get("/gv/last");
-                value.MSGV = "GV" + (parseInt(lastGV.substring(2,5),10)+1).toString().padStart(3,0);
+                value.MSGV = "GV" + (parseInt(lastGV.data.substring(2,5),10)+1).toString().padStart(3,0);
             }
             try {
                 const response = await axiosClient.post("/gv/create", value);
                 setMessage("Đã thêm thành công");
-                setShowForm(0);
                 fetchData();
             } catch (error) {
                 setMessage(error.response.data.message);
@@ -81,13 +113,44 @@ export default function Teacher() {
         }
         setShowForm(isShow);
     }
+    const handlePageChange = (page) =>{
+        fetchData(page);
+    }
     return (
         <div className="main-content relative">
             <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Quản lí Giáo Viên</h2>
             <div>
                 <button className="px-2 mt-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormTeacher(1)}>Thêm giáo viên</button>
             </div>
-            <table className="w-2/3 border-collapse mt-2">
+            <div className="my-1 flex justify-center">
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    disabled={currentPage - 1 === 0}
+                >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                {pages.map((page) => (
+                    <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        disabled={page === currentPage}
+                        className={page === currentPage ?
+                            "me-1 px-3 py-1 border-2 border-black bg-slate-200 rounded"
+                            : "me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"}
+                    >
+                        {page}
+                    </button>
+                ))}
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    disabled={currentPage + 1 > totalPages}
+                >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                </button>
+            </div>
+            <table className="table-auto border-collapse my-2 mx-auto">
                 <thead>
                     <tr>
                         <th className="border border-gray-400 p-2">Mã số giáo viên</th>
@@ -123,7 +186,7 @@ export default function Teacher() {
                 </tbody>
             </table>
             {showForm != 0 &&
-                <div className="absolute z-10 left-[25%] top-1/3 w-[50%] bg-sky-300 p-5">
+                <div className="absolute z-10 left-[25%] top-60 w-[50%] bg-sky-300 p-5">
                     <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600 font-bold" onClick={() => showFormTeacher(0)}>X</button>
                     <h1 className="text-center mb-3 text-2xl font-semibold">Thêm giáo viên</h1>
                     <Formik
@@ -133,6 +196,7 @@ export default function Teacher() {
                             GioiTinh: "",
                             DiaChi: "",
                             SDT: "",
+                            ChuyenMon:"",
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}
@@ -153,7 +217,10 @@ export default function Teacher() {
                                         <Field type="text" name="NgaySinh" className="w-full mb-1 rounded form-input" placeholder="Ngày sinh" />
                                         <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
 
-                                        <Field type="text" name="GioiTinh" className="w-full mb-1 rounded form-input" placeholder="Giới tính" />
+                                        <Field as="select" name="GioiTinh" className="w-full mb-1 rounded form-select">
+                                            <option value="Nam">Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                        </Field>
                                         <ErrorMessage className="text-red-600" name="GioiTinh" component="div" />
 
                                         <Field type="text" name="DiaChi" className="w-full mb-1 rounded form-input" placeholder="Địa chỉ" />
@@ -163,7 +230,7 @@ export default function Teacher() {
                                         <ErrorMessage className="text-red-600" name="SDT" component="div" />
 
                                         <Field as="select" name="ChuyenMon" className="form-select w-full">
-                                            <option disabled defaultChecked>Chọn chuyên môn</option>
+                                            <option value="" disabled defaultChecked>Chọn chuyên môn</option>
                                             {subjectsData.map((subject) => (
                                                 <option key={subject.MaMH} value={subject.MaMH}>{subject.TenMH}</option>
                                             ))}

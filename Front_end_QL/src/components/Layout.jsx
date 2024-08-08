@@ -1,6 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
 import axiosClient from "../axios-client"
-import { useStateContext } from "../context/alterContext";
+import { useStateContext } from "../context/Context";
 import { useEffect, useState } from "react";
 import classNames from 'classnames';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

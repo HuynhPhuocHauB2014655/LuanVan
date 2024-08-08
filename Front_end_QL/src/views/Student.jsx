@@ -1,25 +1,53 @@
 import axiosClient from "../axios-client";
 import React, { useEffect, useState } from 'react';
-import { useStateContext } from "../context/alterContext";
+import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 export default function Student() {
     const [datas, setDatas] = useState([]);
     const { setMessage } = useStateContext();
     const [showForm, setShowForm] = useState(0);
     const [type, setType] = useState(0);
     const [studentForm, setStudentForm] = useState({});
-    const fetchData = async () => {
+    const [pages, setPages] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [startPage, setStartPage] = useState(0);
+    const [endPage, setEndPage] = useState(0);
+    const fetchData = async (page) => {
         try {
-            const response = await axiosClient.get('/hs/index');
-            setDatas(response.data);
+            const response = await axiosClient.get(`/hs/index?page=${page}`);
+            setDatas(response.data.data);
+            setTotalPages(response.data.last_page);
+            setCurrentPage(response.data.current_page);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-
+    useEffect(() => {
+        if (currentPage > endPage) {
+            const newStart = currentPage;
+            const newEnd = newStart + 4 > totalPages ? totalPages : currentPage + 4;
+            setStartPage(newStart);
+            setEndPage(newEnd);
+            console.log(newStart, newEnd, startPage, endPage);
+        }
+        if (currentPage < startPage) {
+            const newEnd = currentPage;
+            const newStart = currentPage - 4 > 0 ? currentPage - 4 : 1;
+            setStartPage(newStart);
+            setEndPage(newEnd);
+            console.log(newStart, newEnd, startPage, endPage);
+        }
+    }, [currentPage]);
+    useEffect(() => {
+        if (startPage !== undefined && endPage !== undefined) {
+            const generatedPages = Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
+            setPages(generatedPages);
+        }
+    }, [endPage]);
     const validationSchema = Yup.object({
         MaNK: Yup.string().required('Mã niên khóa không được bỏ trống'),
         HoTen: Yup.string().required('Họ và tên không được bỏ trống'),
@@ -29,7 +57,7 @@ export default function Student() {
         DanToc: Yup.string().required('Dân Tộc không được bỏ trống'),
         TonGiao: Yup.string().required('Tôn Giáo không được bỏ trống'),
         DiaChi: Yup.string().required('Địa chỉ không được bỏ trống'),
-        SDT: Yup.string().required('Số điện thoại không được bỏ trống'),
+        SDT: Yup.string().matches(/^\d{10}$/, 'Số điện thoại phải có 10 chữ số.').required('Số điện thoại không được bỏ trống'),
         MaBan: Yup.string().required('Ban không được bỏ trống'),
     });
     const handleSubmit = async (values) => {
@@ -42,7 +70,7 @@ export default function Student() {
                 try {
                     await axiosClient.put('/hs/update/' + values.MSHS, updated);
                     setMessage('Đã sửa học sinh thành công');
-                    fetchData();
+                    fetchData(1);
                     showFormStudent(0);
                 } catch (error) {
                     console.error('Error submitting form:', error);
@@ -53,7 +81,7 @@ export default function Student() {
                     var soHocSinh = 0;
                     if (datas.length > 0) {
                         const lastStudent = await axiosClient.get('/hs/last');
-                        soHocSinh = parseInt(lastStudent.data.substring(6, 9),10) + 1;
+                        soHocSinh = parseInt(lastStudent.data.substring(6, 9), 10) + 1;
                     }
                 } catch (error) {
                     console.error('Error submitting form:', error);
@@ -65,7 +93,7 @@ export default function Student() {
                 try {
                     await axiosClient.post('/hs/create', updated);
                     setMessage('Đã thêm học sinh thành công');
-                    fetchData();
+                    fetchData(1);
                 } catch (error) {
                     console.error('Error submitting form:', error);
                     setMessage('Có lỗi trong quá trình thêm học sinh');
@@ -78,7 +106,7 @@ export default function Student() {
             try {
                 await axiosClient.delete('/hs/delete/' + mshs);
                 setMessage('Đã xóa học sinh thành công');
-                fetchData();
+                fetchData(1);
                 showFormStudent(0);
             } catch (error) {
                 console.error('Error submitting form:', error);
@@ -107,7 +135,9 @@ export default function Student() {
         setShowForm(isShow);
     }
     useEffect(() => {
-        fetchData();
+        fetchData(1);
+        setStartPage(1);
+        setEndPage(5);
     }, []);
     const search = async () => {
         const searchValue = document.getElementById('search').value;
@@ -118,6 +148,9 @@ export default function Student() {
             console.error('Error searching data:', error);
             setMessage(error.response.data.message);
         }
+    }
+    const handlePageChange = (page) => {
+        fetchData(page);
     }
     return (
         <div className="main-content relative">
@@ -152,40 +185,40 @@ export default function Student() {
                                 <Form className="relative">
                                     <div className="columns-2 gap-3">
                                         <Field type="text" name="MaNK" className="w-full mb-1 rounded form-input" placeholder="Mã niên khóa" />
-                                        <ErrorMessage className="text-red-600" name="MaNK" component="div" />
+                                        <ErrorMessage className="text-red-700" name="MaNK" component="div" />
 
                                         <Field type="text" name="HoTen" className="w-full mb-1 rounded form-input" placeholder="Họ và tên" />
-                                        <ErrorMessage className="text-red-600" name="HoTen" component="div" />
+                                        <ErrorMessage className="text-red-700" name="HoTen" component="div" />
 
                                         <Field type="text" name="NgaySinh" className="w-full mb-1 rounded form-input" placeholder="Ngày sinh" />
-                                        <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
+                                        <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
 
                                         <Field as="select" name="GioiTinh" className="form-select w-full mb-1">
                                             <option value="Nam" defaultChecked>Nam</option>
                                             <option value="Nữ">Nữ</option>
                                         </Field>
-                                        <ErrorMessage className="text-red-600" name="GioiTinh" component="div" />
+                                        <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
 
                                         <Field type="text" name="QueQuan" className="w-full mb-1 rounded form-input" placeholder="Quê quán" />
-                                        <ErrorMessage className="text-red-600" name="QueQuan" component="div" />
+                                        <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
 
                                         <Field type="text" name="DanToc" className="w-full mb-1 rounded form-input" placeholder="Dân Tộc" />
-                                        <ErrorMessage className="text-red-600" name="DanToc" component="div" />
+                                        <ErrorMessage className="text-red-700" name="DanToc" component="div" />
 
                                         <Field type="text" name="TonGiao" className="w-full mb-1 rounded form-input" placeholder="Tôn Giáo" />
-                                        <ErrorMessage className="text-red-600" name="TonGiao" component="div" />
+                                        <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
 
                                         <Field type="text" name="DiaChi" className="w-full mb-1 rounded form-input" placeholder="Địa chỉ" />
-                                        <ErrorMessage className="text-red-600" name="DiaChi" component="div" />
+                                        <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
 
                                         <Field type="text" name="SDT" className="w-full mb-1 rounded form-input" placeholder="Số điện thoại" />
-                                        <ErrorMessage className="text-red-600" name="SDT" component="div" />
+                                        <ErrorMessage className="text-red-700" name="SDT" component="div" />
 
                                         <Field as="select" name="MaBan" className="form-select w-full">
                                             <option value="TN">Tự nhiên</option>
                                             <option value="XH">Xã hội</option>
                                         </Field>
-                                        <ErrorMessage className="text-red-600" name="ban" component="div" />
+                                        <ErrorMessage className="text-red-700" name="ban" component="div" />
                                     </div>
 
                                     {showForm === 1 ?
@@ -206,13 +239,41 @@ export default function Student() {
             <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Quản lí học sinh</h2>
             <div className="mt-1 flex justify-between">
                 <div>
-                    <button className="px-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2" onClick={fetchData}>Tất cả</button>
+                    <button className="px-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2" onClick={() => fetchData(1)}>Tất cả</button>
                     <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormStudent(1)}>Thêm học sinh</button>
                 </div>
                 <div className="me-3">
                     <input type="text" id="search" className="form-input rounded h-9" placeholder="Nhập mã số học sinh" />
                     <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                 </div>
+            </div>
+            <div className="my-1 flex justify-center">
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    disabled={currentPage - 1 === 0}
+                >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                </button>
+                {pages.map((page) => (
+                    <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        disabled={page === currentPage}
+                        className={page === currentPage ?
+                            "me-1 px-3 py-1 border-2 border-black bg-slate-200 rounded"
+                            : "me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"}
+                    >
+                        {page}
+                    </button>
+                ))}
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    disabled={currentPage + 1 > totalPages}
+                >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                </button>
             </div>
             <table className="table-fixed border-collapse mt-2 mx-auto mb-2">
                 <thead>
@@ -235,7 +296,7 @@ export default function Student() {
                 <tbody>
                     {datas.map((data, index) => (
                         <tr key={index}>
-                            <td className="border border-gray-400 p-2">{index+1}</td>
+                            <td className="border border-gray-400 p-2">{(currentPage - 1) * 10 + index + 1}</td>
                             <td className="border border-gray-400 p-2">{data.MSHS}</td>
                             <td className="border border-gray-400 p-2">{data.HoTen}</td>
                             <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
@@ -246,7 +307,7 @@ export default function Student() {
                             <td className="border border-gray-400 p-2">{data.DiaChi}</td>
                             <td className="border border-gray-400 p-2">{data.SDT}</td>
                             <td className="border border-gray-400 p-2">{data.ban.TenBan}</td>
-                            {data.lop[0].TenLop ? 
+                            {data.lop[0].TenLop ?
                                 <td className="border border-gray-400 p-2">{data.lop[0].TenLop}</td> :
                                 <td className="border border-gray-400 p-2">Chưa xếp</td>}
                             <td className="border border-gray-400 p-2">

@@ -9,7 +9,7 @@ class GiaoVienController extends Controller
 {
     public function index()
     {
-        $giaovien = GiaoVien::with('monHoc')->get();
+        $giaovien = GiaoVien::with('monHoc')->paginate(10);
         return response()->json($giaovien, Response::HTTP_OK);
     }
 
@@ -29,7 +29,7 @@ class GiaoVienController extends Controller
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function lastTeacher(){
-        $hocsinh = GiaoVien::latest()->pluck('MSGV')->first();
+        $giaovien = GiaoVien::latest()->pluck('MSGV')->first();
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function update(Request $request, $MSGV)

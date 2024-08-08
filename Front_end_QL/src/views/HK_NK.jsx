@@ -1,7 +1,6 @@
 import axiosClient from "../axios-client"
 import React, { useEffect, useRef, useState } from 'react';
-import { useStateContext } from "../context/alterContext";
-import { useNienKhoaContext } from "../context/nienKhoaContext";
+import { useStateContext } from "../context/Context";
 export default function HK_NK() {
     const { message, setMessage } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();

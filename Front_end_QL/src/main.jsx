@@ -4,9 +4,13 @@ import App from './App.jsx'
 import './index.css'
 import { RouterProvider } from 'react-router-dom'
 import router from './router.jsx'
-import { ContextProvider } from './context/alterContext.jsx'
+import { ContextProvider } from './context/Context.jsx'
+import { PageContextProvider} from './context/pageContext.jsx'
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <ContextProvider>
+  <PageContextProvider>
+    <ContextProvider>
     <RouterProvider router={router} />
   </ContextProvider>
+  </PageContextProvider>
 )

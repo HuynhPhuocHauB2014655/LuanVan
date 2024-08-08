@@ -1,6 +1,6 @@
 import axiosClient from "../axios-client";
 import React, { useEffect, useState } from 'react';
-import { useStateContext } from "../context/alterContext";
+import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 export default function Class() {
