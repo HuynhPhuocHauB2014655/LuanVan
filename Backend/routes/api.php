@@ -9,6 +9,7 @@ use App\Http\Controllers\HocKiController;
 use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\GiaoVienController;
 use App\Http\Controllers\LopController;
+use App\Http\Controllers\TKBController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -65,7 +66,10 @@ Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 Route::post('/lop/create',[LopController::class,'store']);
 Route::get('/lop/index',[LopController::class,'index']);
 Route::get('/lop/list',[LopController::class,'indexWithStudent']);
+Route::get('/lop/list/{MaNK}',[LopController::class,'indexWithStudentNow']);
 Route::get('/lop/show/{MaLop}',[LopController::class,'show']);
 Route::put('/lop/update/{MaLop}',[LopController::class,'update']);
 Route::delete('/lop/delete/{MaLop}',[LopController::class,'destroy']);
 Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
+
+//tkb route

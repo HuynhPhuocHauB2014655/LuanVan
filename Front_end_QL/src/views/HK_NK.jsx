@@ -8,7 +8,7 @@ export default function HK_NK() {
     const [datas, setDatas] = useState([]);
     const MaNKRef = useRef();
     const TenNKRef = useRef();
-    const addRef = useRef();
+    const nienKhoaHienTaiRef = useRef();
     const fetchData = async () => {
         try {
             const response = await axiosClient.get('/nk/index');
@@ -31,7 +31,7 @@ export default function HK_NK() {
     const handleCheckboxChange = (event) => {
         setIsChecked(event.target.checked);
     };
-    const submit = (ev) => {
+    const submit = async (ev) => {
         ev.preventDefault();
         const payload = {
             MaNK: MaNKRef.current.value,
@@ -64,7 +64,12 @@ export default function HK_NK() {
                     });
             }
             if (isChecked) {
-                submitNKHientai({ "MaNK": MaNKRef.current.value });
+                try {
+                    const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNKRef.current.value } });
+                    fetchData();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
             } else {
                 setMessage('Tạo mới thành công');
             }
@@ -72,14 +77,19 @@ export default function HK_NK() {
             setMessage('Có lỗi trong quá trình tạo mới');
         }
         fetchData();
+        setIsShow(0);
     }
-    const submitNKHientai = async (value) => {
+    const submitNKHientai = async (event) => {
+        event.preventDefault();
+        const MaNK = nienKhoaHienTaiRef.current.value;
         try {
-            const response = await axiosClient.get('/nk/setNow', { params: { "nk": value.MaNK } });
+            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK } });
             setMessage(response.data);
+            fetchData();
         } catch (error) {
             console.error('Error fetching data:', error);
         }
+        setIsShow(0);
     }
     return (
         <div className="main-content">
@@ -101,7 +111,7 @@ export default function HK_NK() {
             }
             {isShow === 2 &&
                 <form onSubmit={submitNKHientai} className="mt-2">
-                    <select name="MaNK">
+                    <select ref={nienKhoaHienTaiRef}>
                         {datas.map((item) => (
                             <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
                         ))}

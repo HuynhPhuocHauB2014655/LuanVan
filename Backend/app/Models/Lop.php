@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use \Illuminate\Database\Eloquent\Relations\BelongsTo;
+use \Illuminate\Database\Eloquent\Relations\HasMany;
 class Lop extends Model
 {
     use HasFactory;
@@ -23,5 +24,11 @@ class Lop extends Model
     }
     public function nienKhoa(): BelongsTo{
         return $this->belongsTo(NienKhoa::class,'MaNK','MaNK');
+    }
+    public function giaoVien(): BelongsTo{
+        return $this->belongsTo(GiaoVIen::class,'MSGV','MSGV');
+    }
+    public function tkb(): HasMany{
+        return $this->hasMany(TKB::class,'MaLop','MaLop');
     }
 }

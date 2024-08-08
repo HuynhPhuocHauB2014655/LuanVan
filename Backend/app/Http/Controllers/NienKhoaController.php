@@ -16,11 +16,9 @@ class NienKhoaController extends Controller
 
     public function setNienKhoaHienTai(Request $request){
         NienKhoaHienTai::truncate();
-        NienKhoaHienTai::create(
-            [
-                'NienKhoa' => $request->query('nk'),
-            ]
-            );
+        $nk_now = new NienKhoaHienTai();
+        $nk_now->NienKhoa = $request->nk;
+        $nk_now->save();
         return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
     }
     public function getNienKhoaHienTai(Request $request){

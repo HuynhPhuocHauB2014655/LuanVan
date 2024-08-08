@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Lop;
 use App\Models\HocSinh;
 use App\Models\HocLop;
+use App\Models\GiaoVien;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class LopController extends Controller
 
     public function indexWithStudent()
     {
-        $lop = Lop::with(['hocSinh','nienKhoa'])->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->get();
         $lop = $lop->sortBy(function ($item) {
             // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
             return $item->hocSinh->first()->name ?? '';
@@ -27,6 +28,16 @@ class LopController extends Controller
         return response()->json($lop, Response::HTTP_OK);
     }
 
+    public function indexWithStudentNow($MaNK)
+    {
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->get();
+        $lop = $lop->sortBy(function ($item) {
+            // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
+            return $item->hocSinh->first()->name ?? '';
+        });
+        return response()->json($lop, Response::HTTP_OK);
+    }
+    
     public function store(Request $request)
     {
         $lop = Lop::create($request->all());
@@ -36,18 +47,31 @@ class LopController extends Controller
 
     public function assignStudentsToClass(Request $request)
     {
+        $gvTN = GiaoVien::
+        where('ChuyenMon','like','TN%')
+        ->orWhere('ChuyenMon','=','CB1')
+        ->orWhere('ChuyenMon','=','TC1')
+        ->orWhere('ChuyenMon','=','CB4')
+        ->inRandomOrder()->get();
+        $gvXH = GiaoVien::
+        where('ChuyenMon','like','XH%')
+        ->orWhere('ChuyenMon','=','CB2')
+        ->orWhere('ChuyenMon','=','TC2')
+        ->orWhere('ChuyenMon','=','CB5')
+        ->inRandomOrder()->get();
         $newClassTN = [];
         $newClassXH = [];
         $nienkhoa = Str::replace('-', '', $request->MaNK);
         for ($i=1; $i <= $request->soLopTN ; $i++) { 
             $maLop = "TN" . $nienkhoa . "10" . $i;
             $tenLop = "10A" . $i;
-            
+            $gvcn = $gvTN->shift();
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
             $lop->MaKhoi = "10";
             $lop->MaNK = $request->MaNK;
+            $lop->MSGV = $gvcn->MSGV;
             $lop->save();
             $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->inRandomOrder()->limit(10)->pluck('MSHS');
             HocLop::insert(
@@ -82,12 +106,13 @@ class LopController extends Controller
         for ($i=1; $i <= $request->soLopXH ; $i++) { 
             $maLop = "XH" . $nienkhoa . "10" . $i;
             $tenLop = "10C" . $i;
-            
+            $gvcn = $gvXH->shift();
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
             $lop->MaKhoi = "10";
             $lop->MaNK = $request->MaNK;
+            $lop->MSGV = $gvcn->MSGV;
             $lop->save();
             $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->inRandomOrder()->limit(10)->pluck('MSHS');
             HocLop::insert(

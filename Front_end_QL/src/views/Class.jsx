@@ -11,9 +11,10 @@ export default function Class() {
     const [TNCount, setTNCount] = useState(0);
     const [XHCount, setXHCount] = useState(0);
     const [showForm, setShowForm] = useState(0);
-    const [nienKhoa, setNienKhoa] = useState([]);
+    const [nienKhoaList, setNienKhoaList] = useState([]);
     const { setMessage } = useStateContext();
     const [visibleTables, setVisibleTables] = useState({});
+    const {nienKhoa} = useStateContext();
     const fetchNewStudent = async () => {
         try {
             const response = await axiosClient.get("/hs/new");
@@ -22,7 +23,7 @@ export default function Class() {
             setTNCount(response.data.filter(student => student.MaBan === 'TN').length);
             setXHCount(response.data.filter(student => student.MaBan === 'XH').length);
             const nienkhoa = await axiosClient.get("/nk/index");
-            setNienKhoa(nienkhoa.data);
+            setNienKhoaList(nienkhoa.data);
         } catch (error) {
             console.error(error);
         }
@@ -32,6 +33,14 @@ export default function Class() {
             const response = await axiosClient.get("/lop/list");
             setClasses(response.data);
         } catch (error) {
+            console.error(error);
+        }
+    }
+    const getClassNow = async () => {
+        try {
+            const response = await axiosClient.get(`/lop/list/${nienKhoa.NienKhoa}`);
+            setClasses(response.data);
+        }catch(error){
             console.error(error);
         }
     }
@@ -139,12 +148,15 @@ export default function Class() {
             }
             {show == 2 &&
                 <div>
-                    <h2 className="text-center font-bold text-2xl">Danh sách lớp</h2>
+                    <h2 className="text-center font-bold text-2xl mb-2">Danh sách lớp</h2>
+                    <div className="mx-11 mb-3">
+                        <button type="button" className="px-2 py-1 mt-1 rounded hover:bg-blue-300" onClick={getClassNow}>Lớp niên khóa hiện tại</button>
+                    </div>
                     <div>
                         {classes.map((classItem, index) => (
-                            <div key={index} className="mx-auto w-full bg-slate-100 p-3 border-2 mb-2" style={{ maxWidth: '90%' }}>
+                            <div key={index} className="mx-auto w-full bg-slate-50 p-3 border-2 mb-2" style={{ maxWidth: '90%' }}>
                                 <div className="w-full flex justify-between">
-                                    <h3 className="text-xl">Lớp: {classItem.TenLop} Niên Khóa: {classItem.nien_khoa.TenNK}</h3>
+                                    <h3 className="text-xl">Lớp: {classItem.TenLop} Niên Khóa: {classItem.nien_khoa.TenNK} Chủ Nhiệm: {classItem.giao_vien.TenGV}</h3>
                                     <button
                                         onClick={() => toggleTable(classItem.MaLop)}
                                         className="border px-3 py-1 rounded hover:bg-gray-200"
@@ -209,7 +221,7 @@ export default function Class() {
                                 <div>
                                     <Field as="select" name="MaNK" className="w-full" placeholder="Mã niên khóa">
                                         <option value='' defaultChecked disabled>Chọn niên khóa</option>
-                                        {nienKhoa.map((data) => (
+                                        {nienKhoaList.map((data) => (
                                             <option key={data.MaNK} value={data.MaNK}>{data.TenNK}</option>
                                         ))}
                                     </Field>

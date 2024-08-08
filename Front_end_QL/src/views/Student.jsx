@@ -9,7 +9,6 @@ export default function Student() {
     const [datas, setDatas] = useState([]);
     const { setMessage } = useStateContext();
     const [showForm, setShowForm] = useState(0);
-    const [type, setType] = useState(0);
     const [studentForm, setStudentForm] = useState({});
     const [pages, setPages] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -152,6 +151,7 @@ export default function Student() {
     const handlePageChange = (page) => {
         fetchData(page);
     }
+    console.log(datas);
     return (
         <div className="main-content relative">
             {showForm != 0 &&
@@ -307,7 +307,7 @@ export default function Student() {
                             <td className="border border-gray-400 p-2">{data.DiaChi}</td>
                             <td className="border border-gray-400 p-2">{data.SDT}</td>
                             <td className="border border-gray-400 p-2">{data.ban.TenBan}</td>
-                            {data.lop[0].TenLop ?
+                            {data.lop.TenLop ?
                                 <td className="border border-gray-400 p-2">{data.lop[0].TenLop}</td> :
                                 <td className="border border-gray-400 p-2">Chưa xếp</td>}
                             <td className="border border-gray-400 p-2">
