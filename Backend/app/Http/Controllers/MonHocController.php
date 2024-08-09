@@ -20,6 +20,20 @@ class MonHocController extends Controller
         return response()->json($monhoc, Response::HTTP_CREATED);
     }
 
+    public function monHocTN(){
+        $monhoc = MonHoc::with('giaoVien')->where('MaMH','like','CB%')
+        ->orWhere('MaMH','like','TN%')
+        ->orWhere("maMH",'=','XH1')
+        ->orWhere('MaMH','=','TC2')->get();
+        return response()->json($monhoc, Response::HTTP_OK);
+    }
+    public function monHocXH(){
+        $monhoc = MonHoc::with('giaoVien')->where('MaMH','like','CB%')
+        ->orWhere('MaMH','like','XH%')
+        ->orWhere("maMH",'=','TN1')
+        ->orWhere('MaMH','=','TC1')->get();
+        return response()->json($monhoc, Response::HTTP_OK);
+    }
     public function show($maMH)
     {
         $monhoc = MonHoc::find($maMH);

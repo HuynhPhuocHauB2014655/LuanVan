@@ -49,6 +49,8 @@ Route::delete('/hk/delete/{maHK}',[HocKiController::class,'destroy']);
 //mon hoc route
 Route::post('/mh/create',[MonHocController::class,'store']);
 Route::get('/mh/index',[MonHocController::class,'index']);
+Route::get('/mh/tn',[MonHocController::class,'monHocTN']);
+Route::get('/mh/xh',[MonHocController::class,'monHocXH']);
 Route::get('/mh/show/{maMH}',[MonHocController::class,'show']);
 Route::put('/mh/update/{maMH}',[MonHocController::class,'update']);
 Route::delete('/mh/delete/{maMH}',[MonHocController::class,'destroy']);
@@ -65,6 +67,7 @@ Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
 Route::get('/lop/index',[LopController::class,'index']);
+Route::get('/lop/list/withoutTkb',[LopController::class,'indexWithoutTKB']);
 Route::get('/lop/list',[LopController::class,'indexWithStudent']);
 Route::get('/lop/list/{MaNK}',[LopController::class,'indexWithStudentNow']);
 Route::get('/lop/show/{MaLop}',[LopController::class,'show']);
@@ -73,3 +76,5 @@ Route::delete('/lop/delete/{MaLop}',[LopController::class,'destroy']);
 Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
 
 //tkb route
+Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
+Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);

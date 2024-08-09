@@ -6,6 +6,7 @@ import HK_NK from "./views/HK_NK.jsx";
 import Subject from "./views/Subject.jsx";
 import Teacher from "./views/Teacher.jsx";
 import Class from "./views/Class.jsx";
+import TKB from "./views/TKB.jsx";
 
 
 const router = createBrowserRouter([
@@ -38,10 +39,13 @@ const router = createBrowserRouter([
                 element: <Class/>,
             },
             {
+                path: "/tkb",
+                element: <TKB/>,
+            },
+            {
                 path: "*",
                 element: <div>404 - Page not found</div>,
             },
-
         ]
     },
 ])

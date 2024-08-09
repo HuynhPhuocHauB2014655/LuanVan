@@ -16,6 +16,7 @@ export default function Layout() {
         { id: 4, route: "/subject", label: 'Môn học' },
         { id: 5, route: "/teacher", label: 'Giáo Viên' },
         { id: 6, route: "/class", label: 'Lớp Học' },
+        { id: 7, route: "/tkb", label: 'Thời Khóa Biểu' },
     ];
     const fetchData = async () => {
         try {

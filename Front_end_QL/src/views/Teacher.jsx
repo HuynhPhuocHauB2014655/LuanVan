@@ -218,6 +218,7 @@ export default function Teacher() {
                                         <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
 
                                         <Field as="select" name="GioiTinh" className="w-full mb-1 rounded form-select">
+                                            <option value="" defaultChecked>Giới tính</option>
                                             <option value="Nam">Nam</option>
                                             <option value="Nữ">Nữ</option>
                                         </Field>

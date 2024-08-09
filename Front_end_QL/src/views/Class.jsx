@@ -99,7 +99,7 @@ export default function Class() {
                     <h2 className="text-center font-bold text-2xl">Danh sách học sinh mới chưa xếp lớp</h2>
                     {newStudents.length > 0 ? <div className="mx-auto w-full" style={{ maxWidth: '90%' }}>
                         <div className="flex justify-between">
-                            <p className="mb-2 font-semibold">Tổng số: {studentCount} Ban Tự nhiên: {TNCount} Ban Xã hội: {XHCount}</p>
+                            <p className="mb-2 font-semibold">Tổng số: {studentCount} Ban Tự nhiên: {TNCount} Ban Xã hội: {XHCount} </p>
                             <button className="border-2 rounded-md px-2 border-blue-400 hover:bg-blue-100" onClick={() => _showForm(1)}>Xếp lớp</button>
                         </div>
                         <table className="table-auto border-collapse mt-2 mb-2 w-full">
@@ -149,7 +149,7 @@ export default function Class() {
             {show == 2 &&
                 <div>
                     <h2 className="text-center font-bold text-2xl mb-2">Danh sách lớp</h2>
-                    <div className="mx-11 mb-3">
+                    <div className="mx-auto mb-3">
                         <button type="button" className="px-2 py-1 mt-1 rounded hover:bg-blue-300" onClick={getClassNow}>Lớp niên khóa hiện tại</button>
                     </div>
                     <div>

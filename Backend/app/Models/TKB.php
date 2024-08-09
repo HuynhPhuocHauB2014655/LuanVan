@@ -17,6 +17,7 @@ class TKB extends Model
         'MaMH',
         'MaLop',
         'MSGV',
+        'MaNK',
     ];
     protected $primaryKey = 'id';
 

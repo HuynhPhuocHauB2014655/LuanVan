@@ -17,10 +17,19 @@ class LopController extends Controller
         $lop = Lop::all();
         return response()->json($lop, Response::HTTP_OK);
     }
-
+    public function indexWithoutTKB()
+    {
+        $lop = Lop::with(
+            'phanCong.giaoVien',
+            'phanCong.monHoc',
+            'phanCong.lop',
+            'nienKhoa')
+            ->doesntHave('tkb')->get();
+        return response()->json($lop, Response::HTTP_OK);
+    }
     public function indexWithStudent()
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->get();
         $lop = $lop->sortBy(function ($item) {
             // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
             return $item->hocSinh->first()->name ?? '';
@@ -30,7 +39,7 @@ class LopController extends Controller
 
     public function indexWithStudentNow($MaNK)
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->get();
         $lop = $lop->sortBy(function ($item) {
             // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
             return $item->hocSinh->first()->name ?? '';

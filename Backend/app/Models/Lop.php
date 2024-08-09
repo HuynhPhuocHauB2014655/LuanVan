@@ -31,4 +31,7 @@ class Lop extends Model
     public function tkb(): HasMany{
         return $this->hasMany(TKB::class,'MaLop','MaLop');
     }
+    public function phanCong(): HasMany{
+        return $this->hasMany(PhanCong::class,'MaLop','MaLop');
+    }
 }
