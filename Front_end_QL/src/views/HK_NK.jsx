@@ -14,7 +14,7 @@ export default function HK_NK() {
             const response = await axiosClient.get('/nk/index');
             setDatas(response.data);
             const NKNow = await axiosClient.get("/nk/getNow");
-            setNienKhoa(NKNow.data[0]);
+            setNienKhoa(NKNow.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }

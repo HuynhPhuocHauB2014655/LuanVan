@@ -64,20 +64,20 @@ export default function Subject() {
             <div>
                 <button className="px-2 mt-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormSubject(1)}>Thêm môn học</button>
             </div>
-            <table className="w-1/2 border-collapse my-2">
+            <table className="w-1/2 table">
                 <thead>
                     <tr>
-                        <th className="border border-gray-400 p-2">Mã môn học</th>
-                        <th className="border border-gray-400 p-2">Tên môn học</th>
-                        <th className="border border-gray-400 p-2">Hành động</th>
+                        <th className="td">Mã môn học</th>
+                        <th className="td">Tên môn học</th>
+                        <th className="td">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {datas && datas.map((data, index) => (
                         <tr key={index}>
-                            <td className="border border-gray-400 p-2">{data.MaMH}</td>
-                            <td className="border border-gray-400 p-2">{data.TenMH}</td>
-                            <td className="border border-gray-400 p-2">
+                            <td className="td">{data.MaMH}</td>
+                            <td className="td">{data.TenMH}</td>
+                            <td className="td">
                                 <div className="flex justify-center">
                                     <button className="px-2 py-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormSubject(2,data)}>Sửa</button>
                                     <button type="button" className="ms-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={()=>deleteSubject(data.MaMH)}>

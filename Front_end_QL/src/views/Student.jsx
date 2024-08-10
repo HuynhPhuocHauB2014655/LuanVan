@@ -275,42 +275,42 @@ export default function Student() {
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
-            <table className="table-fixed border-collapse mt-2 mx-auto mb-2">
+            <table className="table">
                 <thead>
                     <tr>
-                        <th className="border border-gray-400 p-2">STT</th>
-                        <th className="border border-gray-400 p-2">MSHS</th>
-                        <th className="border border-gray-400 p-2">Tên học sinh</th>
-                        <th className="border border-gray-400 p-2">Ngày Sinh</th>
-                        <th className="border border-gray-400 p-2">Giới tính</th>
-                        <th className="border border-gray-400 p-2">Quê quán</th>
-                        <th className="border border-gray-400 p-2">Dân tộc</th>
-                        <th className="border border-gray-400 p-2">Tôn Giáo</th>
-                        <th className="border border-gray-400 p-2">Địa chỉ</th>
-                        <th className="border border-gray-400 p-2">Số điện thoại</th>
-                        <th className="border border-gray-400 p-2">Ban</th>
-                        <th className="border border-gray-400 p-2">Lớp</th>
-                        <th className="border border-gray-400 p-2">Hành động</th>
+                        <th className="td">STT</th>
+                        <th className="td">MSHS</th>
+                        <th className="td">Tên học sinh</th>
+                        <th className="td">Ngày Sinh</th>
+                        <th className="td">Giới tính</th>
+                        <th className="td">Quê quán</th>
+                        <th className="td">Dân tộc</th>
+                        <th className="td">Tôn Giáo</th>
+                        <th className="td">Địa chỉ</th>
+                        <th className="td">Số điện thoại</th>
+                        <th className="td">Ban</th>
+                        <th className="td">Lớp</th>
+                        <th className="td">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {datas.map((data, index) => (
                         <tr key={index}>
-                            <td className="border border-gray-400 p-2">{(currentPage - 1) * 10 + index + 1}</td>
-                            <td className="border border-gray-400 p-2">{data.MSHS}</td>
-                            <td className="border border-gray-400 p-2">{data.HoTen}</td>
-                            <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
-                            <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
-                            <td className="border border-gray-400 p-2">{data.QueQuan}</td>
-                            <td className="border border-gray-400 p-2">{data.DanToc}</td>
-                            <td className="border border-gray-400 p-2">{data.TonGiao}</td>
-                            <td className="border border-gray-400 p-2">{data.DiaChi}</td>
-                            <td className="border border-gray-400 p-2">{data.SDT}</td>
-                            <td className="border border-gray-400 p-2">{data.ban.TenBan}</td>
+                            <td className="td">{(currentPage - 1) * 10 + index + 1}</td>
+                            <td className="td">{data.MSHS}</td>
+                            <td className="td">{data.HoTen}</td>
+                            <td className="td">{data.NgaySinh}</td>
+                            <td className="td">{data.GioiTinh}</td>
+                            <td className="td">{data.QueQuan}</td>
+                            <td className="td">{data.DanToc}</td>
+                            <td className="td">{data.TonGiao}</td>
+                            <td className="td">{data.DiaChi}</td>
+                            <td className="td">{data.SDT}</td>
+                            <td className="td">{data.ban.TenBan}</td>
                             {data.lop.TenLop ?
-                                <td className="border border-gray-400 p-2">{data.lop[0].TenLop}</td> :
-                                <td className="border border-gray-400 p-2">Chưa xếp</td>}
-                            <td className="border border-gray-400 p-2">
+                                <td className="td">{data.lop[0].TenLop}</td> :
+                                <td className="td">Chưa xếp</td>}
+                            <td className="td">
                                 <button className="px-2 py-1 mx-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
                                 <button type="button" className="mx-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
                                     Xóa

@@ -24,3 +24,12 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+.button {
+  @apply px-2 py-1 border-2 ms-1 rounded
+}
+.table {
+  @apply table-auto border-collapse my-2 mx-auto
+}
+.td {
+  @apply border border-gray-400 p-2 border-collapse
+}

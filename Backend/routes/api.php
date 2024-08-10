@@ -67,6 +67,7 @@ Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
 Route::get('/lop/index',[LopController::class,'index']);
+Route::get('/lop/index/tkb/{nk}',[LopController::class,'indexWithTKB']);
 Route::get('/lop/list/withoutTkb',[LopController::class,'indexWithoutTKB']);
 Route::get('/lop/list',[LopController::class,'indexWithStudent']);
 Route::get('/lop/list/{MaNK}',[LopController::class,'indexWithStudentNow']);
@@ -78,3 +79,5 @@ Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
 Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);
+Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
+Route::get('/tkb/date',[TKBController::class,'indexDate']);

@@ -150,30 +150,30 @@ export default function Teacher() {
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
-            <table className="table-auto border-collapse my-2 mx-auto">
+            <table className="table">
                 <thead>
                     <tr>
-                        <th className="border border-gray-400 p-2">Mã số giáo viên</th>
-                        <th className="border border-gray-400 p-2">Tên giáo viên</th>
-                        <th className="border border-gray-400 p-2">Ngày sinh</th>
-                        <th className="border border-gray-400 p-2">Giới tính</th>
-                        <th className="border border-gray-400 p-2">Địa chỉ</th>
-                        <th className="border border-gray-400 p-2">Số điện thoại</th>
-                        <th className="border border-gray-400 p-2">Chuyên môn</th>
-                        <th className="border border-gray-400 p-2">Hành động</th>
+                        <th className="td">Mã số giáo viên</th>
+                        <th className="td">Tên giáo viên</th>
+                        <th className="td">Ngày sinh</th>
+                        <th className="td">Giới tính</th>
+                        <th className="td">Địa chỉ</th>
+                        <th className="td">Số điện thoại</th>
+                        <th className="td">Chuyên môn</th>
+                        <th className="td">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {teachersData && teachersData.map((data, index) => (
                         <tr key={index}>
-                            <td className="border border-gray-400 p-2">{data.MSGV}</td>
-                            <td className="border border-gray-400 p-2">{data.TenGV}</td>
-                            <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
-                            <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
-                            <td className="border border-gray-400 p-2">{data.DiaChi}</td>
-                            <td className="border border-gray-400 p-2">{data.SDT}</td>
-                            <td className="border border-gray-400 p-2">{data.mon_hoc.TenMH}</td>
-                            <td className="border border-gray-400 p-2">
+                            <td className="td">{data.MSGV}</td>
+                            <td className="td">{data.TenGV}</td>
+                            <td className="td">{data.NgaySinh}</td>
+                            <td className="td">{data.GioiTinh}</td>
+                            <td className="td">{data.DiaChi}</td>
+                            <td className="td">{data.SDT}</td>
+                            <td className="td">{data.mon_hoc.TenMH}</td>
+                            <td className="td">
                                 <div className="flex justify-center">
                                     <button className="px-2 py-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormTeacher(2, data)}>Sửa</button>
                                     <button type="button" className="ms-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteTeacher(data.MSGV)}>

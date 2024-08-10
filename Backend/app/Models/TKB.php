@@ -27,10 +27,13 @@ class TKB extends Model
     public function monHoc() : BelongsTo {
         return $this->belongsTo(MonHoc::class, 'MaMH', 'MaMH');
     }
-    public function lopHoc() : BelongsTo {
-        return $this->belongsTo(LopHoc::class, 'MaLop', 'MaLop');
+    public function lop() : BelongsTo {
+        return $this->belongsTo(Lop::class, 'MaLop', 'MaLop');
     }
     public function giaoVien() : BelongsTo {
         return $this->belongsTo(GiaoVien::class, 'MSGV', 'MSGV');
+    }
+    public function nienKhoa() : BelongsTo {
+        return $this->belongsTo(NienKhoa::class, 'MaNK', 'MaNK');
     }
 }

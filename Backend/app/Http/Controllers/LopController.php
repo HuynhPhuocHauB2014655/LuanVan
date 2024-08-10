@@ -17,6 +17,17 @@ class LopController extends Controller
         $lop = Lop::all();
         return response()->json($lop, Response::HTTP_OK);
     }
+    public function indexWithTKB($nk)
+    {
+        $lop = Lop::with(
+            'tkb.giaoVien',
+            'tkb.monHoc',
+            'tkb.ngayTrongTuan',
+            'nienKhoa'
+        )
+        ->where('MaNK',$nk)->get();
+        return response()->json($lop, Response::HTTP_OK);
+    }
     public function indexWithoutTKB()
     {
         $lop = Lop::with(
