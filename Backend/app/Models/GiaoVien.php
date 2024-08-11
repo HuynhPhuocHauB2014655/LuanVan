@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-
+use Illuminate\Database\Eloquent\Relations\HasOne;
 class GiaoVien extends Model
 {
     use HasFactory;
@@ -24,5 +23,8 @@ class GiaoVien extends Model
     protected $primaryKey = 'MSGV';
     public function monHoc(): BelongsTo{
         return $this->belongsTo(MonHoc::class, 'ChuyenMon', 'MaMH');
+    }
+    public function taiKhoan():HasOne{
+        return $this->hasOne(TaiKhoan::class,'MSGV','MSGV');
     }
 }

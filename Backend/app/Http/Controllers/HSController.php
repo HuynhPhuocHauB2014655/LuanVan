@@ -8,23 +8,11 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 class HSController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $hocsinh = HocSinh::with(['ban', 'lop'])->paginate(10);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $hocsinh = HocSinh::create($request->all());
@@ -41,15 +29,9 @@ class HSController extends Controller
         $hocsinh = HocSinh::where('HoTen','like',$name)->with('ban')->get();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param Products $product
-     * @return \Illuminate\Http\Response
-     */
     public function show($mshs)
     {
-        $hocsinh = HocSinh::with('ban')->find($mshs);
+        $hocsinh = HocSinh::with(['ban','taiKhoan'])->find($mshs);
         if (!$hocsinh) {
             return response()->json(['message' => 'Học sinh không tồn tại'], Response::HTTP_NOT_FOUND);
         }
@@ -59,13 +41,6 @@ class HSController extends Controller
         $hocsinh = HocSinh::latest()->pluck('MSHS')->first();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param Products $product
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $mshs)
     {
         $hocsinh = HocSinh::find($mshs);
@@ -75,13 +50,6 @@ class HSController extends Controller
         $hocsinh->update($request->all());
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Products $product
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($mshs)
     {
         $data = HocSinh::find($mshs);

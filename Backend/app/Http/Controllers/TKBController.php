@@ -68,7 +68,9 @@ class TKBController extends Controller
             ->orWhereIn('MaMH', ['CB1', 'CB2', 'CB3', 'XH1', 'TC2'])
             ->inRandomOrder()
             ->get();
-            $this->LoopFunction($lop, $monhocTN, $soTietTuan,$nk);
+            $monhocChieu = MonHoc::whereIn('MaMH', ['CB4', 'CB5'])->inRandomOrder()->get();
+            $this->LoopFunction($lop, $monhocTN, $soTietTuan,$nk,1);
+            $this->LoopFunction($lop, $monhocChieu, $soTietTuan,$nk,5);
         }
         foreach ($lopXH as $lop) {
             $soTietTuan = [
@@ -90,11 +92,13 @@ class TKBController extends Controller
             ->orWhereIn('MaMH', ['CB1', 'CB2', 'CB3', 'TN1', 'TC1'])
             ->inRandomOrder()
             ->get();
-            $this->LoopFunction($lop, $monhocXH, $soTietTuan,$nk);
+            $monhocChieu = MonHoc::whereIn('MaMH', ['CB4', 'CB5'])->inRandomOrder()->get();
+            $this->LoopFunction($lop, $monhocXH, $soTietTuan,$nk,1);
+            $this->LoopFunction($lop, $monhocChieu, $soTietTuan,$nk,5);
         }
         return response()->json("OK");
     }
-    private function LoopFunction($lop,$tongMonHoc,$soTietTuan,$nk)
+    private function LoopFunction($lop,$tongMonHoc,$soTietTuan,$nk,$tietBD)
     {
         for($t=0;$t<3;$t++){
             $dsMonHoc = $tongMonHoc->toArray();
@@ -109,9 +113,19 @@ class TKBController extends Controller
                                     ->where('MaMH', $monHoc['MaMH'])
                                     ->first();
                 for ($i = 2; $i < 8; $i++) {
-                    for ($j = 1; $j < 5; $j++) {
+                    for ($j = $tietBD; $j <= $tietBD + 3; $j++) {
                         if (($i == 2 && $j == 1) || ($i == 7 && $j == 4)) {
                             continue;
+                        }
+                        if($monHoc['MaMH'] != 'CB1' && $monHoc['MaMH'] != 'CB2'){
+                            $checkCungNgay = TKB::where('MaNgay', $i)
+                                    ->where('MaLop', $lop->MaLop)
+                                    ->where('MaNK', $nk)
+                                    ->where('MaMH', $monHoc['MaMH'])
+                                    ->first();
+                            if($checkCungNgay != null){
+                                continue;
+                            }
                         }
                         $check = TKB::where('MaNgay', $i)
                                     ->where('TietDay', $j)

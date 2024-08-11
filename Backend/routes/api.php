@@ -10,6 +10,7 @@ use App\Http\Controllers\MonHocController;
 use App\Http\Controllers\GiaoVienController;
 use App\Http\Controllers\LopController;
 use App\Http\Controllers\TKBController;
+use App\Http\Controllers\TaiKhoanController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -81,3 +82,15 @@ Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
 Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);
 Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
 Route::get('/tkb/date',[TKBController::class,'indexDate']);
+
+//tai khoan route
+Route::get('/tk/index/hs',[TaiKhoanController::class,'indexHS']);
+Route::get('/tk/index/gv',[TaiKhoanController::class,'indexGV']);
+Route::post('/tk/create/hs',[TaiKhoanController::class,'createHS']);
+Route::post('/tk/create/gv',[TaiKhoanController::class,'createGV']);
+Route::put('/tk/update/hs',[TaiKhoanController::class,'updateHS']);
+Route::put('/tk/update/gv',[TaiKhoanController::class,'updateGV']);
+Route::delete('/tk/delete/hs/{id}',[TaiKhoanController::class,'deleteHS']);
+Route::delete('/tk/delete/gv/{id}',[TaiKhoanController::class,'deleteGV']);
+Route::post('/tk/createA/{mabaomat}',[TaiKhoanController::class,'createAdmin']);
+Route::post('/tk/create',[TaiKhoanController::class,'createAccount']);

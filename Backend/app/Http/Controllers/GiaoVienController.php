@@ -22,7 +22,7 @@ class GiaoVienController extends Controller
 
     public function show($MSGV)
     {
-        $giaovien = GiaoVien::find($MSGV);
+        $giaovien = GiaoVien::with('taiKhoan')->find($MSGV);
         if (!$giaovien) {
             return response()->json(['message' => 'Data not found'], Response::HTTP::NOT_FOUND);
         }

@@ -7,7 +7,7 @@ import router from './router.jsx'
 import { ContextProvider } from './context/Context.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <ContextProvider>
+  <ContextProvider>
     <RouterProvider router={router} />
   </ContextProvider>
 )

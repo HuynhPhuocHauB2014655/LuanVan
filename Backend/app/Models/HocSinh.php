@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use \Illuminate\Database\Eloquent\Relations\BelongsTo;
+use \Illuminate\Database\Eloquent\Relations\HasOne;
 class HocSinh extends Model
 {
     use HasFactory;
@@ -29,5 +30,8 @@ class HocSinh extends Model
     }
     public function lop(): BelongsToMany{
         return $this->belongsToMany(Lop::class,'HocLop','MSHS','MaLop');
+    }
+    public function taiKhoan():HasOne{
+        return $this->hasOne(TaiKhoan::class,'MSHS','MSHS');
     }
 }

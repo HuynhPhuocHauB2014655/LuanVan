@@ -31,36 +31,68 @@ export default function TKB() {
         } catch (error) {
             console.log(error);
         }
-        // convertTKB(tkb[0]);
     }
     useEffect(() => {
-        console.log(tkb);
-    }, [tkb])
+        // console.log(tkb);
+        // if (tkb && tkb.length > 0) {
+        //     for (let index = 3; index >= 0; index--) {
+        //         console.log(tkb[0].tkbMatrix[5][index]);
+        //     }
+        // } else {
+        //     console.log("tkb is undefined or empty.");
+        // }
+    }, [tkb]);
     useEffect(() => {
         fetchData();
     }, []);
     const fetchTKB = async () => {
         const tkbs = await axiosClient.get(`lop/index/tkb/${nienKhoa.NienKhoa}`);
-        
+        // settkb(tkbs.data);
         const newTKB = tkbs.data.map(data => {
-            const tkbMatrix = Array(6).fill(null).map(() => Array(4).fill(null));
-    
+            const tkbMatrix = Array(6).fill(null).map(() => Array(8).fill(null));
+
             data.tkb.forEach(schedule => {
                 const dayIndex = schedule.MaNgay - 2;
                 const periodIndex = schedule.TietDay - 1;
-    
-                tkbMatrix[periodIndex][dayIndex] = {
-                    TenMon : schedule.mon_hoc.TenMH,
-                    TenGV : schedule.giao_vien.TenGV
+
+                tkbMatrix[dayIndex][periodIndex] = {
+                    TenMon: schedule.mon_hoc.TenMH,
+                    TenGV: schedule.giao_vien.TenGV
                 };
             });
             tkbMatrix[0][0] = {
-                TenMon : 'Chào cờ',
-                TenGV : 'Chào cờ'
+                TenMon: 'Chào cờ',
+                TenGV: ''
             }
-            return {...data, tkbMatrix};
+            let flat =0;
+            for (let i = 5; i >= 0; i--) {
+                for (let j = 3; j >= 0; j--) {
+                    if (tkbMatrix[i][j] != null) {
+                        if(j==3)
+                        {
+                            tkbMatrix[i+1][0] = {
+                                TenMon: 'Sinh hoạt lớp',
+                                TenGV: ''
+                            }
+                        }
+                        else{
+                            tkbMatrix[i][j+1] = {
+                                TenMon: 'Sinh hoạt lớp',
+                                TenGV: ''
+                            }
+                        }
+                        // tkbMatrix[i][j];
+                        flat = 1;
+                        break;
+                    }
+                }
+                if(flat == 1)
+                {
+                    break;
+                }
+            }
+            return { ...data, tkbMatrix };
         });
-    
         settkb(newTKB);
     }
     const handleSubmit = (event) => {
@@ -104,6 +136,7 @@ export default function TKB() {
     const createTKB = async () => {
         try {
             await axiosClient.post(`/tkb/create/${nienKhoa.NienKhoa}`);
+            fetchData();
             setMessage("Tạo mới thành công");
         } catch (error) {
             console.log(error);
@@ -138,11 +171,11 @@ export default function TKB() {
                 <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200" onClick={() => _setState(1)}>Danh sách TKB</button>
             </div>
             {state === 1 &&
-                <div className="">
+                <div className="mb-2">
                     {tkb.map((data) => (
-                        <div key={data.MaLop} className="">
-                            <h1 >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
-                            <table className="border-2 border-black border-collapse">
+                        <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '90%' }}>
+                            <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
+                            <table className="border-2 border-black border-collapse text-center w-full">
                                 <thead>
                                     <tr>
                                         <th className="td"></th>
@@ -156,13 +189,40 @@ export default function TKB() {
                                         <tr key={i + 1}>
                                             <td className="td">{i + 1}</td>
                                             {[...Array(6)].map((_, j) => (
-                                                <td className="td" key={j + 1}>
-                                                    {data.tkbMatrix[j][i] ? data.tkbMatrix[j][i].TenMon : 'N/A'} <br/>
-                                                    {data.tkbMatrix[j][i] ? data.tkbMatrix[j][i].TenGV : 'N/A'}
-                                                </td>
+                                                data.tkbMatrix[j][i] ?
+                                                    <td className="td" key={j + 1}>
+                                                        {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
+                                                    </td>
+                                                    :
+                                                    <td className="td invisible" key={j + 1}>
+                                                        N/A <br /> N/A
+                                                    </td>
                                             ))}
                                         </tr>
                                     ))}
+                                    <tr className="">
+                                        <td colSpan="6" className="h-10"></td>
+                                    </tr>
+                                    {[...Array(4)].map((_, i) => {
+                                        const startIndex = 4; // Start value for i
+                                        const currentIndex = i + startIndex;
+
+                                        return (
+                                            <tr key={currentIndex}>
+                                                <td className="td">{currentIndex + 1}</td>
+                                                {[...Array(6)].map((_, j) => (
+                                                    data.tkbMatrix[j][currentIndex] ?
+                                                    <td className="td" key={j + 1}>
+                                                        {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
+                                                    </td>
+                                                    :
+                                                    <td className="td invisible" key={j + 1}>
+                                                        N/A <br /> N/A
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
