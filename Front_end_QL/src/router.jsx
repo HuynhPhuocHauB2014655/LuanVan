@@ -7,6 +7,7 @@ import Subject from "./views/Subject.jsx";
 import Teacher from "./views/Teacher.jsx";
 import Class from "./views/Class.jsx";
 import TKB from "./views/TKB.jsx";
+import GuestLayout from "./components/GuestLayout.jsx";
 
 
 const router = createBrowserRouter([
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: "/",
+                path: "/home",
                 element: <Home />,
             },
             {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
             },
         ]
     },
+    {
+        path: "/login",
+        element: <GuestLayout />,
+    }
 ])
 
 export default router;

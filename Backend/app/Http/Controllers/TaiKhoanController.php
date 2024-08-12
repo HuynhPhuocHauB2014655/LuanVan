@@ -9,6 +9,7 @@ use App\Models\HocSinh;
 use App\Models\GiaoVien;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 
 Class TaiKhoanController extends Controller
 {
@@ -81,24 +82,12 @@ Class TaiKhoanController extends Controller
         $baomat->save();
         return response()->json("Sửa thành công", 200);
     }
-    public function createAccount(){
-        $data = new Admin();
-        $data->MaBaoMat = "15131513";
-        $data->save();
-        $hocsinh = HocSinh::pluck("MSHS");
-        foreach ($hocsinh as $hs) {
-            $tkhocsinh = new TKHocSinh();
-            $tkhocsinh->MSHS = $hs;
-            $tkhocsinh->MatKhau = $hs."123";
-            $tkhocsinh->save();
+    public function adminLogin($maBaoMat){
+        $admin = Admin::pluck('MaBaoMat')->first();
+        if(Hash::check($maBaoMat,$admin))
+        {
+            return response()->json("Đăng nhập thành công", 200);
         }
-        $giaovien = GiaoVien::pluck("MSGV");
-        foreach ($giaovien as $gv) {
-            $tkgiaovien = new TKGiaoVien();
-            $tkgiaovien->MSGV = $gv;
-            $tkgiaovien->MatKhau = $gv."123";
-            $tkgiaovien->save();
-        }
-        return response()->json("thanh cong", 200);
+        return response()->json("Mã bảo mật không chính xác",401);
     }
 }

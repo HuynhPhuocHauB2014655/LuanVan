@@ -1,6 +1,7 @@
 import axiosClient from "../axios-client"
 import React, { useEffect, useRef, useState } from 'react';
 import { useStateContext } from "../context/Context";
+import Menu from "../components/Menu";
 export default function HK_NK() {
     const { message, setMessage } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
@@ -93,53 +94,56 @@ export default function HK_NK() {
     }
     return (
         <div className="main-content">
-            <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Học kì - Niên khóa</h2>
-            <div className="button-nav">
-                <button onClick={() => showForm(1)} className="px-3 py-1 mt-2 bg-blue-500 text-white rounded shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg">Thêm niên khóa</button>
-                <button onClick={() => showForm(2)} className="px-3 py-1 mt-2 ms-1 bg-blue-500 text-white rounded shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg">Đặt niên khóa hiện tại</button>
-            </div>
-            {isShow === 1 &&
-                <form onSubmit={submit} className="add_nk_form">
-                    <div>
-                        <input ref={MaNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Mã niên khóa" />
-                        <input ref={TenNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Tên niên khóa" />
-                    </div>
-                    <label htmlFor="add" className="ms-2">Đặt làm niên khóa hiện tại</label>
-                    <input type="checkbox" className="ms-2" name="add" checked={isChecked} onChange={handleCheckboxChange} />
-                    <button className="border px-3 py-1 ms-3 mt-2 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
-                </form>
-            }
-            {isShow === 2 &&
-                <form onSubmit={submitNKHientai} className="mt-2">
-                    <select ref={nienKhoaHienTaiRef}>
-                        {datas.map((item) => (
-                            <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
-                        ))}
-                    </select>
-                    <button type="submit" className="border px-3 py-1 ms-3 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
-                </form>
-            }
-            <div className="hk_nk_content">
-                <h1 className="text-2xl font-bold text-red-600 mt-2">Niên khóa hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
-                <h2 className="text-2xl mt-2 font-semibold">Danh sách niên khóa</h2>
-                <table className="table-auto border-collapse border border-slate-500 ">
-                    <thead>
-                        <tr>
-                            <th className="border border-slate-600 p-2">Mã niên khóa</th>
-                            <th className="border border-slate-600 p-2">Tên niên Khóa</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {datas.map((data, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td className="border border-slate-600 p-2">{data.MaNK}</td>
-                                    <td className="border border-slate-600 p-2">{data.TenNK}</td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
+            <Menu/>
+            <div className='w-[85%] mx-2'>
+                <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Học kì - Niên khóa</h2>
+                <div className="button-nav">
+                    <button onClick={() => showForm(1)} className="px-3 py-1 mt-2 bg-blue-500 text-white button-animation">Thêm niên khóa</button>
+                    <button onClick={() => showForm(2)} className="px-3 py-1 mt-2 ms-1 bg-blue-500 text-white button-animation">Đặt niên khóa hiện tại</button>
+                </div>
+                {isShow === 1 &&
+                    <form onSubmit={submit} className="add_nk_form">
+                        <div>
+                            <input ref={MaNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Mã niên khóa" />
+                            <input ref={TenNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Tên niên khóa" />
+                        </div>
+                        <label htmlFor="add" className="ms-2">Đặt làm niên khóa hiện tại</label>
+                        <input type="checkbox" className="ms-2" name="add" checked={isChecked} onChange={handleCheckboxChange} />
+                        <button className="border px-3 py-1 ms-3 mt-2 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
+                    </form>
+                }
+                {isShow === 2 &&
+                    <form onSubmit={submitNKHientai} className="mt-2">
+                        <select ref={nienKhoaHienTaiRef}>
+                            {datas.map((item) => (
+                                <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
+                            ))}
+                        </select>
+                        <button type="submit" className="border px-3 py-1 ms-3 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
+                    </form>
+                }
+                <div className="hk_nk_content">
+                    <h1 className="text-2xl font-bold text-red-600 mt-2">Niên khóa hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
+                    <h2 className="text-2xl mt-2 font-semibold">Danh sách niên khóa</h2>
+                    <table className="table-auto border-collapse border border-slate-500 ">
+                        <thead>
+                            <tr>
+                                <th className="border border-slate-600 p-2">Mã niên khóa</th>
+                                <th className="border border-slate-600 p-2">Tên niên Khóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {datas.map((data, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td className="border border-slate-600 p-2">{data.MaNK}</td>
+                                        <td className="border border-slate-600 p-2">{data.TenNK}</td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

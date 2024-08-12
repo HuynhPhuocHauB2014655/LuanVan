@@ -5,9 +5,12 @@ import './index.css'
 import { RouterProvider } from 'react-router-dom'
 import router from './router.jsx'
 import { ContextProvider } from './context/Context.jsx'
+import { UserProvider } from './context/userContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <ContextProvider>
-    <RouterProvider router={router} />
-  </ContextProvider>
+  <UserProvider>
+    <ContextProvider>
+      <RouterProvider router={router} />
+    </ContextProvider>
+  </UserProvider>
 )

@@ -92,5 +92,4 @@ Route::put('/tk/update/hs',[TaiKhoanController::class,'updateHS']);
 Route::put('/tk/update/gv',[TaiKhoanController::class,'updateGV']);
 Route::delete('/tk/delete/hs/{id}',[TaiKhoanController::class,'deleteHS']);
 Route::delete('/tk/delete/gv/{id}',[TaiKhoanController::class,'deleteGV']);
-Route::post('/tk/createA/{mabaomat}',[TaiKhoanController::class,'createAdmin']);
-Route::post('/tk/create',[TaiKhoanController::class,'createAccount']);
+Route::get('/tk/adminLogin/{maBaoMat}',[TaiKhoanController::class,'adminLogin']);

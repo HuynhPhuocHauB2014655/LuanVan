@@ -2,15 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 .header{
-  min-height: 10vh;
+  height: 10vh;
 }
 .main-content{
   display: flex;
-  flex-direction: column;
   min-height: 80vh;
 }
 .footer{
-  min-height: 10vh;
+  height: 10vh;
 }
 /* Hide the spinner in Chrome, Safari, and Edge */
 input[type="number"]::-webkit-inner-spin-button,
@@ -32,4 +31,60 @@ input[type="number"] {
 }
 .td {
   @apply border border-gray-400 p-2 border-collapse
+}
+.home {
+  background-image: url('assets/home_background.jpg');
+  background-size: cover;          /* Scales the image to cover the entire element */
+  background-repeat: no-repeat;    /* Prevents the image from repeating */
+  background-position: center;     /* Centers the image */
+}
+.button-animation {
+  @apply shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg
+}
+.confirm-overlay {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirm-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-buttons {
+  margin-top: 20px;
+}
+
+.confirm-buttons button {
+  padding: 5px 10px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#confirm-yes {
+  border: 2px solid #28a745;
+  color: black;
+}
+#confirm-yes:hover{
+  background-color: #28a745;
+}
+#confirm-no {
+  border: 2px solid #dc3545;
+  color: black;
+}
+#confirm-no:hover{
+  background-color: #dc3545;
 }

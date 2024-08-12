@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import Menu from "../components/Menu";
 export default function TKB() {
     const [classes, setClasses] = useState([]);
     const [subjectTN, setSubjectTN] = useState([]);
@@ -64,19 +65,18 @@ export default function TKB() {
                 TenMon: 'Chào cờ',
                 TenGV: ''
             }
-            let flat =0;
+            let flat = 0;
             for (let i = 5; i >= 0; i--) {
                 for (let j = 3; j >= 0; j--) {
                     if (tkbMatrix[i][j] != null) {
-                        if(j==3)
-                        {
-                            tkbMatrix[i+1][0] = {
+                        if (j == 3) {
+                            tkbMatrix[i + 1][0] = {
                                 TenMon: 'Sinh hoạt lớp',
                                 TenGV: ''
                             }
                         }
-                        else{
-                            tkbMatrix[i][j+1] = {
+                        else {
+                            tkbMatrix[i][j + 1] = {
                                 TenMon: 'Sinh hoạt lớp',
                                 TenGV: ''
                             }
@@ -86,8 +86,7 @@ export default function TKB() {
                         break;
                     }
                 }
-                if(flat == 1)
-                {
+                if (flat == 1) {
                     break;
                 }
             }
@@ -166,142 +165,145 @@ export default function TKB() {
     }
     return (
         <div className="main-content">
-            <div className="flex my-2">
-                <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200" onClick={() => _setState(2)}>Xếp TKB</button>
-                <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200" onClick={() => _setState(1)}>Danh sách TKB</button>
-            </div>
-            {state === 1 &&
-                <div className="mb-2">
-                    {tkb.map((data) => (
-                        <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '90%' }}>
-                            <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
-                            <table className="border-2 border-black border-collapse text-center w-full">
-                                <thead>
-                                    <tr>
-                                        <th className="td"></th>
-                                        {date.map((date) => (
-                                            <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {[...Array(4)].map((_, i) => (
-                                        <tr key={i + 1}>
-                                            <td className="td">{i + 1}</td>
-                                            {[...Array(6)].map((_, j) => (
-                                                data.tkbMatrix[j][i] ?
-                                                    <td className="td" key={j + 1}>
-                                                        {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
-                                                    </td>
-                                                    :
-                                                    <td className="td invisible" key={j + 1}>
-                                                        N/A <br /> N/A
-                                                    </td>
+            <Menu />
+            <div className="w-[85%] mx-2">
+                <div className="flex my-2">
+                    <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(2)}>Xếp TKB</button>
+                    <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(1)}>Danh sách TKB</button>
+                </div>
+                {state === 1 &&
+                    <div className="mb-2">
+                        {tkb.map((data) => (
+                            <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '90%' }}>
+                                <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
+                                <table className="border-2 border-black border-collapse text-center w-full">
+                                    <thead>
+                                        <tr>
+                                            <th className="td"></th>
+                                            {date.map((date) => (
+                                                <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
                                             ))}
                                         </tr>
-                                    ))}
-                                    <tr className="">
-                                        <td colSpan="6" className="h-10"></td>
-                                    </tr>
-                                    {[...Array(4)].map((_, i) => {
-                                        const startIndex = 4; // Start value for i
-                                        const currentIndex = i + startIndex;
-
-                                        return (
-                                            <tr key={currentIndex}>
-                                                <td className="td">{currentIndex + 1}</td>
+                                    </thead>
+                                    <tbody>
+                                        {[...Array(4)].map((_, i) => (
+                                            <tr key={i + 1}>
+                                                <td className="td">{i + 1}</td>
                                                 {[...Array(6)].map((_, j) => (
-                                                    data.tkbMatrix[j][currentIndex] ?
-                                                    <td className="td" key={j + 1}>
-                                                        {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
-                                                    </td>
-                                                    :
-                                                    <td className="td invisible" key={j + 1}>
-                                                        N/A <br /> N/A
-                                                    </td>
+                                                    data.tkbMatrix[j][i] ?
+                                                        <td className="td" key={j + 1}>
+                                                            {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
+                                                        </td>
+                                                        :
+                                                        <td className="td invisible" key={j + 1}>
+                                                            N/A <br /> N/A
+                                                        </td>
                                                 ))}
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    ))}
-                </div>
-            }
-            {state == 2 &&
-                <div>
-                    {classes.length > 0 ?
-                        <div>
-                            <h1 className="text-2xl my-2 font-semibold text-center">Lớp chưa xếp Thời khóa biểu</h1>
-                            {classes.map((data, index) => (
-                                <div key={index} className="border-2 p-3 mb-1">
-                                    <div className="text-xl mb-2">Tên lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</div>
-                                    {data.phan_cong.length > 0 ?
-                                        <div className="columns-2 w-[70%]">
-                                            {data.phan_cong.map((pc) => (
-                                                <div className="text-lg" key={pc.MaMH}>{pc.mon_hoc.TenMH}: {pc.giao_vien.TenGV}</div>
-                                            ))}
-                                        </div>
-                                        :
-                                        <div>
-                                            <button className="text-red-500 border-2 border-slate-500 px-2 py-1 my-1 rounded" onClick={() => showForm(data.MaLop)}>Phân công dạy học</button>
-                                            {show === data.MaLop &&
-                                                <form onSubmit={handleSubmit} className="">
-                                                    <div className="columns-5 ">
-                                                        <input type="hidden" name="MaLop" value={data.MaLop} />
-                                                        {data.MaLop.substring(0, 2) == "TN" ?
-                                                            <div>
-                                                                {subjectTN.map((tn) => (
-                                                                    <div key={tn.MaMH} className="mb-1 ms-1">
-                                                                        <select name={tn.MaMH} required className="w-36">
-                                                                            <option value="" defaultChecked>{tn.TenMH}</option>
-                                                                            {tn.giao_vien.map((gvtn) => (
-                                                                                <option key={gvtn.MSGV} value={gvtn.MSGV}>{gvtn.TenGV}</option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            :
-                                                            <div>
-                                                                {subjectXH.map((xh) => (
-                                                                    <div key={xh.MaMH} className="mb-1 ms-1">
-                                                                        <select name={xh.MaMH} required className="w-36">
-                                                                            <option value="" defaultValue={xh.TenMH} >{xh.TenMH}</option>
-                                                                            {xh.giao_vien.map((gvxh) => (
-                                                                                <option key={gvxh.MSGV} value={gvxh.MSGV}>{gvxh.TenGV}</option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                    <button className="px-2 py-1 border-2 rounded border-blue-500 ms-1 mt-1 hover:bg-blue-300" type="submit">Xác nhận</button>
-                                                </form>}
-                                        </div>
-                                    }
-                                </div>
-                            ))}
-                            <div>
-                                <button
-                                    className="text-red-500 border-2 border-slate-500 px-2 py-1 rounded my-2 hover:bg-slate-300"
-                                    onClick={createTKB}
-                                    disabled={disable}
-                                >
-                                    Xếp TKB
-                                </button>
-                            </div>
+                                        ))}
+                                        <tr className="">
+                                            <td colSpan="6" className="h-10"></td>
+                                        </tr>
+                                        {[...Array(4)].map((_, i) => {
+                                            const startIndex = 4; // Start value for i
+                                            const currentIndex = i + startIndex;
 
-                        </div>
-                        :
-                        <div className="mt-20 text-center  text-green-500 text-5xl">
-                            Không có lớp cần xếp TKB
-                        </div>
-                    }
-                </div>
-            }
+                                            return (
+                                                <tr key={currentIndex}>
+                                                    <td className="td">{currentIndex + 1}</td>
+                                                    {[...Array(6)].map((_, j) => (
+                                                        data.tkbMatrix[j][currentIndex] ?
+                                                            <td className="td" key={j + 1}>
+                                                                {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
+                                                            </td>
+                                                            :
+                                                            <td className="td invisible" key={j + 1}>
+                                                                N/A <br /> N/A
+                                                            </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ))}
+                    </div>
+                }
+                {state == 2 &&
+                    <div>
+                        {classes.length > 0 ?
+                            <div>
+                                <h1 className="text-2xl my-2 font-semibold text-center">Lớp chưa xếp Thời khóa biểu</h1>
+                                {classes.map((data, index) => (
+                                    <div key={index} className="border-2 p-3 mb-1">
+                                        <div className="text-xl mb-2">Tên lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</div>
+                                        {data.phan_cong.length > 0 ?
+                                            <div className="columns-2 w-[70%]">
+                                                {data.phan_cong.map((pc) => (
+                                                    <div className="text-lg" key={pc.MaMH}>{pc.mon_hoc.TenMH}: {pc.giao_vien.TenGV}</div>
+                                                ))}
+                                            </div>
+                                            :
+                                            <div>
+                                                <button className="text-red-500 border-2 border-slate-500 px-2 py-1 my-1 rounded" onClick={() => showForm(data.MaLop)}>Phân công dạy học</button>
+                                                {show === data.MaLop &&
+                                                    <form onSubmit={handleSubmit} className="">
+                                                        <div className="columns-5 ">
+                                                            <input type="hidden" name="MaLop" value={data.MaLop} />
+                                                            {data.MaLop.substring(0, 2) == "TN" ?
+                                                                <div>
+                                                                    {subjectTN.map((tn) => (
+                                                                        <div key={tn.MaMH} className="mb-1 ms-1">
+                                                                            <select name={tn.MaMH} required className="w-36">
+                                                                                <option value="" defaultChecked>{tn.TenMH}</option>
+                                                                                {tn.giao_vien.map((gvtn) => (
+                                                                                    <option key={gvtn.MSGV} value={gvtn.MSGV}>{gvtn.TenGV}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                :
+                                                                <div>
+                                                                    {subjectXH.map((xh) => (
+                                                                        <div key={xh.MaMH} className="mb-1 ms-1">
+                                                                            <select name={xh.MaMH} required className="w-36">
+                                                                                <option value="" defaultValue={xh.TenMH} >{xh.TenMH}</option>
+                                                                                {xh.giao_vien.map((gvxh) => (
+                                                                                    <option key={gvxh.MSGV} value={gvxh.MSGV}>{gvxh.TenGV}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <button className="px-2 py-1 border-2 rounded border-blue-500 ms-1 mt-1 hover:bg-blue-300" type="submit">Xác nhận</button>
+                                                    </form>}
+                                            </div>
+                                        }
+                                    </div>
+                                ))}
+                                <div>
+                                    <button
+                                        className="text-red-500 border-2 border-slate-500 px-2 py-1 rounded my-2 hover:bg-slate-300"
+                                        onClick={createTKB}
+                                        disabled={disable}
+                                    >
+                                        Xếp TKB
+                                    </button>
+                                </div>
+
+                            </div>
+                            :
+                            <div className="mt-20 text-center  text-green-500 text-5xl">
+                                Không có lớp cần xếp TKB
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
         </div>
     )
 }

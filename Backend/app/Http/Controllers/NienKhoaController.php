@@ -22,7 +22,7 @@ class NienKhoaController extends Controller
         return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
     }
     public function getNienKhoaHienTai(Request $request){
-        $nienkhoa = NienKhoaHienTai::all();
+        $nienkhoa = NienKhoaHienTai::first();
         return response()->json($nienkhoa, Response::HTTP_OK);
     }
     public function store(Request $request)
