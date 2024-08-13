@@ -1,13 +1,11 @@
 import { Link } from "react-router-dom";
 export default function Home() {
     const menu_items = [
-        { id: 1, route: "/student", label: 'Học sinh' },
-        { id: 2, route: "/nk", label: 'Niên Khóa' },
-        { id: 3, route: "/subject", label: 'Môn học' },
-        { id: 4, route: "/teacher", label: 'Giáo Viên' },
-        { id: 5, route: "/class", label: 'Lớp Học' },
-        { id: 6, route: "/tkb", label: 'Thời Khóa Biểu' },
-        { id: 7, route: "/account", label: 'Tài khoản' },
+        { id: 1, route: "/info", label: 'Thông tin cá nhân' },
+        { id: 2, route: "/", label: 'Chủ nhiệm' },
+        { id: 3, route: "/", label: 'Quản lí điểm' },
+        { id: 4, route: "/", label: 'Thời khóa biểu' },
+        { id: 5, route: "/", label: 'Lớp dạy' },
     ];
     return (
         <div className="main-content">

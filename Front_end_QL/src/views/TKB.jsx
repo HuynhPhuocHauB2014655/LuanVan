@@ -166,7 +166,8 @@ export default function TKB() {
     return (
         <div className="main-content">
             <Menu />
-            <div className="w-[85%] mx-2">
+            <div className="right-part">
+                <h1 className="page-name">Quản lí thời khóa biểu</h1>
                 <div className="flex my-2">
                     <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(2)}>Xếp TKB</button>
                     <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(1)}>Danh sách TKB</button>

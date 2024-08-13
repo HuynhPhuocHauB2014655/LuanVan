@@ -25,6 +25,6 @@ class GiaoVien extends Model
         return $this->belongsTo(MonHoc::class, 'ChuyenMon', 'MaMH');
     }
     public function taiKhoan():HasOne{
-        return $this->hasOne(TaiKhoan::class,'MSGV','MSGV');
+        return $this->hasOne(TKGiaoVien::class,'MSGV','MSGV');
     }
 }

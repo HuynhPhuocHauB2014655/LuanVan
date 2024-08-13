@@ -22,7 +22,7 @@ export default function GuestLayout() {
         }
     }, [message]);
     if(maBaoMat){
-        return <Navigate to="/home"/>
+        return <Navigate to="/"/>
     }
     const goToTop = () => {
         window.scrollTo(0, 0);
@@ -40,7 +40,7 @@ export default function GuestLayout() {
     const validationSchema = Yup.object({
         maBaoMat: Yup.string().required('Vui lòng nhập mã bảo mật')
             .min(2, 'Mã bảo mật có ít nhất 2 ký tự')
-            .max(10, 'Mã bảo mật có nhiều nhất 10 ký tự'),
+            .max(20, 'Mã bảo mật có nhiều nhất 10 ký tự'),
     })
     return (
         <div className="mx-20 bg-amber-100 relative">

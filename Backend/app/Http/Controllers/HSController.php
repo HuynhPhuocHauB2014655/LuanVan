@@ -13,6 +13,13 @@ class HSController extends Controller
         $hocsinh = HocSinh::with(['ban', 'lop'])->paginate(10);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
+    public function indexWithAccount($MSHS)
+    {
+        $hocsinh = HocSinh::with(['taiKhoan' => function($query) {
+            $query->select('updated_at','MSHS');
+        }])->find($MSHS);
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
     public function store(Request $request)
     {
         $hocsinh = HocSinh::create($request->all());

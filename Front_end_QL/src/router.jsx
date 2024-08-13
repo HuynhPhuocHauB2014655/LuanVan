@@ -8,6 +8,7 @@ import Teacher from "./views/Teacher.jsx";
 import Class from "./views/Class.jsx";
 import TKB from "./views/TKB.jsx";
 import GuestLayout from "./components/GuestLayout.jsx";
+import Account from "./views/Account.jsx";
 
 
 const router = createBrowserRouter([
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: "/home",
+                path: "/",
                 element: <Home />,
             },
             {
@@ -44,15 +45,19 @@ const router = createBrowserRouter([
                 element: <TKB/>,
             },
             {
-                path: "*",
-                element: <div>404 - Page not found</div>,
+                path: "/account",
+                element: <Account/>,
             },
         ]
     },
     {
         path: "/login",
         element: <GuestLayout />,
-    }
+    },
+    {
+        path: "*",
+        element: <div>404 - Page not found</div>,
+    },
 ])
 
 export default router;

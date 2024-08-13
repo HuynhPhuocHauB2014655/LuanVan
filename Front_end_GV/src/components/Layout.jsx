@@ -8,7 +8,7 @@ import { useUserContext } from "../context/userContext";
 export default function Layout() {
     const { message, setMessage } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
-    const { maBaoMat, setMaBaoMat } = useUserContext();
+    const { userName, setUserName } = useUserContext();
     const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
     const fetchData = async () => {
@@ -19,14 +19,14 @@ export default function Layout() {
             console.log(error);
         }
     }
-    if (!maBaoMat) {
+    if (!userName) {
         return <Navigate to="/login" replace/>
     }
     const logOut = () => {
         setShowConfirm(true);
     }
     const onConfirm = () => {
-        setMaBaoMat(false);
+        setUserName("");
         navigate("/login");
     }
     const onCancel = () => {

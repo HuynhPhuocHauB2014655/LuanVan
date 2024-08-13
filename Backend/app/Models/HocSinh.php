@@ -32,6 +32,6 @@ class HocSinh extends Model
         return $this->belongsToMany(Lop::class,'HocLop','MSHS','MaLop');
     }
     public function taiKhoan():HasOne{
-        return $this->hasOne(TaiKhoan::class,'MSHS','MSHS');
+        return $this->hasOne(TKHocSinh::class,'MSHS','MSHS');
     }
 }

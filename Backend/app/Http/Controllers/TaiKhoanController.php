@@ -10,6 +10,7 @@ use App\Models\GiaoVien;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 Class TaiKhoanController extends Controller
 {
@@ -40,7 +41,7 @@ Class TaiKhoanController extends Controller
         {
             return response()->json("Không thể tìm thấy tài khoản",404);
         }
-        $tkhocsinh->MatKhau = $request->MatKhau;
+        $tkhocsinh->MatKhau = $request->password;
         $tkhocsinh->save();
         return response()->json($tkhocsinh, 200);
     }
@@ -51,7 +52,7 @@ Class TaiKhoanController extends Controller
         {
             return response()->json("Không thể tìm thấy tài khoản",404);
         }
-        $tkgiaovien->MatKhau = $request->MatKhau;
+        $tkgiaovien->MatKhau = $request->password;
         $tkgiaovien->save();
         return response()->json($tkgiaovien, 200);
     }
@@ -75,12 +76,22 @@ Class TaiKhoanController extends Controller
         $tkgiaovien->delete();
         return response()->json("Xóa thành công", 200);
     }
-    public function changeAdmin($mabaomat)
+    public function changeAdmin(Request $request)
     {
+        $admin = Admin::pluck('MaBaoMat')->first();
+        if(!Hash::check($request->old_maBaoMat,$admin))
+        {
+            return response()->json("Mã bảo mật không chính xác", 401);
+        }
         $baomat = new Admin();
-        $baomat->MaBaomat = $mabaomat;
+        $baomat->MaBaomat = $request->maBaoMat;
         $baomat->save();
-        return response()->json("Sửa thành công", 200);
+        return response()->json("Đã cập nhật mã bảo mật thành công", 200);
+    }
+    public function checkTime()
+    {
+        $admin = Admin::pluck('updated_at')->first();
+        return response()->json($admin, 200);
     }
     public function adminLogin($maBaoMat){
         $admin = Admin::pluck('MaBaoMat')->first();
@@ -89,5 +100,87 @@ Class TaiKhoanController extends Controller
             return response()->json("Đăng nhập thành công", 200);
         }
         return response()->json("Mã bảo mật không chính xác",401);
+    }
+    public function findHocSinh($MSHS)
+    {
+        $hocsinh = TKHocSinh::with(['hocSinh' => function($query) {
+            $query->select('HoTen','MSHS');
+        }])->select('MSHS','updated_at')->find($MSHS);
+        if($hocsinh)
+        {
+            return response()->json($hocsinh, Response::HTTP_OK);
+        }
+        return response()->json("not found",404);
+    }
+    public function findGiaoVien($MSGV)
+    {
+        $giaovien = TKGiaoVien::with(['giaoVien' => function($query) {
+            $query->select('TenGV','MSGV');
+        }])->select('MSGV','updated_at')->find($MSGV);
+        if($giaovien)
+        {
+            return response()->json($giaovien, Response::HTTP_OK);
+        }
+        return response()->json("not found",404);
+    }
+    public function changePassHSAdmin(Request $request)
+    {
+        $hocsinh = TKHocSinh::find($request->MSHS);
+        $hocsinh->MatKhau = $request->password;
+        $hocsinh->save();
+        return response()->json("Đổi mật khẩu thành công", 200);
+    }
+    public function changePassGVAdmin(Request $request)
+    {
+        $giaovien = TKGiaoVien::find($request->MSGV);
+        $giaovien->MatKhau = $request->password;
+        $giaovien->save();
+        return response()->json("Đổi mật khẩu thành công", 200);
+    }
+    public function changePassGV(Request $request)
+    {
+        $giaovien = TKGiaoVien::find($request->MSGV);
+        if(!Hash::check($request->oldPassword, $giaovien->MatKhau))
+        {
+            return response()->json("Mật khẩu cũ không đúng", 401);
+        }
+        $giaovien->MatKhau = $request->newPassword;
+        $giaovien->save();
+        return response()->json("Đổi mật khẩu thành công", 200);
+    }
+    public function changePassHS(Request $request)
+    {
+        $hocsinh = TKHocSinh::find($request->MSHS);
+        if(!Hash::check($request->oldPassword, $hocsinh->MatKhau))
+        {
+            return response()->json("Mật khẩu cũ không đúng", 401);
+        }
+        $hocsinh->MatKhau = $request->newPassword;
+        $hocsinh->save();
+        return response()->json("Đổi mật khẩu thành công", 200);
+    }
+    public function HSLogin(Request $request)
+    {
+        $hocsinh = TKHocSinh::where('MSHS', $request->MSHS)->first();
+        if(!$hocsinh){
+            return response()->json("Sai mã học sinh", 401);
+        }
+        if(!Hash::check($request->password, $hocsinh->MatKhau))
+        {
+            return response()->json("Sai mật khẩu", 401);
+        }
+        return response()->json($hocsinh->MSHS, 200);
+    }
+    public function GVLogin(Request $request)
+    {
+        $giaovien = TKGiaoVien::where('MSGV', $request->MSGV)->first();
+        if(!$giaovien){
+            return response()->json("Sai mã học sinh", 401);
+        }
+        if(!Hash::check($request->MatKhau, $giaovien->MatKhau))
+        {
+            return response()->json("Sai mật khẩu", 401);
+        }
+        return response()->json($giaovien->MSGV, 200);
     }
 }

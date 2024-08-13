@@ -156,7 +156,7 @@ export default function Student() {
     return (
         <div className="main-content relative">
             <Menu />
-            <div className="w-[85%] mx-2">
+            <div className="right-part">
                 {showForm != 0 &&
                     <div className="absolute z-10 w-[70%] left-[15%] top-40 bg-sky-300 p-5">
                         <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
@@ -239,7 +239,7 @@ export default function Student() {
                             }}
                         </Formik>
                     </div>}
-                <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Quản lí học sinh</h2>
+                <h2 className="page-name">Quản lí học sinh</h2>
                 <div className="mt-1 flex justify-between">
                     <div>
                         <button className="px-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2 button-animation" onClick={() => fetchData(1)}>Tất cả</button>

@@ -5,14 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\GiaoVien;
 use Illuminate\Http\Response;
+use App\Http\Controllers\TaiKhoanController;
 class GiaoVienController extends Controller
 {
+    protected $tkGiaoVien;
+    public function __construct(TaiKhoanController $tkGiaoVien)
+    {
+        $this->tkGiaoVien = $tkGiaoVien;
+    }
     public function index()
     {
         $giaovien = GiaoVien::with('monHoc')->paginate(10);
         return response()->json($giaovien, Response::HTTP_OK);
     }
-
+    public function indexWithAccount($MSGV)
+    {
+        $hocsinh = Giaovien::with('taiKhoan')->find($MSGV);
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
     public function store(Request $request)
     {
         $giaovien = GiaoVien::create($request->all());
@@ -22,7 +32,7 @@ class GiaoVienController extends Controller
 
     public function show($MSGV)
     {
-        $giaovien = GiaoVien::with('taiKhoan')->find($MSGV);
+        $giaovien = GiaoVien::with('monHoc')->find($MSGV);
         if (!$giaovien) {
             return response()->json(['message' => 'Data not found'], Response::HTTP::NOT_FOUND);
         }
@@ -45,6 +55,7 @@ class GiaoVienController extends Controller
     public function destroy($MSGV)
     {
         $data = GiaoVien::find($MSGV);
+        $this->$tkGiaoVien->deleteGV($MSGV);
         if (!$data) {
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }

@@ -95,8 +95,8 @@ export default function HK_NK() {
     return (
         <div className="main-content">
             <Menu/>
-            <div className='w-[85%] mx-2'>
-                <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Học kì - Niên khóa</h2>
+            <div className='right-part'>
+                <h2 className="page-name">Học kì - Niên khóa</h2>
                 <div className="button-nav">
                     <button onClick={() => showForm(1)} className="px-3 py-1 mt-2 bg-blue-500 text-white button-animation">Thêm niên khóa</button>
                     <button onClick={() => showForm(2)} className="px-3 py-1 mt-2 ms-1 bg-blue-500 text-white button-animation">Đặt niên khóa hiện tại</button>

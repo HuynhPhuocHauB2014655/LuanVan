@@ -4,14 +4,12 @@ import { Link } from "react-router-dom";
 export default function Menu() {
     const [active, setActive] = useState(0);
     const menu_items = [
-        { id: 1, route: "/", label: 'Trang chủ' },
-        { id: 2, route: "/student", label: 'Học sinh' },
-        { id: 3, route: "/nk", label: 'Niên Khóa' },
-        { id: 4, route: "/subject", label: 'Môn học' },
-        { id: 5, route: "/teacher", label: 'Giáo Viên' },
-        { id: 6, route: "/class", label: 'Lớp Học' },
-        { id: 7, route: "/tkb", label: 'Thời Khóa Biểu' },
-        { id: 8, route: "/account", label: 'Tài khoản' },
+        { id: 1, route: '/', label: 'Trang chủ' },
+        { id: 2, route: "/info", label: 'Thông tin cá nhân' },
+        { id: 3, route: "/", label: 'Chủ nhiệm' },
+        { id: 4, route: "/", label: 'Quản lí điểm' },
+        { id: 5, route: "/", label: 'Thời khóa biểu' },
+        { id: 6, route: "/", label: 'Lớp dạy' },
     ];
     const activeItem = (id) => {
         setActive(id);

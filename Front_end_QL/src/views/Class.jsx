@@ -89,8 +89,8 @@ export default function Class() {
     return (
         <div className="main-content relative">
             <Menu />
-            <div className="w-[85%] mx-2">
-                <h2 className="text-2xl font-bold text-center border-b-2 border-cyan-400 py-3">Quản lí Lớp học</h2>
+            <div className="right-part">
+                <h2 className="page-name">Quản lí Lớp học</h2>
                 <div className="flex justify-between">
                     <div>
                         <button type="button" className="px-2 py-1 mt-1 hover:bg-cyan-300 button-animation" onClick={() => _setShow(1)}>Học sinh mới</button>

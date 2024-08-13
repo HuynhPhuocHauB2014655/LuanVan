@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 .header{
-  height: 10vh;
+  min-height: 10vh;
 }
 .main-content{
   display: flex;
   min-height: 80vh;
 }
 .footer{
-  height: 10vh;
+  min-height: 10vh;
 }
 /* Hide the spinner in Chrome, Safari, and Edge */
 input[type="number"]::-webkit-inner-spin-button,
@@ -37,12 +37,6 @@ input[type="number"] {
 }
 .right-part{
   @apply w-[85%] mx-2
-}
-.home {
-  background-image: url('assets/home_background.jpg');
-  background-size: cover;          /* Scales the image to cover the entire element */
-  background-repeat: no-repeat;    /* Prevents the image from repeating */
-  background-position: center;     /* Centers the image */
 }
 .button-animation {
   @apply shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg
@@ -93,4 +87,14 @@ input[type="number"] {
 }
 #confirm-no:hover{
   background-color: #dc3545;
+}
+
+.f-label{
+  @apply block mb-2 text-sm font-medium text-gray-700
+}
+.f-field{
+  @apply w-full px-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500
+}
+.f-button{
+  @apply w-[50%] block mx-auto px-4 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300
 }

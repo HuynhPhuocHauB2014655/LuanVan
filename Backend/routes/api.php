@@ -11,6 +11,8 @@ use App\Http\Controllers\GiaoVienController;
 use App\Http\Controllers\LopController;
 use App\Http\Controllers\TKBController;
 use App\Http\Controllers\TaiKhoanController;
+
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -92,4 +94,14 @@ Route::put('/tk/update/hs',[TaiKhoanController::class,'updateHS']);
 Route::put('/tk/update/gv',[TaiKhoanController::class,'updateGV']);
 Route::delete('/tk/delete/hs/{id}',[TaiKhoanController::class,'deleteHS']);
 Route::delete('/tk/delete/gv/{id}',[TaiKhoanController::class,'deleteGV']);
+Route::post('/tk/update/admin',[TaiKhoanController::class,'changeAdmin']);
 Route::get('/tk/adminLogin/{maBaoMat}',[TaiKhoanController::class,'adminLogin']);
+Route::get('/tk/admin/check',[TaiKhoanController::class,'checkTime']);
+Route::get('/tk/hs/{MSHS}',[TaiKhoanController::class,'findHocSinh']);
+Route::get('/tk/gv/{MSGV}',[TaiKhoanController::class,'findGiaoVien']);
+Route::post('/tk/gv',[TaiKhoanController::class,'changePassGVAdmin']);
+Route::post('/tk/hs',[TaiKhoanController::class,'changePassHSAdmin']);
+Route::put('/tk/update/gv',[TaiKhoanController::class,'changePassGV']);
+Route::put('/tk/update/hs',[TaiKhoanController::class,'changePassHS']);
+Route::post('/tk/hs/login',[TaiKhoanController::class,'HSLogin']);
+Route::post('/tk/gv/login',[TaiKhoanController::class,'GVLogin']);
