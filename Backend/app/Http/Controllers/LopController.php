@@ -67,17 +67,25 @@ class LopController extends Controller
 
     public function assignStudentsToClass(Request $request)
     {
-        $gvTN = GiaoVien::
-        where('ChuyenMon','like','TN%')
-        ->orWhere('ChuyenMon','=','CB1')
-        ->orWhere('ChuyenMon','=','TC1')
-        ->orWhere('ChuyenMon','=','CB4')
+        $TNCount = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->count();
+        $XHCount = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->count();
+        $soHSTN = floor($TNCount/$request->soLopTN);
+        $soHSXH = floor($XHCount/$request->soLopXH);
+        $gvTN = GiaoVien::where(function($query){
+            $query->whereIn('ChuyenMon',['CB1','TC1','CB4'])
+            ->orWhere('ChuyenMon','like','TN%');
+        })
+        ->where(function($query){
+            $query->where("TrangThai",0);
+        })
         ->inRandomOrder()->get();
-        $gvXH = GiaoVien::
-        where('ChuyenMon','like','XH%')
-        ->orWhere('ChuyenMon','=','CB2')
-        ->orWhere('ChuyenMon','=','TC2')
-        ->orWhere('ChuyenMon','=','CB5')
+        $gvXH = GiaoVien::where(function($query){
+            $query->whereIn('ChuyenMon',['CB2','TC2','CB5'])
+            ->orWhere('ChuyenMon','like','XH%');
+        })
+        ->where(function($query){
+            $query->where("TrangThai",0);
+        })
         ->inRandomOrder()->get();
         $newClassTN = [];
         $newClassXH = [];
@@ -93,7 +101,7 @@ class LopController extends Controller
             $lop->MaNK = $request->MaNK;
             $lop->MSGV = $gvcn->MSGV;
             $lop->save();
-            $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->inRandomOrder()->limit(10)->pluck('MSHS');
+            $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->limit($soHSTN)->pluck('MSHS');
             HocLop::insert(
                 $hocsinhTN->map(fn($mshs) => [
                     'MaLop' => $maLop,
@@ -104,11 +112,11 @@ class LopController extends Controller
                 ])->toArray()
             );
         }
-        $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->inRandomOrder()->pluck('MSHS');
-        if($hocsinhTN->count() > 0 && $hocsinh->count() < 10)
+        $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
+        if($hocsinhTN->count() > 0 && $hocsinhTN->count() < 10)
         {
             $malop = "TN".$nienkhoa."10%";
-            for ($i=0; $i < $hocsinh->count(); $i++) { 
+            for ($i=0; $i < $hocsinhTN->count(); $i++) { 
                 $randomClass = Lop::where('MaLop','like', $malop)->inRandomOrder()->limit(1)->pluck('MaLop')->first();
                 DB::table('HocLop')->insert(
                     [
@@ -134,7 +142,7 @@ class LopController extends Controller
             $lop->MaNK = $request->MaNK;
             $lop->MSGV = $gvcn->MSGV;
             $lop->save();
-            $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->inRandomOrder()->limit(10)->pluck('MSHS');
+            $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->limit($soHSXH)->pluck('MSHS');
             HocLop::insert(
                 $hocsinhTXH->map(fn($mshs) => [
                     'MaLop' => $maLop,
@@ -145,7 +153,7 @@ class LopController extends Controller
                 ])->toArray()
             );
         }
-        $hocsinhXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->inRandomOrder()->pluck('MSHS');
+        $hocsinhXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
         if($hocsinhXH->count() > 0 && $hocsinhXH->count() < 10)
         {
             $malop = "XH".$nienkhoa."10%";

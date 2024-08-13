@@ -18,7 +18,7 @@ export default function Teacher() {
     const [startPage, setStartPage] = useState(0);
     const [endPage, setEndPage] = useState(0);
     const fetchData = async (page) => {
-        const teachers = await axiosClient.get(`/gv/index?page=${page}`);
+        const teachers = await axiosClient.get(`/gv/all?page=${page}`);
         setTeachersData(teachers.data.data);
         setTotalPages(teachers.data.last_page);
         totalPages < 5 ? setEndPage(totalPages) : setEndPage(5);
@@ -161,6 +161,7 @@ export default function Teacher() {
                             <th className="td">Giới tính</th>
                             <th className="td">Địa chỉ</th>
                             <th className="td">Số điện thoại</th>
+                            <th className="td">Trạng thái</th>
                             <th className="td">Chuyên môn</th>
                             <th className="td">Hành động</th>
                         </tr>
@@ -174,6 +175,7 @@ export default function Teacher() {
                                 <td className="td">{data.GioiTinh}</td>
                                 <td className="td">{data.DiaChi}</td>
                                 <td className="td">{data.SDT}</td>
+                                <td className="td">{data.TrangThai == 0 ? "Đang giảng dạy" : "Đã thôi dạy"}</td>
                                 <td className="td">{data.mon_hoc.TenMH}</td>
                                 <td className="td">
                                     <div className="flex justify-center">

@@ -22,7 +22,8 @@ class HocSinh extends Model
         'SDT',
         'TonGiao',
         'DanToc',
-        'MaBan'
+        'MaBan',
+        'TrangThai'
     ];
     protected $primaryKey = 'MSHS';
     public function ban(): BelongsTo{

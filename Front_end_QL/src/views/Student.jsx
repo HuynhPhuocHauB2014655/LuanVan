@@ -18,7 +18,7 @@ export default function Student() {
     const [endPage, setEndPage] = useState(0);
     const fetchData = async (page) => {
         try {
-            const response = await axiosClient.get(`/hs/index?page=${page}`);
+            const response = await axiosClient.get(`/hs/all?page=${page}`);
             setDatas(response.data.data);
             setTotalPages(response.data.last_page);
             setCurrentPage(response.data.current_page);
@@ -293,6 +293,7 @@ export default function Student() {
                             <th className="td">Số điện thoại</th>
                             <th className="td">Ban</th>
                             <th className="td">Lớp</th>
+                            <th className="td">Trạng thái</th>
                             <th className="td">Hành động</th>
                         </tr>
                     </thead>
@@ -313,9 +314,10 @@ export default function Student() {
                                 {data.lop.TenLop ?
                                     <td className="td">{data.lop[0].TenLop}</td> :
                                     <td className="td">Chưa xếp</td>}
+                                <td className="td">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
                                 <td className="td">
-                                    <button className="px-2 py-1 mx-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
-                                    <button type="button" className="mx-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
+                                    <button className="p-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
+                                    <button type="button" className="p-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
                                         Xóa
                                     </button>
                                 </td>

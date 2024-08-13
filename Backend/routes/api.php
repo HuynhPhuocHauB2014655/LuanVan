@@ -26,6 +26,7 @@ Route::delete('/ban/delete/{MaBan}',[BanController::class,'destroy']);
 //hoc sinh route
 Route::post('/hs/create',[HSController::class,'store']);
 Route::get('/hs/index',[HSController::class,'index']);
+Route::get('/hs/all',[HSController::class,'allHS']);
 Route::get('/hs/show/{mshs}',[HSController::class,'show']);
 Route::put('/hs/update/{mshs}',[HSController::class,'update']);
 Route::delete('/hs/delete/{mshs}',[HSController::class,'destroy']);
@@ -62,6 +63,7 @@ Route::delete('/mh/delete/{maMH}',[MonHocController::class,'destroy']);
 //giao vien route
 Route::post('/gv/create',[GiaoVienController::class,'store']);
 Route::get('/gv/index',[GiaoVienController::class,'index']);
+Route::get('/gv/all',[GiaoVienController::class,'allGV']);
 Route::get('/gv/show/{MSGV}',[GiaoVienController::class,'show']);
 Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);

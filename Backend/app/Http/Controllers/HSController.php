@@ -8,16 +8,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 class HSController extends Controller
 {
-    public function index()
+    public function allHS()
     {
         $hocsinh = HocSinh::with(['ban', 'lop'])->paginate(10);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
-    public function indexWithAccount($MSHS)
+    public function index()
     {
-        $hocsinh = HocSinh::with(['taiKhoan' => function($query) {
-            $query->select('updated_at','MSHS');
-        }])->find($MSHS);
+        $hocsinh = HocSinh::with(['ban', 'lop'])->where("TrangThai",0)->paginate(10);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function store(Request $request)
@@ -27,7 +25,7 @@ class HSController extends Controller
         return response()->json($hocsinh, Response::HTTP_CREATED);
     }
     public function newStudents(){
-        $hocsinh = HocSinh::with(['ban','lop'])->doesntHave('lop')->get();
+        $hocsinh = HocSinh::with(['ban','lop'])->where("TrangThai",0)->doesntHave('lop')->get();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function findByName($name)
@@ -63,8 +61,8 @@ class HSController extends Controller
         if (!$data) {
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }
-        $data->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $data->TrangThai = 1;
+        $data->save();
+        return response()->json("Đã xóa thành công", Response::HTTP_NO_CONTENT);
     }
 }

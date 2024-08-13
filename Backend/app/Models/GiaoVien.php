@@ -19,6 +19,7 @@ class GiaoVien extends Model
         'DiaChi',
         'SDT',
         'ChuyenMon',
+        'TrangThai'
     ];
     protected $primaryKey = 'MSGV';
     public function monHoc(): BelongsTo{

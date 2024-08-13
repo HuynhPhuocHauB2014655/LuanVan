@@ -60,13 +60,13 @@ export default function Class() {
     const validationSchema = Yup.object({
         MaNK: Yup.string().required("Trường bắt buộc"),
         soLopTN: Yup.number()
-            .min(Math.floor(TNCount / 10), `Số lớp tối thiểu ${Math.floor(TNCount / 10)}`)
-            .max(10, "Số quá lớn")
+            .max(Math.floor(TNCount / 10), `Số lớp tối đa ${Math.floor(TNCount / 10)}`)
+            .min(Math.ceil(TNCount / 40), `Số lớp tối thiểu ${Math.ceil(TNCount / 40)}`)
             .integer("Số không hợp lệ")
             .required("Trường bắt buộc"),
         soLopXH: Yup.number()
-            .min(Math.floor(XHCount / 10), `Số lớp tối thiểu ${Math.floor(XHCount / 10)}`)
-            .max(10, "Số quá lớn")
+            .max(Math.floor(XHCount / 10), `Số lớp tối đa ${Math.floor(XHCount / 10)}`)
+            .min(Math.ceil(XHCount / 40), `Số lớp tối thiểu ${Math.ceil(XHCount / 40)}`)
             .integer("Số không hợp lệ")
             .required("Trường bắt buộc"),
     });

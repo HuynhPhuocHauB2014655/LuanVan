@@ -13,9 +13,14 @@ class GiaoVienController extends Controller
     {
         $this->tkGiaoVien = $tkGiaoVien;
     }
-    public function index()
+    public function allGV()
     {
         $giaovien = GiaoVien::with('monHoc')->paginate(10);
+        return response()->json($giaovien, Response::HTTP_OK);
+    }
+    public function index()
+    {
+        $giaovien = GiaoVien::with('monHoc')->where("TrangThai",0)->paginate(10);
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function indexWithAccount($MSGV)
@@ -55,12 +60,11 @@ class GiaoVienController extends Controller
     public function destroy($MSGV)
     {
         $data = GiaoVien::find($MSGV);
-        $this->$tkGiaoVien->deleteGV($MSGV);
         if (!$data) {
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }
-        $data->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $data->TrangThai = 1;
+        $data->save();
+        return response()->json("Đã xóa thành công", Response::HTTP_NO_CONTENT);
     }
 }

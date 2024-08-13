@@ -21,17 +21,31 @@ class MonHocController extends Controller
     }
 
     public function monHocTN(){
-        $monhoc = MonHoc::with('giaoVien')->where('MaMH','like','CB%')
-        ->orWhere('MaMH','like','TN%')
-        ->orWhere("maMH",'=','XH1')
-        ->orWhere('MaMH','=','TC2')->get();
+        $monhoc = MonHoc::with('giaoVien')
+            ->where(function($query) {
+                $query->where('MaMH', 'like', 'CB%')
+                ->orWhere('MaMH', 'like', 'TN%')
+                ->orWhere('MaMH', '=', 'XH1')
+                ->orWhere('MaMH', '=', 'TC2');
+            })
+            ->whereHas('giaoVien', function($query) {
+                $query->where('TrangThai', 0);
+            })
+            ->get();
         return response()->json($monhoc, Response::HTTP_OK);
     }
     public function monHocXH(){
-        $monhoc = MonHoc::with('giaoVien')->where('MaMH','like','CB%')
-        ->orWhere('MaMH','like','XH%')
-        ->orWhere("maMH",'=','TN1')
-        ->orWhere('MaMH','=','TC1')->get();
+        $monhoc = MonHoc::with('giaoVien')
+            ->where(function($query) {
+                $query->where('MaMH', 'like', 'CB%')
+                ->orWhere('MaMH', 'like', 'XH%')
+                ->orWhere('MaMH', '=', 'XH1')
+                ->orWhere('MaMH', '=', 'TC1');
+            })
+            ->whereHas('giaoVien', function($query) {
+                $query->where('TrangThai', 0);
+            })
+            ->get();
         return response()->json($monhoc, Response::HTTP_OK);
     }
     public function show($maMH)
