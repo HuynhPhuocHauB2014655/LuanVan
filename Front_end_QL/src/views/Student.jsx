@@ -59,6 +59,7 @@ export default function Student() {
         DiaChi: Yup.string().required('Địa chỉ không được bỏ trống'),
         SDT: Yup.string().matches(/^\d{10}$/, 'Số điện thoại phải có 10 chữ số.').required('Số điện thoại không được bỏ trống'),
         MaBan: Yup.string().required('Ban không được bỏ trống'),
+        TrangThai: Yup.string(),
     });
     const handleSubmit = async (values) => {
 
@@ -128,6 +129,7 @@ export default function Student() {
                 TonGiao: data.TonGiao,
                 DiaChi: data.DiaChi,
                 SDT: data.SDT,
+                TrangThai: data.TrangThai
             });
         } else {
             setStudentForm({});
@@ -154,9 +156,9 @@ export default function Student() {
     }
     console.log(datas);
     return (
-        <div className="main-content relative">
+        <div className="main-content ">
             <Menu />
-            <div className="right-part">
+            <div className="right-part relative">
                 {showForm != 0 &&
                     <div className="absolute z-10 w-[70%] left-[15%] top-40 bg-sky-300 p-5">
                         <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
@@ -166,13 +168,14 @@ export default function Student() {
                                 MaNK: '',
                                 HoTen: '',
                                 NgaySinh: '',
-                                GioiTinh: '',
+                                GioiTinh: "Nam",
                                 QueQuan: '',
                                 DanToc: '',
                                 TonGiao: '',
                                 DiaChi: '',
                                 SDT: '',
                                 MaBan: 'TN',
+                                TrangThai: ''
                             }}
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
@@ -186,7 +189,7 @@ export default function Student() {
                                 }, [studentForm, setValues]);
                                 return (
                                     <Form className="relative">
-                                        <div className="columns-2 gap-3">
+                                        <div className="columns-3 gap-3">
                                             <Field type="text" name="MaNK" className="w-full mb-1 rounded form-input" placeholder="Mã niên khóa" />
                                             <ErrorMessage className="text-red-700" name="MaNK" component="div" />
 
@@ -217,19 +220,29 @@ export default function Student() {
                                             <Field type="text" name="SDT" className="w-full mb-1 rounded form-input" placeholder="Số điện thoại" />
                                             <ErrorMessage className="text-red-700" name="SDT" component="div" />
 
-                                            <Field as="select" name="MaBan" className="form-select w-full">
+                                            <Field as="select" name="MaBan" className="form-select w-full mb-1">
                                                 <option value="TN">Tự nhiên</option>
                                                 <option value="XH">Xã hội</option>
                                             </Field>
                                             <ErrorMessage className="text-red-700" name="ban" component="div" />
+
+                                            <Field as="select" name="TrangThai" className="form-select w-full">
+                                                <option value="0">Đang học</option>
+                                                <option value="1">Đã thôi học</option>
+                                                <option value="2">Đã tốt nghiệp</option>
+                                            </Field>
+                                            <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
                                         </div>
 
                                         {showForm === 1 ?
-                                            <button type="submit" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-                                                Thêm
-                                            </button> :
-                                            <div className="flex justify-between">
-                                                <button type="submit" className="mt-2 px-4 py-2 bg-cyan-500 text-white rounded">
+                                            <div className="flex justify-center">
+                                                <button type="submit" className="w-1/3 mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300">
+                                                    Thêm
+                                                </button>
+                                            </div>
+                                            :
+                                            <div className="flex justify-center">
+                                                <button type="submit" className="w-1/3 mt-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400">
                                                     Sửa
                                                 </button>
                                             </div>
@@ -311,15 +324,14 @@ export default function Student() {
                                 <td className="td">{data.DiaChi}</td>
                                 <td className="td">{data.SDT}</td>
                                 <td className="td">{data.ban.TenBan}</td>
-                                {data.lop.TenLop ?
+                                {data.lop[0]?.TenLop ?
                                     <td className="td">{data.lop[0].TenLop}</td> :
                                     <td className="td">Chưa xếp</td>}
                                 <td className="td">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
                                 <td className="td">
-                                    <button className="p-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
-                                    <button type="button" className="p-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteStudent(data.MSHS)}>
-                                        Xóa
-                                    </button>
+                                    <div className="flex justify-center">
+                                        <button className="px-2 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

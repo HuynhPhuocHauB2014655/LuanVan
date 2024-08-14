@@ -28,6 +28,14 @@ class LopController extends Controller
         ->where('MaNK',$nk)->get();
         return response()->json($lop, Response::HTTP_OK);
     }
+    public function indexTN($MaNK){
+        $lop = Lop::where('MaLop','like','A%')->where('MaNK','=',$MaNK)->get();
+        return response()->json($lop, Response::HTTP_OK);
+    }
+    public function indexXH($MaNK){
+        $lop = Lop::where('MaLop','like','C%')->where('MaNK','=',$MaNK)->get();
+        return response()->json($lop, Response::HTTP_OK);
+    }
     public function indexWithoutTKB()
     {
         $lop = Lop::with(
@@ -40,20 +48,21 @@ class LopController extends Controller
     }
     public function indexWithStudent()
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->get();
-        $lop = $lop->sortBy(function ($item) {
-            // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
-            return $item->hocSinh->first()->name ?? '';
-        });
-        return response()->json($lop, Response::HTTP_OK);
-    }
+    $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->get();
+
+// Sort the lops collection by the name of the first student in the hocSinh relationship
+$sortedLops = $lops->sortBy(function ($lop) {
+    return $lop->hocSinh->first()->HoTen ?? '';
+})->values()->all();
+
+return response()->json($sortedLops, Response::HTTP_OK);
+}
 
     public function indexWithStudentNow($MaNK)
     {
         $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->get();
         $lop = $lop->sortBy(function ($item) {
-            // Assuming 'hocSinh' is a collection and 'name' is the attribute to sort by
-            return $item->hocSinh->first()->name ?? '';
+            return $item->hocSinh->first()->HoTen ?? '';
         });
         return response()->json($lop, Response::HTTP_OK);
     }
@@ -91,7 +100,7 @@ class LopController extends Controller
         $newClassXH = [];
         $nienkhoa = Str::replace('-', '', $request->MaNK);
         for ($i=1; $i <= $request->soLopTN ; $i++) { 
-            $maLop = "TN" . $nienkhoa . "10" . $i;
+            $maLop = "A" . $nienkhoa . "10" . $i;
             $tenLop = "10A" . $i;
             $gvcn = $gvTN->shift();
             $lop = new Lop();
@@ -115,7 +124,7 @@ class LopController extends Controller
         $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
         if($hocsinhTN->count() > 0 && $hocsinhTN->count() < 10)
         {
-            $malop = "TN".$nienkhoa."10%";
+            $malop = "A".$nienkhoa."10%";
             for ($i=0; $i < $hocsinhTN->count(); $i++) { 
                 $randomClass = Lop::where('MaLop','like', $malop)->inRandomOrder()->limit(1)->pluck('MaLop')->first();
                 DB::table('HocLop')->insert(
@@ -132,7 +141,7 @@ class LopController extends Controller
 
 
         for ($i=1; $i <= $request->soLopXH ; $i++) { 
-            $maLop = "XH" . $nienkhoa . "10" . $i;
+            $maLop = "C" . $nienkhoa . "10" . $i;
             $tenLop = "10C" . $i;
             $gvcn = $gvXH->shift();
             $lop = new Lop();
@@ -156,7 +165,7 @@ class LopController extends Controller
         $hocsinhXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
         if($hocsinhXH->count() > 0 && $hocsinhXH->count() < 10)
         {
-            $malop = "XH".$nienkhoa."10%";
+            $malop = "C".$nienkhoa."10%";
             for ($i=0; $i < $hocsinhXH->count(); $i++) { 
                 $randomClass = Lop::where('MaLop','like', $malop)->inRandomOrder()->limit(1)->pluck('MaLop')->first();
                 DB::table('HocLop')->insert(
@@ -180,7 +189,17 @@ class LopController extends Controller
         }
         return response()->json($lop, Response::HTTP_OK);
     }
-
+    public function addToClass(Request $request)
+    {
+        $hoclop = new HocLop();
+        $hoclop->MaLop = $request->MaLop;
+        $hoclop->MSHS = $request->MSHS;
+        $hoclop->MaNK = $request->MaNK;
+        $hoclop->MaHL = 0;
+        $hoclop->MaHK = 0;
+        $hoclop->save();
+        return response()->json("Đã thêm thành công", Response::HTTP_OK);
+    }
     public function update(Request $request, $MaLop)
     {
         $lop = Lop::find($MaLop);

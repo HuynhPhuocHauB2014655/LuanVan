@@ -59,6 +59,7 @@ export default function Teacher() {
         DiaChi: Yup.string().required('Địa chỉ không được bỏ trống'),
         SDT: Yup.string().matches(/^\d{10}$/, 'Số điện thoại phải có 10 chữ số.').required('Số điện thoại không được bỏ trống'),
         ChuyenMon: Yup.string().required('Chuyên môn không được để trống'),
+        TrangThai: Yup.string().required('Không được để trống'),
     });
     const handleSubmit = async (value) => {
         if (showForm == 1) {
@@ -107,6 +108,7 @@ export default function Teacher() {
                 DiaChi: data.DiaChi,
                 SDT: data.SDT,
                 ChuyenMon: data.ChuyenMon,
+                TrangThai: data.TrangThai
             })
         } else {
             setTeacherForm({});
@@ -175,14 +177,11 @@ export default function Teacher() {
                                 <td className="td">{data.GioiTinh}</td>
                                 <td className="td">{data.DiaChi}</td>
                                 <td className="td">{data.SDT}</td>
-                                <td className="td">{data.TrangThai == 0 ? "Đang giảng dạy" : "Đã thôi dạy"}</td>
+                                <td className="td">{data.TrangThai == 0 ? "Đang dạy" : "Đã nghỉ"}</td>
                                 <td className="td">{data.mon_hoc.TenMH}</td>
                                 <td className="td">
                                     <div className="flex justify-center">
                                         <button className="px-2 py-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormTeacher(2, data)}>Sửa</button>
-                                        <button type="button" className="ms-1 px-2 py-1 border rounded bg-white border-black hover:border-red-500" onClick={() => deleteTeacher(data.MSGV)}>
-                                            Xóa
-                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -201,6 +200,7 @@ export default function Teacher() {
                                 DiaChi: "",
                                 SDT: "",
                                 ChuyenMon: "",
+                                TrangThai: 0,
                             }}
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
@@ -214,7 +214,7 @@ export default function Teacher() {
                                 }, [teacherForm, setValues]);
                                 return (
                                     <Form className="relative">
-                                        <div className="columns-2">
+                                        <div className="columns-3 gap-3">
                                             <Field type="text" name="TenGV" className="w-full mb-1 rounded form-input" placeholder="Tên giáo viên" />
                                             <ErrorMessage className="text-red-600" name="TenGV" component="div" />
 
@@ -234,13 +234,19 @@ export default function Teacher() {
                                             <Field type="text" name="SDT" className="w-full mb-1 rounded form-input" placeholder="Số điện thoại" />
                                             <ErrorMessage className="text-red-600" name="SDT" component="div" />
 
-                                            <Field as="select" name="ChuyenMon" className="form-select w-full">
+                                            <Field as="select" name="ChuyenMon" className="form-select rounded w-full mb-1">
                                                 <option value="" disabled defaultChecked>Chọn chuyên môn</option>
                                                 {subjectsData.map((subject) => (
                                                     <option key={subject.MaMH} value={subject.MaMH}>{subject.TenMH}</option>
                                                 ))}
                                             </Field>
                                             <ErrorMessage className="text-red-600" name="ChuyenMon" component="div" />
+
+                                            <Field as="select" name="TrangThai" className="form-select rounded w-full">
+                                                <option value="0">Đang dạy</option>
+                                                <option value="1">Đã nghỉ</option>
+                                            </Field>
+                                            <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
                                         </div>
 
                                         {showForm === 1 ?

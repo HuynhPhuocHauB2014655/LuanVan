@@ -80,6 +80,9 @@ Route::get('/lop/show/{MaLop}',[LopController::class,'show']);
 Route::put('/lop/update/{MaLop}',[LopController::class,'update']);
 Route::delete('/lop/delete/{MaLop}',[LopController::class,'destroy']);
 Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
+Route::get('/lop/tn/{MaNK}',[LopController::class,'indexTN']);
+Route::get('/lop/xh/{MaNK}',[LopController::class,'indexXH']);
+Route::post('/lop/addHS',[LopController::class,'addToClass']);
 
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
