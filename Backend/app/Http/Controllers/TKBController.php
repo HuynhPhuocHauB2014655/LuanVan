@@ -40,12 +40,12 @@ class TKBController extends Controller
 
         // Retrieve classes
         $lopTN = Lop::doesntHave('tkb')
-                    ->where('MaLop', 'like', 'TN'.$nienKhoa.'%')
+                    ->where('MaLop', 'like', 'A'.$nienKhoa.'%')
                     ->inRandomOrder()
                     ->get();
 
         $lopXH = Lop::doesntHave('tkb')
-                    ->where('MaLop', 'like', 'XH'.$nienKhoa.'%')
+                    ->where('MaLop', 'like', 'C'.$nienKhoa.'%')
                     ->inRandomOrder()
                     ->get();
         foreach ($lopTN as $lop) {

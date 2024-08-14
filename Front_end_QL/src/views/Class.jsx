@@ -104,14 +104,14 @@ export default function Class() {
         const payload = {
             MSHS: MSHS,
             MaNK: nienKhoa.NienKhoa,
-            MaLop:classed
+            MaLop: classed
         };
-        try{
-            const response = await axiosClient.post(`/lop/addHS`,payload);
-            fetchNewStudent();  
+        try {
+            const response = await axiosClient.post(`/lop/addHS`, payload);
+            fetchNewStudent();
             setMessage(response.data);
             setShowForm(0);
-        }catch(error){
+        } catch (error) {
             console.log(error);
             setMessage(error.response.data);
         }
@@ -189,7 +189,7 @@ export default function Class() {
                 {showForm == 2 &&
                     <div className="w-[50%] p-3 border-2 border-slate-400 rounded bg-slate-100 absolute top-64 left-[25%]">
                         <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => _showForm(0)}>X</button>
-                        <button className="button border-blue-500 hover:bg-blue-300" onClick={() =>SelectClass(selected.MSHS)}>Lưu</button>
+                        <button className="button border-blue-500 hover:bg-blue-300" onClick={() => SelectClass(selected.MSHS)}>Lưu</button>
                         <table className="table-auto border-collapse mt-2 mb-2 w-full">
                             <thead>
                                 <tr>
@@ -210,10 +210,10 @@ export default function Class() {
                                                 {selected.ban.MaBan == "TN" ? classTN.map((lop) => (
                                                     <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
                                                 ))
-                                                :
-                                                classXH.map((lop) => (
-                                                    <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
-                                                ))}
+                                                    :
+                                                    classXH.map((lop) => (
+                                                        <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
+                                                    ))}
                                             </select>
                                         </div>
                                     </td>
@@ -225,55 +225,57 @@ export default function Class() {
                 {show == 2 &&
                     <div>
                         <h2 className="text-center font-bold text-2xl mb-2">Danh sách lớp</h2>
-                        <div className="mx-auto mb-3">
-                            <button type="button" className="px-2 py-1 mt-1 rounded hover:bg-blue-300 shadow-lg" onClick={getClassNow}>Lớp niên khóa hiện tại</button>
-                        </div>
-                        <div>
-                            {classes.map((classItem, index) => (
-                                <div key={index} className="mx-auto w-full bg-slate-50 p-3 border-2 mb-2" style={{ maxWidth: '90%' }}>
-                                    <div className="w-full flex justify-between">
+                        <div className="mx-auto" style={{ maxWidth: '95%' }}>
+                            <div className="mx-auto mb-3">
+                                <button type="button" className="px-2 py-1 mt-1 rounded hover:bg-blue-300 shadow-lg" onClick={getClassNow}>Lớp niên khóa hiện tại</button>
+                            </div>
+                            <div>
+                                {classes.map((classItem, index) => (
+                                    <div key={index} className="bg-slate-50 p-3 border-2 mb-2">
+                                        <div className="w-full flex justify-between">
                                         <h3 className="text-xl">Lớp: {classItem.TenLop} Niên Khóa: {classItem.nien_khoa.TenNK} Chủ Nhiệm: {classItem.giao_vien.TenGV}</h3>
-                                        <button
-                                            onClick={() => toggleTable(classItem.MaLop)}
-                                            className="border px-3 py-1 rounded hover:bg-gray-200"
-                                        >
-                                            {visibleTables[classItem.MaLop] ? 'Ẩn danh sách' : 'Hiện danh sách'}
-                                        </button>
-                                    </div>
-                                    {visibleTables[classItem.MaLop] && <table className="border-collapse mt-2 mx-auto mb-2 w-full">
-                                        <thead>
-                                            <tr>
-                                                <th className="border border-gray-400 p-2">STT</th>
-                                                <th className="border border-gray-400 p-2">MSHS</th>
-                                                <th className="border border-gray-400 p-2">Tên học sinh</th>
-                                                <th className="border border-gray-400 p-2">Ngày Sinh</th>
-                                                <th className="border border-gray-400 p-2">Giới tính</th>
-                                                <th className="border border-gray-400 p-2">Quê quán</th>
-                                                <th className="border border-gray-400 p-2">Dân tộc</th>
-                                                <th className="border border-gray-400 p-2">Tôn Giáo</th>
-                                                <th className="border border-gray-400 p-2">Địa chỉ</th>
-                                                <th className="border border-gray-400 p-2">Số điện thoại</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {classItem.hoc_sinh.map((data, index) => (
-                                                <tr key={index}>
-                                                    <td className="border border-gray-400 p-2">{index + 1}</td>
-                                                    <td className="border border-gray-400 p-2">{data.MSHS}</td>
-                                                    <td className="border border-gray-400 p-2">{data.HoTen}</td>
-                                                    <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
-                                                    <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
-                                                    <td className="border border-gray-400 p-2">{data.QueQuan}</td>
-                                                    <td className="border border-gray-400 p-2">{data.DanToc}</td>
-                                                    <td className="border border-gray-400 p-2">{data.TonGiao}</td>
-                                                    <td className="border border-gray-400 p-2">{data.DiaChi}</td>
-                                                    <td className="border border-gray-400 p-2">{data.SDT}</td>
+                                            <button
+                                                onClick={() => toggleTable(classItem.MaLop)}
+                                                className="border px-3 py-1 rounded hover:bg-gray-200"
+                                            >
+                                                {visibleTables[classItem.MaLop] ? 'Ẩn danh sách' : 'Hiện danh sách'}
+                                            </button>
+                                        </div>
+                                        {visibleTables[classItem.MaLop] && <table className="border-collapse mt-2 mb-2 w-full">
+                                            <thead>
+                                                <tr>
+                                                    <th className="border border-gray-400 p-2">STT</th>
+                                                    <th className="border border-gray-400 p-2">MSHS</th>
+                                                    <th className="border border-gray-400 p-2">Tên học sinh</th>
+                                                    <th className="border border-gray-400 p-2">Ngày Sinh</th>
+                                                    <th className="border border-gray-400 p-2">Giới tính</th>
+                                                    <th className="border border-gray-400 p-2">Quê quán</th>
+                                                    <th className="border border-gray-400 p-2">Dân tộc</th>
+                                                    <th className="border border-gray-400 p-2">Tôn Giáo</th>
+                                                    <th className="border border-gray-400 p-2">Địa chỉ</th>
+                                                    <th className="border border-gray-400 p-2">Số điện thoại</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>}
-                                </div>
-                            ))}
+                                            </thead>
+                                            <tbody>
+                                                {classItem.hoc_sinh.map((data, index) => (
+                                                    <tr key={index}>
+                                                        <td className="border border-gray-400 p-2">{index + 1}</td>
+                                                        <td className="border border-gray-400 p-2">{data.MSHS}</td>
+                                                        <td className="border border-gray-400 p-2">{data.HoTen}</td>
+                                                        <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
+                                                        <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
+                                                        <td className="border border-gray-400 p-2">{data.QueQuan}</td>
+                                                        <td className="border border-gray-400 p-2">{data.DanToc}</td>
+                                                        <td className="border border-gray-400 p-2">{data.TonGiao}</td>
+                                                        <td className="border border-gray-400 p-2">{data.DiaChi}</td>
+                                                        <td className="border border-gray-400 p-2">{data.SDT}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 }

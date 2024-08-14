@@ -38,9 +38,11 @@ class GiaoVienController extends Controller
     public function show($MSGV)
     {
         $giaovien = GiaoVien::with('monHoc')->find($MSGV);
-        if (!$giaovien) {
-            return response()->json(['message' => 'Data not found'], Response::HTTP::NOT_FOUND);
-        }
+        return response()->json($giaovien, Response::HTTP_OK);
+    }
+    public function findByName($name)
+    {
+        $giaovien = GiaoVien::with('monHoc')->where('TenGV','like','%'.$name.'%')->get();
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function lastTeacher(){

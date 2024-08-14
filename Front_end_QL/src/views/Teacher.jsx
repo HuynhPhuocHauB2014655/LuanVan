@@ -118,13 +118,39 @@ export default function Teacher() {
     const handlePageChange = (page) => {
         fetchData(page);
     }
+    const search = async () => {
+        const searchValue = document.getElementById('search').value;
+        try {
+            const searchId = await axiosClient.get('/gv/show/' + searchValue);
+            if(Object.keys(searchId.data).length === 0){
+                const searchName = await axiosClient.get(`/gv/search/${searchValue}`);
+                if(Object.keys(searchName.data).length === 0){
+                    setMessage('Không tìm thấy kết quả');
+                }else{
+                    setTeachersData(searchName.data);
+                }
+            }else{
+                setTeachersData([searchId.data]);
+            }
+        } catch (error) {
+            console.error('Error searching data:', error);
+            setMessage(error.response.data.message);
+        }
+    }
     return (
         <div className="main-content relative">
             <Menu />
             <div className="right-part">
                 <h2 className="page-name">Quản lí Giáo Viên</h2>
-                <div>
-                    <button className="px-2 mt-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormTeacher(1)}>Thêm giáo viên</button>
+                <div className="flex justify-between mt-2">
+                    <div className="space-x-2">
+                        <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={fetchData}>Tất cả</button>
+                        <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormTeacher(1)}>Thêm giáo viên</button>
+                    </div>
+                    <div className="me-3 flex w-[25%]">
+                        <input type="text" id="search" className="form-input rounded h-9 w-full" placeholder="Tìm tên hoặc mã số giáo viên" />
+                        <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                    </div>
                 </div>
                 <div className="my-1 flex justify-center">
                     <button
@@ -157,29 +183,29 @@ export default function Teacher() {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th className="td">Mã số giáo viên</th>
-                            <th className="td">Tên giáo viên</th>
-                            <th className="td">Ngày sinh</th>
-                            <th className="td">Giới tính</th>
-                            <th className="td">Địa chỉ</th>
-                            <th className="td">Số điện thoại</th>
-                            <th className="td">Trạng thái</th>
-                            <th className="td">Chuyên môn</th>
-                            <th className="td">Hành động</th>
+                            <th className="td py-1 px-2">Mã số giáo viên</th>
+                            <th className="td py-1 px-2">Tên giáo viên</th>
+                            <th className="td py-1 px-2">Ngày sinh</th>
+                            <th className="td py-1 px-2">Giới tính</th>
+                            <th className="td py-1 px-2">Địa chỉ</th>
+                            <th className="td py-1 px-2">Số điện thoại</th>
+                            <th className="td py-1 px-2">Trạng thái</th>
+                            <th className="td py-1 px-2">Chuyên môn</th>
+                            <th className="td py-1 px-2">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {teachersData && teachersData.map((data, index) => (
                             <tr key={index}>
-                                <td className="td">{data.MSGV}</td>
-                                <td className="td">{data.TenGV}</td>
-                                <td className="td">{data.NgaySinh}</td>
-                                <td className="td">{data.GioiTinh}</td>
-                                <td className="td">{data.DiaChi}</td>
-                                <td className="td">{data.SDT}</td>
-                                <td className="td">{data.TrangThai == 0 ? "Đang dạy" : "Đã nghỉ"}</td>
-                                <td className="td">{data.mon_hoc.TenMH}</td>
-                                <td className="td">
+                                <td className="td py-1 px-2">{data.MSGV}</td>
+                                <td className="td py-1 px-2">{data.TenGV}</td>
+                                <td className="td py-1 px-2">{data.NgaySinh}</td>
+                                <td className="td py-1 px-2">{data.GioiTinh}</td>
+                                <td className="td py-1 px-2">{data.DiaChi}</td>
+                                <td className="td py-1 px-2">{data.SDT}</td>
+                                <td className="td py-1 px-2">{data.TrangThai == 0 ? "Đang dạy" : "Đã nghỉ"}</td>
+                                <td className="td py-1 px-2">{data.mon_hoc.TenMH}</td>
+                                <td className="td py-1 px-2">
                                     <div className="flex justify-center">
                                         <button className="px-2 py-1 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormTeacher(2, data)}>Sửa</button>
                                     </div>

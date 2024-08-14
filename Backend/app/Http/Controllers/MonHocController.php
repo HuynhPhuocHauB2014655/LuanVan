@@ -39,7 +39,7 @@ class MonHocController extends Controller
             ->where(function($query) {
                 $query->where('MaMH', 'like', 'CB%')
                 ->orWhere('MaMH', 'like', 'XH%')
-                ->orWhere('MaMH', '=', 'XH1')
+                ->orWhere('MaMH', '=', 'TN1')
                 ->orWhere('MaMH', '=', 'TC1');
             })
             ->whereHas('giaoVien', function($query) {

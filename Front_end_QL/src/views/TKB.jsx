@@ -34,16 +34,6 @@ export default function TKB() {
         }
     }
     useEffect(() => {
-        // console.log(tkb);
-        // if (tkb && tkb.length > 0) {
-        //     for (let index = 3; index >= 0; index--) {
-        //         console.log(tkb[0].tkbMatrix[5][index]);
-        //     }
-        // } else {
-        //     console.log("tkb is undefined or empty.");
-        // }
-    }, [tkb]);
-    useEffect(() => {
         fetchData();
     }, []);
     const fetchTKB = async () => {
@@ -65,30 +55,9 @@ export default function TKB() {
                 TenMon: 'Chào cờ',
                 TenGV: ''
             }
-            let flat = 0;
-            for (let i = 5; i >= 0; i--) {
-                for (let j = 3; j >= 0; j--) {
-                    if (tkbMatrix[i][j] != null) {
-                        if (j == 3) {
-                            tkbMatrix[i + 1][0] = {
-                                TenMon: 'Sinh hoạt lớp',
-                                TenGV: ''
-                            }
-                        }
-                        else {
-                            tkbMatrix[i][j + 1] = {
-                                TenMon: 'Sinh hoạt lớp',
-                                TenGV: ''
-                            }
-                        }
-                        // tkbMatrix[i][j];
-                        flat = 1;
-                        break;
-                    }
-                }
-                if (flat == 1) {
-                    break;
-                }
+            tkbMatrix[5][3] = {
+                TenMon: 'Sinh hoạt lớp',
+                TenGV: ''
             }
             return { ...data, tkbMatrix };
         });
@@ -103,7 +72,7 @@ export default function TKB() {
             data[key] = value;
         });
         try {
-            if (data.MaLop.substring(0, 2) === "TN") {
+            if (data.MaLop.substring(0, 1) === "A") {
                 subjectTN.map(function (mh) {
                     const payload = {
                         MaLop: data.MaLop,
@@ -114,7 +83,7 @@ export default function TKB() {
                     fetchData();
                 })
             }
-            if (data.MaLop.substring(0, 2) === "XH") {
+            if (data.MaLop.substring(0, 1) === "C") {
                 subjectXH.map(function (mh) {
                     const payload = {
                         MaLop: data.MaLop,
@@ -137,10 +106,10 @@ export default function TKB() {
             await axiosClient.post(`/tkb/create/${nienKhoa.NienKhoa}`);
             fetchData();
             setMessage("Tạo mới thành công");
+            fetchData();
         } catch (error) {
             console.log(error);
         }
-        fetchData();
     }
     const showForm = (id) => {
         if (show == id) {
@@ -175,7 +144,7 @@ export default function TKB() {
                 {state === 1 &&
                     <div className="mb-2">
                         {tkb.map((data) => (
-                            <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '90%' }}>
+                            <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '95%' }}>
                                 <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
                                 <table className="border-2 border-black border-collapse text-center w-full">
                                     <thead>
@@ -189,7 +158,7 @@ export default function TKB() {
                                     <tbody>
                                         {[...Array(4)].map((_, i) => (
                                             <tr key={i + 1}>
-                                                <td className="td">{i + 1}</td>
+                                                <td className="td px-3">{i + 1}</td>
                                                 {[...Array(6)].map((_, j) => (
                                                     data.tkbMatrix[j][i] ?
                                                         <td className="td" key={j + 1}>
@@ -252,7 +221,7 @@ export default function TKB() {
                                                     <form onSubmit={handleSubmit} className="">
                                                         <div className="columns-5 ">
                                                             <input type="hidden" name="MaLop" value={data.MaLop} />
-                                                            {data.MaLop.substring(0, 2) == "TN" ?
+                                                            {data.MaLop.substring(0, 1) == "A" ?
                                                                 <div>
                                                                     {subjectTN.map((tn) => (
                                                                         <div key={tn.MaMH} className="mb-1 ms-1">

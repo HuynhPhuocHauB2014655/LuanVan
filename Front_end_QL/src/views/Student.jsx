@@ -144,8 +144,17 @@ export default function Student() {
     const search = async () => {
         const searchValue = document.getElementById('search').value;
         try {
-            const response = await axiosClient.get('/hs/show/' + searchValue);
-            setDatas([response.data]);
+            const searchId = await axiosClient.get('/hs/show/' + searchValue);
+            if(Object.keys(searchId.data).length === 0){
+                const searchName = await axiosClient.get(`/hs/search/${searchValue}`);
+                if(Object.keys(searchName.data).length === 0){
+                    setMessage('Không tìm thấy kết quả');
+                }else{
+                    setDatas(searchName.data);
+                }
+            }else{
+                setDatas([searchId.data]);
+            }
         } catch (error) {
             console.error('Error searching data:', error);
             setMessage(error.response.data.message);
@@ -154,7 +163,6 @@ export default function Student() {
     const handlePageChange = (page) => {
         fetchData(page);
     }
-    console.log(datas);
     return (
         <div className="main-content ">
             <Menu />
@@ -253,13 +261,13 @@ export default function Student() {
                         </Formik>
                     </div>}
                 <h2 className="page-name">Quản lí học sinh</h2>
-                <div className="mt-1 flex justify-between">
+                <div className="mt-2 flex justify-between">
                     <div>
                         <button className="px-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2 button-animation" onClick={() => fetchData(1)}>Tất cả</button>
                         <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400 button-animation" onClick={() => showFormStudent(1)}>Thêm học sinh</button>
                     </div>
-                    <div className="me-3">
-                        <input type="text" id="search" className="form-input rounded h-9" placeholder="Nhập mã số học sinh" />
+                    <div className="me-3 flex w-[25%]">
+                        <input type="text" id="search" className="form-input rounded h-9 w-full" placeholder="Tìm tên hoặc mã số học sinh" />
                         <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                     </div>
                 </div>
@@ -294,36 +302,36 @@ export default function Student() {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th className="td">STT</th>
-                            <th className="td">MSHS</th>
-                            <th className="td">Tên học sinh</th>
-                            <th className="td">Ngày Sinh</th>
-                            <th className="td">Giới tính</th>
-                            <th className="td">Quê quán</th>
-                            <th className="td">Dân tộc</th>
-                            <th className="td">Tôn Giáo</th>
-                            <th className="td">Địa chỉ</th>
-                            <th className="td">Số điện thoại</th>
-                            <th className="td">Ban</th>
-                            <th className="td">Lớp</th>
-                            <th className="td">Trạng thái</th>
-                            <th className="td">Hành động</th>
+                            <th className="td py-1 px-2" >STT</th>
+                            <th className="td py-1 px-2" >MSHS</th>
+                            <th className="td py-1 px-2" >Tên học sinh</th>
+                            <th className="td py-1 px-2" >Ngày Sinh</th>
+                            <th className="td py-1 px-2" >Giới tính</th>
+                            <th className="td py-1 px-2" >Quê quán</th>
+                            <th className="td py-1 px-2" >Dân tộc</th>
+                            <th className="td py-1 px-2" >Tôn Giáo</th>
+                            <th className="td py-1 px-2" >Địa chỉ</th>
+                            <th className="td py-1 px-2" >Số điện thoại</th>
+                            <th className="td py-1 px-2" >Ban</th>
+                            <th className="td py-1 px-2" >Lớp</th>
+                            <th className="td py-1 px-2" >Trạng thái</th>
+                            <th className="td py-1 px-2" >Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {datas.map((data, index) => (
                             <tr key={index}>
-                                <td className="td">{(currentPage - 1) * 10 + index + 1}</td>
-                                <td className="td">{data.MSHS}</td>
-                                <td className="td">{data.HoTen}</td>
-                                <td className="td">{data.NgaySinh}</td>
-                                <td className="td">{data.GioiTinh}</td>
-                                <td className="td">{data.QueQuan}</td>
-                                <td className="td">{data.DanToc}</td>
-                                <td className="td">{data.TonGiao}</td>
-                                <td className="td">{data.DiaChi}</td>
-                                <td className="td">{data.SDT}</td>
-                                <td className="td">{data.ban.TenBan}</td>
+                                <td className="td py-1 px-2" >{(currentPage - 1) * 10 + index + 1}</td>
+                                <td className="td py-1 px-2" >{data.MSHS}</td>
+                                <td className="td py-1 px-2" >{data.HoTen}</td>
+                                <td className="td py-1 px-2" >{data.NgaySinh}</td>
+                                <td className="td py-1 px-2" >{data.GioiTinh}</td>
+                                <td className="td py-1 px-2" >{data.QueQuan}</td>
+                                <td className="td py-1 px-2" >{data.DanToc}</td>
+                                <td className="td py-1 px-2" >{data.TonGiao}</td>
+                                <td className="td py-1 px-2" >{data.DiaChi}</td>
+                                <td className="td py-1 px-2" >{data.SDT}</td>
+                                <td className="td py-1 px-2" >{data.ban.TenBan}</td>
                                 {data.lop[0]?.TenLop ?
                                     <td className="td">{data.lop[0].TenLop}</td> :
                                     <td className="td">Chưa xếp</td>}

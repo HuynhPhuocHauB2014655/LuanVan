@@ -31,15 +31,12 @@ class HSController extends Controller
     public function findByName($name)
     {
         $name = "%".$name."%";
-        $hocsinh = HocSinh::where('HoTen','like',$name)->with('ban')->get();
+        $hocsinh = HocSinh::where('HoTen','like',$name)->with(['ban', 'lop'])->get();
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function show($mshs)
     {
-        $hocsinh = HocSinh::with(['ban','taiKhoan'])->find($mshs);
-        if (!$hocsinh) {
-            return response()->json(['message' => 'Học sinh không tồn tại'], Response::HTTP_NOT_FOUND);
-        }
+        $hocsinh = HocSinh::with(['ban','taiKhoan','lop'])->find($mshs);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function lastStudent(){
