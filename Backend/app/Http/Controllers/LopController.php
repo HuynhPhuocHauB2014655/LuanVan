@@ -7,6 +7,7 @@ use App\Models\Lop;
 use App\Models\HocSinh;
 use App\Models\HocLop;
 use App\Models\GiaoVien;
+use App\Models\Diem;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -48,22 +49,13 @@ class LopController extends Controller
     }
     public function indexWithStudent()
     {
-    $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->get();
-
-// Sort the lops collection by the name of the first student in the hocSinh relationship
-$sortedLops = $lops->sortBy(function ($lop) {
-    return $lop->hocSinh->first()->HoTen ?? '';
-})->values()->all();
-
-return response()->json($sortedLops, Response::HTTP_OK);
-}
+        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->get();
+        return response()->json($lops, Response::HTTP_OK);
+    }
 
     public function indexWithStudentNow($MaNK)
     {
         $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->get();
-        $lop = $lop->sortBy(function ($item) {
-            return $item->hocSinh->first()->HoTen ?? '';
-        });
         return response()->json($lop, Response::HTTP_OK);
     }
     
@@ -220,4 +212,25 @@ return response()->json($sortedLops, Response::HTTP_OK);
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
+    // public function createDiem(){
+    //     $diem = new Diem();
+    //     $monhocTN = MonHoc::where('MaMH', 'like', 'TN%')
+    //         ->orWhere('MaMH', 'like', 'CB%')
+    //         ->orWhereIn('MaMH', ['XH1', 'TC2'])
+    //         ->get();
+    //     $monhocXH = MonHoc::where('MaMH', 'like', 'XH%')
+    //         ->orWhere('MaMH', 'like', 'CB%')
+    //         ->orWhereIn('MaMH', ['TN1', 'TC1'])
+    //         ->get();
+    //     $hocsinhTN = HocSinh::where('MaBan',"TN")->get();
+    //     $hocsinhXH = HocSinh::where('MaBan',"XH")->get();
+    //     foreach($hocsinhTN as $hocsinh)
+    //     {
+    //         foreach($monhocTN as $monhoc)
+    //         {
+    //             $diem->MaHS = $hocsinh->MSHS;
+    //             $diem->MaMH = $monhoc->MaMH;
+    //         }
+    //     }
+    // }
 }

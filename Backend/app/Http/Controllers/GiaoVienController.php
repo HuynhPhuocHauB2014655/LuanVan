@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\GiaoVien;
+use App\Models\PhanCong;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class GiaoVienController extends Controller
@@ -37,8 +38,12 @@ class GiaoVienController extends Controller
 
     public function show($MSGV)
     {
-        $giaovien = GiaoVien::with('monHoc')->find($MSGV);
+        $giaovien = GiaoVien::with(['monHoc','lop.hocSinh'])->find($MSGV);
         return response()->json($giaovien, Response::HTTP_OK);
+    }
+    public function showTeaching($MSGV){
+        $class = PhanCong::with(['lop.hocSinh','monHoc'])->where('MSGV',$MSGV)->get();
+        return response()->json($class, Response::HTTP_OK);
     }
     public function findByName($name)
     {

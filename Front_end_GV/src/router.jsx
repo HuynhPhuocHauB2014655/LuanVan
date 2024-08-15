@@ -3,6 +3,9 @@ import Home from './views/Home.jsx';
 import Layout from "./components/Layout.jsx";
 import GuestLayout from "./components/GuestLayout.jsx";
 import Info from "./views/Info.jsx";
+import Homeroom from "./views/Homeroom.jsx";
+import Class from "./views/Class.jsx";
+import ClassInfo from "./views/ClassInfo.jsx";
 
 
 const router = createBrowserRouter([
@@ -17,6 +20,18 @@ const router = createBrowserRouter([
             {
                 path: "/info",
                 element: <Info />,
+            },
+            {
+                path: "/cn",
+                element: <Homeroom />,
+            },
+            {
+                path: "/class",
+                element: <Class />,
+            },
+            {
+                path: "/class-info",
+                element: <ClassInfo />,
             },
         ]
     },

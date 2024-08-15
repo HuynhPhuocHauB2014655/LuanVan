@@ -11,7 +11,7 @@ use App\Http\Controllers\GiaoVienController;
 use App\Http\Controllers\LopController;
 use App\Http\Controllers\TKBController;
 use App\Http\Controllers\TaiKhoanController;
-
+use App\Http\Controllers\DiemController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -69,6 +69,7 @@ Route::get('/gv/search/{name}',[GiaoVienController::class,'findByName']);
 Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
 Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
+Route::get('/gv/teaching/{MSGV}',[GiaoVienController::class,'showTeaching']);
 
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
@@ -111,3 +112,7 @@ Route::put('/tk/update/gv',[TaiKhoanController::class,'changePassGV']);
 Route::put('/tk/update/hs',[TaiKhoanController::class,'changePassHS']);
 Route::post('/tk/hs/login',[TaiKhoanController::class,'HSLogin']);
 Route::post('/tk/gv/login',[TaiKhoanController::class,'GVLogin']);
+
+//Diem route
+Route::get('/diem/loaidiem',[DiemController::class,'loaiDiem']);
+Route::post('/diem/get',[DiemController::class,'diem']);

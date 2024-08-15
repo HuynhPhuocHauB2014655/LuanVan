@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 export default function Home() {
     const menu_items = [
         { id: 1, route: "/info", label: 'Thông tin cá nhân' },
-        { id: 2, route: "/", label: 'Chủ nhiệm' },
-        { id: 3, route: "/", label: 'Quản lí điểm' },
+        { id: 2, route: "/cn", label: 'Chủ nhiệm' },
+        { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
         { id: 4, route: "/", label: 'Thời khóa biểu' },
         { id: 5, route: "/", label: 'Lớp dạy' },
     ];
