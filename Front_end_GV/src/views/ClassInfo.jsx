@@ -50,9 +50,11 @@ export default function ClassInfo() {
             }
             setLoading(true);
             try {
-                const diemHk1 = await axiosClient.post("/diem/get", payloadHK1);
+                const [diemHk1, diemHk2] = await Promise.all([
+                    axiosClient.post("/diem/get", payloadHK1),
+                    axiosClient.post("/diem/get", payloadHK2),
+                ]);
                 setDiemHK1(diemHk1.data);
-                const diemHk2 = await axiosClient.post("/diem/get", payloadHK2);
                 setDiemHK2(diemHk2.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -62,21 +64,56 @@ export default function ClassInfo() {
         }
         setShow(show);
     }
-    const hocki = {
-        "Học kỳ 1": 1 + nienKhoa.NienKhoa,
-        "Học kỳ 2": 2 + nienKhoa.NienKhoa
-    };
     const diemHK = loaiDiem.filter((item) => item.MaLoai === 'tx' || item.MaLoai === 'gk' || item.MaLoai === 'ck');
     const countTX1 = {};
-    classData.lop.hoc_sinh.map((student) => {
-        const count = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === 'tx').length;
-        countTX1[student.MSHS] = count;
-    });
+    if (diemHK1.length > 0) {
+        classData.lop.hoc_sinh.map((student) => {
+            const count = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === 'tx').length;
+            countTX1[student.MSHS] = count;
+        });
+    }
     const countTX2 = {};
-    classData.lop.hoc_sinh.map((student) => {
-        const count = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === 'tx').length;
-        countTX2[student.MSHS] = count;
-    });
+    if (diemHK2.length > 0) {
+        classData.lop.hoc_sinh.map((student) => {
+            const count = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === 'tx').length;
+            countTX2[student.MSHS] = count;
+        });
+    }
+    const generateTXCells = (grades, emptyCellsCount,student) => {
+        if (grades.length == 0) {
+            const cells = [...Array(4)].map((_, i) => (
+                <td key={i} className="border border-black"></td>
+            ));
+            return cells;
+        } else {
+            const cells = grades.map((data, index) => (
+                <td key={`tx-grade-${student.MSHS}-${index}`} className="border border-black">
+                    {data.Diem || ""}
+                </td>
+            ));
+            for (let i = 0; i < emptyCellsCount; i++) {
+                cells.push(<td key={`tx-empty-${student.MSHS}-${i + cells.length}`} className="border border-black"></td>);
+            }
+            return cells;
+        }
+    };
+
+    const generateOtherCells = (grades,student) => {
+        if (grades.length == 0) {
+            const cells = diemHK.map((data) => (
+                data.MaLoai != 'tx' &&
+                <td key={data.MaLoai} className="border border-black">
+                </td>
+            ))
+            return cells;
+        } else {
+            return grades.map((data, index) => (
+                <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">
+                    {data.Diem || ""}
+                </td>
+            ));
+        }
+    };
     return (
         <div className="main-content">
             <Menu />
@@ -137,60 +174,26 @@ export default function ClassInfo() {
                                 {classData.lop.hoc_sinh.map((student) => {
                                     const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
                                     const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-                                    const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai !== "tx");
-                                    const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai !== "tx");
+                                    const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
+                                    const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
 
-                                    const emptyTXCellsCount1 = 4 - countTX2[student.MSHS];
-                                    const emptyTXCellsCount2 = 4 - countTX2[student.MSHS];
+                                    const emptyTXCellsCount1 = 4 - (countTX1[student.MSHS] || 0);
+                                    const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
 
-                                    const generateTXCells = (grades, emptyCellsCount) => {
-                                        if (grades.length == 0) {
-                                            const cells = [...Array(4)].map((_, i) => (
-                                                <td key={i} className="border border-black"></td>
-                                            ));
-                                            return cells;
-                                        } else {
-                                            const cells = grades.map((data, index) => (
-                                                <td key={`tx-grade-${student.MSHS}-${index}`} className="border border-black">
-                                                    {data.Diem || ""}
-                                                </td>
-                                            ));
-                                            for (let i = cells.length; i < emptyCellsCount; i++) {
-                                                cells.push(<td key={`tx-empty-${student.MSHS}-${i}`} className="border border-black"></td>);
-                                            }
-                                            return cells;
-                                        }
-                                    };
 
-                                    const generateOtherCells = (grades) => {
-                                        if (grades.length == 0) {
-                                            const cells = diemHK.map((data) => (
-                                                data.MaLoai != 'tx' &&
-                                                <td key={data.MaLoai} className="border border-black">
-                                                </td>
-                                            ))
-                                            return cells;
-                                        } else {
-                                            return grades.map((data, index) => (
-                                                <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">
-                                                    {data.Diem || ""}
-                                                </td>
-                                            ));
-                                        }
-                                    };
 
                                     return (
                                         <tr key={student.MSHS}>
                                             <td className="border border-black">{student.MSHS}</td>
                                             <td className="border border-black">{student.HoTen}</td>
 
-                                            {generateTXCells(txGrades1, emptyTXCellsCount1)}
+                                            {generateTXCells(txGrades1, emptyTXCellsCount1, student)}
 
-                                            {generateOtherCells(otherGrades1)}
+                                            {generateOtherCells(otherGrades1, student)}
 
-                                            {generateTXCells(txGrades2, emptyTXCellsCount2)}
+                                            {generateTXCells(txGrades2, emptyTXCellsCount2, student)}
 
-                                            {generateOtherCells(otherGrades2)}
+                                            {generateOtherCells(otherGrades2, student)}
                                         </tr>
                                     );
                                 })}
