@@ -94,3 +94,6 @@ input[type="number"] {
 #confirm-no:hover{
   background-color: #dc3545;
 }
+.X-button{
+  @apply px-1 border-s-2 border-b-2 rounded-bl-lg rounded-tr-lg border-red-500 text-red-900 hover:text-white hover:bg-red-500
+}

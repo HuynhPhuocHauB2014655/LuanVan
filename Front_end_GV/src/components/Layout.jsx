@@ -39,7 +39,7 @@ export default function Layout() {
         if (message) {
             const timer = setTimeout(() => {
                 setMessage("");
-            }, 3000);
+            }, 1000);
 
             return () => clearTimeout(timer);
         }

@@ -26,8 +26,7 @@ export default function HK_NK() {
     const showForm = (show) => {
         setIsShow(show);
     };
-    const createHK = () => {
-    }
+
     const [isChecked, setIsChecked] = useState(false);
     const handleCheckboxChange = (event) => {
         setIsChecked(event.target.checked);
@@ -83,8 +82,9 @@ export default function HK_NK() {
     const submitNKHientai = async (event) => {
         event.preventDefault();
         const MaNK = nienKhoaHienTaiRef.current.value;
+        const TenNK = datas.find((item) => item.MaNK === MaNK).TenNK;
         try {
-            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK } });
+            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK,'tennk': TenNK } });
             setMessage(response.data);
             fetchData();
         } catch (error) {

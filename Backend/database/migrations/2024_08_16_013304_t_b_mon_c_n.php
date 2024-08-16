@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Diem', function (Blueprint $table) {
+        Schema::create('TBMonCN', function (Blueprint $table) {
             $table->id();
             $table->string('MSHS',10);
             $table->string('MaMH',10);
-            $table->string('MaHK',10);
-            $table->string('MaLoai',10);
+            $table->string('MaNK',10);
             $table->float('Diem');
             $table->foreign('MSHS')->references('MSHS')->on('HocSinh');
             $table->foreign('MaMH')->references('MaMH')->on('MonHoc');
-            $table->foreign('MaHK')->references('MaHK')->on('HocKi');
-            $table->foreign('MaLoai')->references('MaLoai')->on('LoaiDiem');
+            $table->foreign('MaNK')->references('MaNK')->on('NienKhoa');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('Diem');
+        Schema::dropIfExists('TBMonCN');
     }
 };

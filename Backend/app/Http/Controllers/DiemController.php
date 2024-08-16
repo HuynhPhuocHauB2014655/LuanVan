@@ -5,14 +5,28 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Diem;
 use App\Models\LoaiDiem;
+use App\Models\TBMonCN;
+use App\Models\HocSinh;
+use App\Models\Lop;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class DiemController extends Controller
 {
     public function loaiDiem()
     {
-        $loaiDiem = LoaiDiem::orderBy('MaLoai', 'desc')->get();
+        $loaiDiem = LoaiDiem::orderBy('created_at', 'desc')->get();
         return response()->json($loaiDiem, Response::HTTP_OK);
+    }
+    public function diemCN(Request $request)
+    {
+        $diem = TBMonCN::with(['hocSinh.lop'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaNK', $request->MaNK)
+        ->where('MaMH', $request->MaMH)
+        ->get();
+        return response()->json($diem, Response::HTTP_OK);
     }
     public function diem(Request $request)
     {
@@ -25,4 +39,116 @@ class DiemController extends Controller
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
+        public function AddDiem(Request $request)
+        {
+            if($request->MaLoai == "tx")
+            {
+                $txCount = Diem::where('MSHS',$request->MSHS)
+                                ->where('MaHK',$request->MaHK)
+                                ->where('MaMH',$request->MaMH)
+                                ->where('MaLoai',$request->MaLoai)
+                                ->count();
+                if($txCount >= 4){
+                    return response()->json("Đã đạt số cột điểm tối đa", 409);
+                }
+                $diem = Diem::create($request->all());
+                return response()->json("Đã thêm điểm thành công", 200);
+            }else{
+                $exits = Diem::where('MSHS',$request->MSHS)
+                                ->where('MaHK',$request->MaHK)
+                                ->where('MaMH',$request->MaMH)
+                                ->where('MaLoai',$request->MaLoai)->first();
+                if($exits == null){
+                    $diem = Diem::create($request->all());
+                    return response()->json("Đã thêm điểm thành công", 200);
+                }else{
+                    return response()->json("Đã đạt số cột điểm tối đa", 409);
+                }
+            }
+        }
+        public function updateDiem(Request $request)
+        {
+            $diem = Diem::find($request->id);
+            if($diem){
+                $diem->update($request->all());
+                return response()->json("Đã cập nhật điểm thành công", 200);
+            }
+            else{
+                return response()->json("Điểm không tồn tại", 404);
+            }
+        }
+        public function deleteDiem($id)
+        {
+            $diem = Diem::find($id);
+            if($diem){
+                $diem->delete();
+                return response()->json("Đã cập nhật điểm thành công", 200);
+            }
+            else{
+                return response()->json("Điểm không tồn tại", 404);
+            }
+        }
+        public function TongKetDiemHK(Request $request)
+        {
+            $lop = Lop::where("MaLop",$request->MaLop)->first();
+            $hocsinh = $lop->hocSinh;
+            $tongTx = 0;
+            foreach ($hocsinh as $hs) {
+                $diemTX = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $request->MaHK)
+                    ->where('MaMH', $request->MaMH)
+                    ->where('MaLoai', 'tx')
+                    ->get();
+                $tongTx = $diemTX->sum('Diem');
+                $diemGK = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $request->MaHK)
+                    ->where('MaMH', $request->MaMH)
+                    ->where('MaLoai', 'gk')
+                    ->first();
+        
+                $diemCK = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $request->MaHK)
+                    ->where('MaMH', $request->MaMH)
+                    ->where('MaLoai', 'ck')
+                    ->first();
+        
+                if ($diemTX->count() > 0) {
+                    $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() +5),1);
+                } else {
+                    $tbhk = 0;
+                }
+                $diemHk = new Diem();
+                $diemHk->MSHS = $hs->MSHS;
+                $diemHk->MaHK = $request->MaHK;
+                $diemHk->MaMH = $request->MaMH;
+                $diemHk->MaLoai = substr($request->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2";
+                $diemHk->Diem = $tbhk;
+                $diemHk->save();
+            }
+            return response()->json("Đã cập nhật điểm thành công",402);
+        }
+        public function TongKetDiemCN(Request $request){
+            $lop = Lop::where("MaLop",$request->MaLop)->first();
+            $hocsinh = $lop->hocSinh;
+            foreach ($hocsinh as $hs){
+                $tbhk1 = Diem::where('MSHS', $hs->MSHS)
+                ->where('MaHK','1'. $request->MaNK)
+                ->where('MaMH', $request->MaMH)
+                ->where('MaLoai', 'tbhk1')
+                ->first();
+                $tbhk2 = Diem::where('MSHS', $hs->MSHS)
+                ->where('MaHK','2' . $request->MaNK)
+                ->where('MaMH', $request->MaMH)
+                ->where('MaLoai', 'tbhk2')
+                ->first();
+                $tbcn = round(($tbhk1->Diem + $tbhk2->Diem*2)/3,1);
+                $diemCN = new TBMonCN();
+                $diemCN->MSHS = $hs->MSHS;
+                $diemCN->MaNK = $request->MaNK;
+                $diemCN->MaMH = $request->MaMH;
+                $diemCN->Diem = $tbcn;
+                $diemCN->save();
+            }
+            return response()->json("Đã cập nhật điểm thành công",402);
+        } 
 }
