@@ -4,7 +4,7 @@ export default function Home() {
         { id: 1, route: "/info", label: 'Thông tin cá nhân' },
         { id: 2, route: "/cn", label: 'Chủ nhiệm' },
         { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
-        { id: 4, route: "/", label: 'Thời khóa biểu' },
+        { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
         { id: 5, route: "/", label: 'Lớp dạy' },
     ];
     return (

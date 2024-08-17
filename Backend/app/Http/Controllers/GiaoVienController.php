@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\GiaoVien;
 use App\Models\PhanCong;
+use App\Models\TKB;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class GiaoVienController extends Controller
@@ -84,5 +85,9 @@ class GiaoVienController extends Controller
         $data->TrangThai = 1;
         $data->save();
         return response()->json("Đã xóa thành công", Response::HTTP_NO_CONTENT);
+    }
+    public function getTKB(Request $rq){
+        $tkb = TKB::with(['lop','monHoc'])->where("MSGV",$rq->MSGV)->where("MaNK",$rq->MaNK)->get();
+        return response()->json($tkb, Response::HTTP_OK);
     }
 }

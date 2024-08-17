@@ -6,7 +6,7 @@ import Info from "./views/Info.jsx";
 import Homeroom from "./views/Homeroom.jsx";
 import Class from "./views/Class.jsx";
 import ClassInfo from "./views/ClassInfo.jsx";
-import StudentInfo from "./views/StudentInfo.jsx";
+import TKB from "./views/TKB.jsx";
 
 
 const router = createBrowserRouter([
@@ -35,8 +35,8 @@ const router = createBrowserRouter([
                 element: <ClassInfo />,
             },
             {
-                path: "/student-info",
-                element: <StudentInfo />,
+                path: "/tkb",
+                element: <TKB />,
             },
         ]
     },

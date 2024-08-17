@@ -71,7 +71,7 @@ Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
 Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 Route::get('/gv/teaching/{MSGV}',[GiaoVienController::class,'showTeaching']);
-
+Route::post('/gv/tkb',[GiaoVienController::class,'getTKB']);
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
 Route::get('/lop/index',[LopController::class,'index']);

@@ -35,4 +35,7 @@ class GiaoVien extends Model
     public function phanCong():HasMany{
         return $this->hasMany(PhanCong::class,'MSGV','MSGV');
     }
+    public function tkb():HasMany{
+        return $this->hasMany(TKB::class,'MSGV','MSGV');
+    }
 }
