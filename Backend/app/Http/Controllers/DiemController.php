@@ -28,14 +28,33 @@ class DiemController extends Controller
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
-    public function diem(Request $request)
+    public function diemCNLopHoc(Request $request)
+    {
+        $diem = TBMonCN::with(['hocSinh.lop'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaNK', $request->MaNK)->orderBy('MSHS')
+        ->get();
+        return response()->json($diem, Response::HTTP_OK);
+    }
+    public function diemMH(Request $request)
     {
         $diem = Diem::with(['hocSinh.lop'])
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })
         ->where('MaHK', $request->MaHK)
-        ->where('MaMH', $request->MaMH)
+        ->get();
+        return response()->json($diem, Response::HTTP_OK);
+    }
+    public function diemLH(Request $request)
+    {
+        $diem = Diem::with(['hocSinh.lop'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaHK', $request->MaHK)->orderBy('MSHS')
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }

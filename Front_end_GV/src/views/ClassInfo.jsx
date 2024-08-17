@@ -260,8 +260,8 @@ export default function ClassInfo() {
             <div className="right-part mb-2 relative">
                 <h1 className="page-name">Thông tin lớp</h1>
                 <div className="my-2 flex">
-                    <button className="w-1/2 border py-2 text-xl border-collapse border-cyan-600 bg-slate-200 shadow-md hover:bg-cyan-200" onClick={() => handleShow(1)}>Danh sách lớp</button>
-                    <button className="w-1/2 border py-2 text-xl border-collapse border-cyan-600 bg-slate-200 shadow-md hover:bg-cyan-200" onClick={() => handleShow(2)}>Quản lí điểm</button>
+                    <button className="teacher-head" onClick={() => handleShow(1)}>Danh sách lớp</button>
+                    <button className="teacher-head" onClick={() => handleShow(2)}>Quản lí điểm</button>
                 </div>
                 <div className="flex justify-between px-2 text-xl">
                     <p><strong>Tên lớp:</strong> {classData.lop.TenLop}</p>
@@ -308,10 +308,8 @@ export default function ClassInfo() {
                             loaiDiem={loaiDiemHK}
                             diemHK1={diemHK1}
                             diemHK2={diemHK2}
-                            loaiDiemTB={loaiDiemTB}
                             diemCN={diemCN}
                             show={showForm}
-                            reloadData={() => handleShow(2)}
                             _delete={handleDelete}
                             _update={handleUpdate}
                         />

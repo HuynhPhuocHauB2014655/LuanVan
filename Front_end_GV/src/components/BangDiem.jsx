@@ -5,7 +5,7 @@ import { useStateContext } from '../context/Context';
 import axiosClient from '../axios-client';
 
 const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
-    diemHK2, loaiDiemTB, diemCN, show,reloadData,
+    diemHK2, diemCN, show,
     _delete, _update
 }) => {
     const [showEditForm, setShowEditForm] = useState(false);

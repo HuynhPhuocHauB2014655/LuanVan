@@ -115,8 +115,10 @@ Route::post('/tk/gv/login',[TaiKhoanController::class,'GVLogin']);
 
 //Diem route
 Route::get('/diem/loaidiem',[DiemController::class,'loaiDiem']);
-Route::post('/diem/get',[DiemController::class,'diem']);
+Route::post('/diem/get',[DiemController::class,'diemMH']);
+Route::post('/diem/cn',[DiemController::class,'diemLH']);
 Route::post('/diem/getCN',[DiemController::class,'diemCN']);
+Route::post('/diem/cn/getCN',[DiemController::class,'diemCNLopHoc']);
 Route::post('/diem/add',[DiemController::class,'AddDiem']);
 Route::post('/diem/update',[DiemController::class,'updateDiem']);
 Route::delete('/diem/delete/{id}',[DiemController::class,'deleteDiem']);
