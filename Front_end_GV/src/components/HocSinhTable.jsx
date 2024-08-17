@@ -1,6 +1,7 @@
 import React from 'react';
-
-const HocSinhTable = ({ datas }) => {
+import { useNavigate } from "react-router-dom";
+const HocSinhTable = ({ datas}) => {
+    const navigate = useNavigate();
     return (
         <table className="border-collapse mt-2 mb-2 w-full">
             <thead>

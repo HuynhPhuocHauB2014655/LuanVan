@@ -10,7 +10,6 @@ import BangDiem from "../components/BangDiem";
 
 export default function Homeroom() {
     const { userName } = useUserContext();
-    const [chuNhiemNow, setChuNhiemNow] = useState({});
     const { nienKhoa } = useStateContext();
     const [loading, setLoading] = useState(true);
     const [datas, setDatas] = useState();
@@ -27,8 +26,12 @@ export default function Homeroom() {
     });
     useEffect(() => {
         const fetchData = async () => {
+            const payload ={
+                MaNK: nienKhoa.NienKhoa,
+                MSGV: userName,
+            }
             try {
-                const response = await axiosClient.get(`/gv/show/${userName}`);
+                const response = await axiosClient.post(`/gv/show/cn`,payload);
                 setDatas(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -37,11 +40,11 @@ export default function Homeroom() {
             }
         };
         fetchData();
-    }, [userName]);
+    }, [userName,nienKhoa]);
     const handleState = async (view) => {
         if (view == 2) {
             var urlMH = '';
-            if (chuNhiemNow[0].MaLop.substring(0, 1) === "C") {
+            if (datas.lop[0].MaLop.substring(0, 1) === "C") {
                 urlMH = '/mh/xh';
             } else {
                 urlMH = '/mh/tn';
@@ -58,9 +61,9 @@ export default function Homeroom() {
     useEffect(() => {
         if (state == 2 && subjects.length > 0) {
             const fetchDiem = async () => {
-                const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: chuNhiemNow[0].MaLop };
-                const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: chuNhiemNow[0].MaLop };
-                const payloadCN = { MaNK: nienKhoa.NienKhoa, MaLop: chuNhiemNow[0].MaLop };
+                const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+                const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+                const payloadCN = { MaNK: nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
 
                 try {
                     const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
@@ -82,25 +85,18 @@ export default function Homeroom() {
         }
     }, [subjects])
     useEffect(() => {
-        if (datas) {
-            const filter = datas.lop?.filter((item) => item.MaNK === nienKhoa.NienKhoa)
-            setChuNhiemNow(filter);
-        };
-    }, [datas, nienKhoa])
-    useEffect(() => {
-        if (chuNhiemNow.length > 0) {
+        if (datas && Object.keys(datas).length > 0) {
             const newCount = {
-                Siso: chuNhiemNow[0].hoc_sinh.length,
-                Nam: chuNhiemNow[0].hoc_sinh.filter(item => item.GioiTinh === 'Nam').length,
-                Nu: chuNhiemNow[0].hoc_sinh.filter(item => item.GioiTinh === 'Nữ').length,
+                Siso: datas.lop[0].hoc_sinh.length,
+                Nam: datas.lop[0].hoc_sinh.filter(item => item.GioiTinh === 'Nam').length,
+                Nu: datas.lop[0].hoc_sinh.filter(item => item.GioiTinh === 'Nữ').length,
             };
             setCount(newCount);
         }
-    }, [chuNhiemNow]);
+    }, [datas]);
     if (loading) {
         return <Loading />
     }
-    console.log(subjects)
     const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai));
     return (
         <div className="main-content">
@@ -108,28 +104,28 @@ export default function Homeroom() {
             <div className="right-part">
                 <h1 className="page-name">Quản lí lớp chủ nhiệm</h1>
                 <div>
-                    {Object.keys(chuNhiemNow).length > 0 ?
+                    {Object.keys(datas).length > 0 ?
                         <div className="mt-2">
                             <div className="my-2 flex">
                                 <button className="teacher-head" onClick={() => handleState(1)}>Danh sách lớp</button>
                                 <button className="teacher-head" onClick={() => handleState(2)}>Xem điểm</button>
                             </div>
                             <div className="flex justify-between">
-                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {chuNhiemNow[0].TenLop}</p>
+                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {datas.TenLop}</p>
                                 <p className="text-2xl font-bold">Sỉ số: {count.Siso}</p>
                                 <p className="text-2xl font-bold">Nam: {count.Nam}</p>
                                 <p className="text-2xl font-bold">Nữ: {count.Nu}</p>
                             </div>
-                            {state == 1 ? <HocSinhTable datas={chuNhiemNow[0].hoc_sinh} />
+                            {state == 1 ? <HocSinhTable datas={datas.lop[0]?.hoc_sinh} />
                                 :
                                 <div className="">
                                     <div>
                                         <h2 className="text-2xl font-bold text-center mt-2">Điểm các môn học</h2>
                                         {subjects.map((mh) => (
-                                            <div className="my-2">
+                                            <div key={mh.MaMH} className="my-2">
                                                 <h3 className="text-2xl font-bold">Tên môn: {mh.TenMH}</h3>
                                                 <BangDiem
-                                                    hocSinh={chuNhiemNow[0].hoc_sinh}
+                                                    hocSinh={datas.lop[0]?.hoc_sinh}
                                                     loaiDiem={loaiDiemHK}
                                                     diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
                                                     diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}

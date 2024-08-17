@@ -41,6 +41,17 @@ class GiaoVienController extends Controller
         $giaovien = GiaoVien::with(['monHoc','lop.hocSinh'])->find($MSGV);
         return response()->json($giaovien, Response::HTTP_OK);
     }
+    public function showChuNhiem(Request $rq)
+{
+    $giaovien = GiaoVien::with(['monHoc', 'lop.hocSinh'])
+        ->where('MSGV', $rq->MSGV)
+        ->whereHas('lop', function($query) use ($rq) {
+            $query->where('MaNK', $rq->MaNK);
+        })
+        ->first();
+
+    return response()->json($giaovien, Response::HTTP_OK);
+}
     public function showTeaching($MSGV){
         $class = PhanCong::with(['lop.hocSinh','monHoc'])->where('MSGV',$MSGV)->get();
         return response()->json($class, Response::HTTP_OK);

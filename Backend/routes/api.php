@@ -65,6 +65,7 @@ Route::post('/gv/create',[GiaoVienController::class,'store']);
 Route::get('/gv/index',[GiaoVienController::class,'index']);
 Route::get('/gv/all',[GiaoVienController::class,'allGV']);
 Route::get('/gv/show/{MSGV}',[GiaoVienController::class,'show']);
+Route::post('/gv/show/cn',[GiaoVienController::class,'showChuNhiem']);
 Route::get('/gv/search/{name}',[GiaoVienController::class,'findByName']);
 Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
