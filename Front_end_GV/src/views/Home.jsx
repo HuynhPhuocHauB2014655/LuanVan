@@ -5,7 +5,7 @@ export default function Home() {
         { id: 2, route: "/cn", label: 'Chủ nhiệm' },
         { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
-        { id: 5, route: "/", label: 'Lớp dạy' },
+        { id: 5, route: "/diemdanh", label: 'Điểm danh' },
     ];
     return (
         <div className="main-content">

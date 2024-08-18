@@ -27,18 +27,7 @@ class TKBController extends Controller
     }
     public function create(Request $request, $nk)
     {
-        // Convert academic year format
         $nienKhoa = str_replace('-', '', $nk);
-
-        // Fetch subjects
-        $monhocXH = MonHoc::where('MaMH', 'like', 'XH%')
-                        ->orWhere('MaMH', 'like', 'CB%')
-                        ->orWhere('MaMH', '=', 'TN1')
-                        ->orWhere('MaMH', '=', 'TC1')
-                        ->inRandomOrder()
-                        ->get();
-
-        // Retrieve classes
         $lopTN = Lop::doesntHave('tkb')
                     ->where('MaLop', 'like', 'A'.$nienKhoa.'%')
                     ->inRandomOrder()

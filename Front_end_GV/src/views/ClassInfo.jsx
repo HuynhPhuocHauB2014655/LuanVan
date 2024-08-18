@@ -9,6 +9,7 @@ import axiosClient from "../axios-client";
 import { useLocation } from "react-router-dom";
 import HocSinhTable from "../components/HocSinhTable";
 import BangDiem from "../components/BangDiem";
+import Draggable from 'react-draggable';
 
 export default function ClassInfo() {
     const { userName } = useUserContext();
@@ -32,6 +33,7 @@ export default function ClassInfo() {
     const [maHK1, setMaHK1] = useState("");
     const [maHK2, setMaHK2] = useState("");
     const { classData } = location.state || {};
+    const dragRef = useRef();
 
     useEffect(() => {
         const fetchLoaiDiem = async () => {
@@ -53,8 +55,7 @@ export default function ClassInfo() {
     const fetchDiem = async () => {
         const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: classData.MaLop, MaMH: classData.MaMH };
         const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classData.MaLop, MaMH: classData.MaMH };
-        const payloadCN = { MaNK: nienKhoa.NienKhoa, MaLop: classData.MaLop, MaMH: classData.MaMH };
-
+        const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classData.MaLop, MaMH: classData.MaMH };
         try {
             const [diemHk1, diemHk2, diemCn] = await Promise.all([
                 axiosClient.post("/diem/get", payloadHK1),
@@ -105,13 +106,13 @@ export default function ClassInfo() {
             console.log(error);
             setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            if(disableHK1 == false){
+            if (disableHK1 == false) {
                 TongKetHK(maHK1);
             }
-            if(disableHK2 == false){
+            if (disableHK2 == false) {
                 TongKetHK(maHK2);
             }
-            if(disableNH == false){
+            if (disableNH == false) {
                 TongKetNH();
             }
             fetchDiem();
@@ -147,45 +148,47 @@ export default function ClassInfo() {
         "Học kì 2": 2 + nienKhoa.NienKhoa
     };
     const CheckTongKet = () => {
-        let checkHK1 = true;
-        let checkHK2 = true;
-        let checkCN = true;
-        classData.lop.hoc_sinh.map((student) => {
-            const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-            const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-            const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
-            const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
-            const TBHK1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk1");
-            const TBHK2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk2");
-            if ((txGrades1.length == 0 || otherGrades1.length < 2)) {
-                checkHK1 = false;
-            }
-            if ((txGrades2.length == 0 || otherGrades2.length < 2)) {
-                checkHK2 = false;
-            }
-            if (!TBHK1.Diem || !TBHK2.Diem) {
-                checkCN = false;
-            }
-        })
-        if (checkHK1) {
-            setDisableHK1(false);
-            setMaHK1(1 + nienKhoa.NienKhoa);
-        }
-        else if (checkHK2) {
-            setDisableHK2(false);
-            setMaHK2(2 + nienKhoa.NienKhoa);
-        }
-        else {
-            setDisableHK1(true);
-            setDisableHK2(true);
-            setMaHK1("");
-            setMaHK2("");
-        }
-        if (checkCN) {
-            setDisableNH(false);
-        } else {
-            setDisableNH(true);
-        }
+        // let checkHK1 = true;
+        // let checkHK2 = true;
+        // let checkCN = true;
+        // classData.lop.hoc_sinh.map((student) => {
+        //     const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
+        //     const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
+        //     const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
+        //     const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
+        //     const TBHK1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk1");
+        //     const TBHK2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk2");
+        //     if ((txGrades1.length == 0 || otherGrades1.length < 2)) {
+        //         checkHK1 = false;
+        //     }
+        //     if ((txGrades2.length == 0 || otherGrades2.length < 2)) {
+        //         checkHK2 = false;
+        //     }
+        //     if (!TBHK1.Diem || !TBHK2.Diem) {
+        //         checkCN = false;
+        //     }
+        // })
+        // if (checkHK1) {
+        //     setDisableHK1(false);
+        //     setMaHK1(1 + nienKhoa.NienKhoa);
+        // }
+        // else if (checkHK2) {
+        //     setDisableHK2(false);
+        //     setMaHK2(2 + nienKhoa.NienKhoa);
+        // }
+        // else {
+        //     setDisableHK1(true);
+        //     setDisableHK2(true);
+        //     setMaHK1("");
+        //     setMaHK2("");
+        // }
+        // if (checkCN) {
+        //     setDisableNH(false);
+        // } else {
+        //     setDisableNH(true);
+        // }
+        setMaHK1(1 + nienKhoa.NienKhoa);
+        setMaHK2(2 + nienKhoa.NienKhoa);
         setShowButton(!showButton);
     }
     const changeConfirm = (type) => {
@@ -301,7 +304,7 @@ export default function ClassInfo() {
                                     <button
                                         type="button"
                                         className={!disableNH ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        disabled={disableNH}
+                                        // disabled={disableNH}
                                         onClick={() => changeConfirm('tknh')}
                                     >
                                         Tổng kết năm học
@@ -309,7 +312,7 @@ export default function ClassInfo() {
                                     <button
                                         type="button"
                                         className={!disableHK1 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        disabled={disableHK1}
+                                        // disabled={disableHK1}
                                         onClick={() => changeConfirm('tkhk1')}
                                     >
                                         Tổng kết học kì 1
@@ -317,7 +320,7 @@ export default function ClassInfo() {
                                     <button
                                         type="button"
                                         className={!disableHK2 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        disabled={disableHK2}
+                                        // disabled={disableHK2}
                                         onClick={() => changeConfirm('tkhk2')}
                                     >
                                         Tổng kết học kì 2
@@ -347,104 +350,108 @@ export default function ClassInfo() {
                     </div>
                 )}
                 {showForm === 1 && (
-                    <div className="z-10 absolute w-1/2 top-64 left-1/4 border-2 border-black rounded-lg bg-white">
-                        <div className="absolute top-0 right-0">
-                            <button className="X-button" onClick={() => setShowForm(0)}>X</button>
-                        </div>
-                        <div className="p-2 text-center text-xl border-b-2 border-slate-100 text-white bg-slate-400">Nhập điểm</div>
-                        <div className="p-4">
-                            <Formik
-                                initialValues={{
-                                    MSHS: '',
-                                    Diem: '',
-                                    MaHK: '',
-                                    MaLoai: '',
-                                }}
-                                validationSchema={Yup.object().shape({
-                                    MSHS: Yup.string().required('Bắt buộc'),
-                                    Diem: Yup.number().typeError("Không đúng định dạng")
-                                        .required('Bắt buộc')
-                                        .min(0, "Điểm không hợp lệ")
-                                        .max(10, "Điểm không hợp lệ"),
-                                    MaHK: Yup.string().required('Bắt buộc'),
-                                    MaLoai: Yup.string().required('Bắt buộc'),
-                                })}
-                                enableReinitialize={true}
-                                onSubmit={handleSubmit}
-                            >
-                                <Form className="flex items-center justify-center">
-                                    <div className="w-full max-w-lg p-3 space-y-4">
-                                        <h2 className="text-2xl font-bold text-center underline underline-offset-8 decoration-4 decoration-blue-300">Nhập điểm</h2>
-                                        <div className="grid grid-rows-2 grid-flow-col">
-                                            <div className="w-[80%] mx-auto">
-                                                <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
-                                                    Mã học sinh
-                                                </label>
-                                                <Field
-                                                    type="text"
-                                                    name="MSHS"
-                                                    className="f-field"
-                                                    placeholder="Nhập mã học sinh"
-                                                />
-                                                <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
-                                            </div>
-                                            <div className="w-[80%] mx-auto">
-                                                <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="Diem">
-                                                    Điểm
-                                                </label>
-                                                <Field
-                                                    type="text"
-                                                    name="Diem"
-                                                    className="f-field"
-                                                    placeholder="Nhập mã điểm"
-                                                />
-                                                <ErrorMessage className="text-red-700 block mb-2" name="Diem" component="div" />
-                                            </div>
-                                            <div className="w-[80%] mx-auto">
-                                                <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaHK">
-                                                    Học kì
-                                                </label>
-                                                <Field
-                                                    as="select"
-                                                    name="MaHK"
-                                                    className="f-field"
+                    <Draggable nodeRef={dragRef} handle=".drag-handle">
+                        <div className="z-10 absolute w-1/2 top-64 left-1/4" ref={dragRef}>
+                            <div className="border-2 border-black rounded-lg bg-white">
+                                <div className="absolute top-0 right-0">
+                                    <button className="X-button" onClick={() => setShowForm(0)}>X</button>
+                                </div>
+                                <div className="drag-handle cursor-move p-2 text-center text-xl border-b-2 border-slate-100 text-white bg-slate-400">Nhập điểm</div>
+                                <div className="p-4">
+                                    <Formik
+                                        initialValues={{
+                                            MSHS: '',
+                                            Diem: '',
+                                            MaHK: '',
+                                            MaLoai: '',
+                                        }}
+                                        validationSchema={Yup.object().shape({
+                                            MSHS: Yup.string().required('Bắt buộc'),
+                                            Diem: Yup.number().typeError("Không đúng định dạng")
+                                                .required('Bắt buộc')
+                                                .min(0, "Điểm không hợp lệ")
+                                                .max(10, "Điểm không hợp lệ"),
+                                            MaHK: Yup.string().required('Bắt buộc'),
+                                            MaLoai: Yup.string().required('Bắt buộc'),
+                                        })}
+                                        enableReinitialize={true}
+                                        onSubmit={handleSubmit}
+                                    >
+                                        <Form className="flex items-center justify-center">
+                                            <div className="w-full max-w-lg p-3 space-y-4">
+                                                <h2 className="text-2xl font-bold text-center underline underline-offset-8 decoration-4 decoration-blue-300">Nhập điểm</h2>
+                                                <div className="grid grid-rows-2 grid-flow-col">
+                                                    <div className="w-[80%] mx-auto">
+                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
+                                                            Mã học sinh
+                                                        </label>
+                                                        <Field
+                                                            type="text"
+                                                            name="MSHS"
+                                                            className="f-field"
+                                                            placeholder="Nhập mã học sinh"
+                                                        />
+                                                        <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
+                                                    </div>
+                                                    <div className="w-[80%] mx-auto">
+                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="Diem">
+                                                            Điểm
+                                                        </label>
+                                                        <Field
+                                                            type="text"
+                                                            name="Diem"
+                                                            className="f-field"
+                                                            placeholder="Nhập mã điểm"
+                                                        />
+                                                        <ErrorMessage className="text-red-700 block mb-2" name="Diem" component="div" />
+                                                    </div>
+                                                    <div className="w-[80%] mx-auto">
+                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaHK">
+                                                            Học kì
+                                                        </label>
+                                                        <Field
+                                                            as="select"
+                                                            name="MaHK"
+                                                            className="f-field"
+                                                        >
+                                                            <option value="">Chọn học kì</option>
+                                                            <option value={hocki["Học kì 1"]}>Học kì 1</option>
+                                                            <option value={hocki["Học kì 2"]}>Học kì 2</option>
+                                                        </Field>
+                                                        <ErrorMessage className="text-red-700 block mb-2" name="MaHK" component="div" />
+                                                    </div>
+                                                    <div className="w-[80%] mx-auto">
+                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaLoai">
+                                                            Loại điểm
+                                                        </label>
+                                                        <Field
+                                                            as="select"
+                                                            name="MaLoai"
+                                                            className="f-field"
+                                                        >
+                                                            <option value="">Chọn loại điểm</option>
+                                                            {loaiDiemHK.map((data) => (
+                                                                <option key={data.MaLoai} value={data.MaLoai}>{data.TenLoai}</option>
+                                                            ))}
+                                                        </Field>
+                                                        <ErrorMessage className="text-red-700 block mb-2" name="MaLoai" component="div" />
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    type="submit"
+                                                    className="f-button"
                                                 >
-                                                    <option value="">Chọn học kì</option>
-                                                    <option value={hocki["Học kì 1"]}>Học kì 1</option>
-                                                    <option value={hocki["Học kì 2"]}>Học kì 2</option>
-                                                </Field>
-                                                <ErrorMessage className="text-red-700 block mb-2" name="MaHK" component="div" />
+                                                    Lưu
+                                                </button>
                                             </div>
-                                            <div className="w-[80%] mx-auto">
-                                                <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaLoai">
-                                                    Loại điểm
-                                                </label>
-                                                <Field
-                                                    as="select"
-                                                    name="MaLoai"
-                                                    className="f-field"
-                                                >
-                                                    <option value="">Chọn loại điểm</option>
-                                                    {loaiDiemHK.map((data) => (
-                                                        <option key={data.MaLoai} value={data.MaLoai}>{data.TenLoai}</option>
-                                                    ))}
-                                                </Field>
-                                                <ErrorMessage className="text-red-700 block mb-2" name="MaLoai" component="div" />
-                                            </div>
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            className="f-button"
-                                        >
-                                            Lưu
-                                        </button>
-                                    </div>
-                                </Form>
-                            </Formik>
+                                        </Form>
+                                    </Formik>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </Draggable>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

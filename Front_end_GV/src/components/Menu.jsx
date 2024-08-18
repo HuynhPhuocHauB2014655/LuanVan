@@ -10,7 +10,7 @@ export default function Menu() {
         { id: 3, route: "/cn", label: 'Chủ nhiệm' },
         { id: 4, route: "/class", label: 'Quản lí lớp dạy' },
         { id: 5, route: "/tkb", label: 'Thời khóa biểu' },
-        { id: 6, route: "/", label: 'Lớp dạy' },
+        { id: 6, route: "/diemdanh", label: 'Điểm danh' },
     ];
     const activeItem = (id) => {
         setActive(id);

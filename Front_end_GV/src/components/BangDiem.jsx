@@ -167,15 +167,15 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
 
                                 {generateOtherCells(otherGrades1, student, !TBHK1)}
 
-                                <td className="bd-td-normal">{TBHK1?.Diem || ""}</td>
+                                <td className="bd-td-normal">{TBHK1?.Diem >= 0 ? TBHK1?.Diem : ""}</td>
 
                                 {generateTXCells(txGrades2, emptyTXCellsCount2, student,)}
 
                                 {generateOtherCells(otherGrades2, student, !TBHK2)}
 
-                                <td className="bd-td-normal">{TBHK2?.Diem || ""}</td>
+                                <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.Diem : ""}</td>
 
-                                <td className="bd-td-normal">{TBCN?.Diem || ""}</td>
+                                <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.Diem : ""}</td>
                             </tr>
                         );
                     })}

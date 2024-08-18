@@ -98,6 +98,7 @@ export default function Homeroom() {
         return <Loading />
     }
     const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai));
+    // console.log(datas);
     return (
         <div className="main-content">
             <Menu />
@@ -110,8 +111,8 @@ export default function Homeroom() {
                                 <button className="teacher-head" onClick={() => handleState(1)}>Danh sách lớp</button>
                                 <button className="teacher-head" onClick={() => handleState(2)}>Xem điểm</button>
                             </div>
-                            <div className="flex justify-between">
-                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {datas.TenLop}</p>
+                            <div className="flex justify-between w-[90%] mx-auto">
+                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {datas.lop[0].TenLop}</p>
                                 <p className="text-2xl font-bold">Sỉ số: {count.Siso}</p>
                                 <p className="text-2xl font-bold">Nam: {count.Nam}</p>
                                 <p className="text-2xl font-bold">Nữ: {count.Nu}</p>

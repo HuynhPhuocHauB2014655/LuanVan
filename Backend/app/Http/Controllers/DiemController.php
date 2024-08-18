@@ -19,18 +19,19 @@ class DiemController extends Controller
     }
     public function diemCN(Request $request)
     {
-        $diem = TBMonCN::with(['hocSinh.lop'])
+        $diem = Diem::with(['hocSinh.lop'])
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })
-        ->where('MaNK', $request->MaNK)
+        ->where('MaHK', $request->MaHK)
         ->where('MaMH', $request->MaMH)
+        ->where('MaLoai',"tbcn")
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
     public function diemCNLopHoc(Request $request)
     {
-        $diem = TBMonCN::with(['hocSinh.lop'])
+        $diem = Diem::with(['hocSinh.lop'])
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })
@@ -45,6 +46,7 @@ class DiemController extends Controller
             $query->where('lop.MaLop', $request->MaLop);
         })
         ->where('MaHK', $request->MaHK)
+        ->where('MaMH', $request->MaMH)
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
@@ -118,7 +120,6 @@ class DiemController extends Controller
                 ->where('MaMH', $request->MaMH)
                 ->where('MaLoai', 'tx')
                 ->get();
-            $tongTx = $diemTX->sum('Diem');
             $diemGK = Diem::where('MSHS', $hs->MSHS)
                 ->where('MaHK', $request->MaHK)
                 ->where('MaMH', $request->MaMH)
@@ -131,8 +132,9 @@ class DiemController extends Controller
                 ->where('MaLoai', 'ck')
                 ->first();
     
-            if ($diemTX->count() > 0) {
-                $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() +5),1);
+            if ($diemTX->isNotEmpty()) {
+                $tongTx = $diemTX->sum('Diem');
+                $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() + 5),1);
             } else {
                 $tbhk = 0;
             }
@@ -153,7 +155,7 @@ class DiemController extends Controller
                 $diemHk->save();
             }
         }
-        return response()->json("Đã cập nhật điểm thành công",200);
+        return response()->json("Đã tính điểm thành công!",200);
     }
     public function TongKetDiemCN(Request $request){
         $lop = Lop::where("MaLop",$request->MaLop)->first();
