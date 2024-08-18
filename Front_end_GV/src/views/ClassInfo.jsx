@@ -21,14 +21,16 @@ export default function ClassInfo() {
     const [show, setShow] = useState(1);
     const [showButton, setShowButton] = useState(false);
     const [showForm, setShowForm] = useState(0);
-    const [disableHK, setDisableHK] = useState(true);
+    const [disableHK1, setDisableHK1] = useState(true);
+    const [disableHK2, setDisableHK2] = useState(true);
     const [disableNH, setDisableNH] = useState(true);
     const [showConfirm, setShowConfrim] = useState(false);
     const [type, setType] = useState(0);
     const [data, setData] = useState();
     const [content, setContent] = useState("");
     const location = useLocation();
-    const [maHK, setMaHK] = useState("");
+    const [maHK1, setMaHK1] = useState("");
+    const [maHK2, setMaHK2] = useState("");
     const { classData } = location.state || {};
 
     useEffect(() => {
@@ -103,6 +105,15 @@ export default function ClassInfo() {
             console.log(error);
             setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
+            if(disableHK1 == false){
+                TongKetHK(maHK1);
+            }
+            if(disableHK2 == false){
+                TongKetHK(maHK2);
+            }
+            if(disableNH == false){
+                TongKetNH();
+            }
             fetchDiem();
             setShowButton(false);
         }
@@ -131,7 +142,6 @@ export default function ClassInfo() {
         }
     }
     const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai));
-    const loaiDiemTB = loaiDiem.filter(item => ['tbhk1', 'tbhk2'].includes(item.MaLoai));
     const hocki = {
         "Học kì 1": 1 + nienKhoa.NienKhoa,
         "Học kì 2": 2 + nienKhoa.NienKhoa
@@ -147,22 +157,29 @@ export default function ClassInfo() {
             const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
             const TBHK1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk1");
             const TBHK2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk2");
-            if ((txGrades1.length == 0 || otherGrades1.length < 2 || TBHK1.length > 0)) {
+            if ((txGrades1.length == 0 || otherGrades1.length < 2)) {
                 checkHK1 = false;
             }
-            if ((txGrades2.length == 0 || otherGrades2.length < 2 || TBHK2.length > 0)) {
+            if ((txGrades2.length == 0 || otherGrades2.length < 2)) {
                 checkHK2 = false;
             }
             if (!TBHK1.Diem || !TBHK2.Diem) {
                 checkCN = false;
             }
         })
-        if (checkHK1 || checkHK2) {
-            setDisableHK(false);
-            checkHK1 ? setMaHK(1 + nienKhoa.NienKhoa) : setMaHK(2 + nienKhoa.NienKhoa)
+        if (checkHK1) {
+            setDisableHK1(false);
+            setMaHK1(1 + nienKhoa.NienKhoa);
+        }
+        else if (checkHK2) {
+            setDisableHK2(false);
+            setMaHK2(2 + nienKhoa.NienKhoa);
         }
         else {
-            setDisableHK(true);
+            setDisableHK1(true);
+            setDisableHK2(true);
+            setMaHK1("");
+            setMaHK2("");
         }
         if (checkCN) {
             setDisableNH(false);
@@ -172,8 +189,11 @@ export default function ClassInfo() {
         setShowButton(!showButton);
     }
     const changeConfirm = (type) => {
-        if (type == 'tkhk') {
-            setContent(`Bạn có chắc chắn muốn tổng kết học kì ${maHK.substring(0, 1)}?`);
+        if (type == 'tkhk1') {
+            setContent(`Bạn có chắc chắn muốn tổng kết học kì 1?`);
+        }
+        if (type == 'tkhk2') {
+            setContent(`Bạn có chắc chắn muốn tổng kết học kì 2?`);
         }
         if (type == 'tknh') {
             setContent(`Bạn có chắc chắn muốn tổng kết năm học ${nienKhoa.TenNK}?`);
@@ -191,8 +211,11 @@ export default function ClassInfo() {
         setShowConfrim(true);
     }
     const onConfirm = () => {
-        if (type == 'tkhk') {
-            TongKetHK();
+        if (type == 'tkhk1') {
+            TongKetHK(maHK1);
+        }
+        if (type == 'tkhk2') {
+            TongKetHK(maHK2);
         }
         if (type == 'tknh') {
             TongKetNH();
@@ -227,7 +250,7 @@ export default function ClassInfo() {
             handleShow(2);
         }
     }
-    const TongKetHK = async () => {
+    const TongKetHK = async (maHK) => {
         const payload = {
             MaHK: maHK,
             MaLop: classData.MaLop,
@@ -277,7 +300,7 @@ export default function ClassInfo() {
                                 {showButton && <div className="space-x-2">
                                     <button
                                         type="button"
-                                        className="button button-animation border-blue-600 hover:bg-blue-600"
+                                        className={!disableNH ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
                                         disabled={disableNH}
                                         onClick={() => changeConfirm('tknh')}
                                     >
@@ -285,11 +308,19 @@ export default function ClassInfo() {
                                     </button>
                                     <button
                                         type="button"
-                                        className="button button-animation border-blue-600 hover:bg-blue-600"
-                                        disabled={disableHK}
-                                        onClick={() => changeConfirm('tkhk')}
+                                        className={!disableHK1 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
+                                        disabled={disableHK1}
+                                        onClick={() => changeConfirm('tkhk1')}
                                     >
-                                        Tổng kết học kì
+                                        Tổng kết học kì 1
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={!disableHK2 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
+                                        disabled={disableHK2}
+                                        onClick={() => changeConfirm('tkhk2')}
+                                    >
+                                        Tổng kết học kì 2
                                     </button>
                                 </div>}
                             </div>

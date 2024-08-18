@@ -38,7 +38,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
         }
         setShowEditForm(!showEditForm);
     }
-    const generateTXCells = (grades, emptyCellsCount, student, tbhk) => {
+    const generateTXCells = (grades, emptyCellsCount, student) => {
         if (grades.length == 0) {
             const cells = [...Array(4)].map((_, i) => (
                 <td key={i} className="bd-td-normal"></td>
@@ -47,7 +47,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
         } else {
             const cells = grades.map((data, index) => (
                 data.Diem ?
-                    show == 2 && tbhk ?
+                    show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
                             {data.Diem}
                         </td> :
@@ -65,7 +65,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
         }
     };
 
-    const generateOtherCells = (grades, student, tbhk) => {
+    const generateOtherCells = (grades, student) => {
         if (grades.length == 0) {
             const cells = loaiDiem.map((data) => (
                 data.MaLoai != 'tx' &&
@@ -76,7 +76,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
         } else {
             return grades.map((data, index) => (
                 data.Diem ?
-                    show == 2 && tbhk ?
+                    show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
                             {data.Diem}
                         </td> :
@@ -163,13 +163,13 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
 
                                 <td className="bd-td-normal text-start">{student.HoTen}</td>
 
-                                {generateTXCells(txGrades1, emptyTXCellsCount1, student, !TBHK1)}
+                                {generateTXCells(txGrades1, emptyTXCellsCount1, student,)}
 
                                 {generateOtherCells(otherGrades1, student, !TBHK1)}
 
                                 <td className="bd-td-normal">{TBHK1?.Diem || ""}</td>
 
-                                {generateTXCells(txGrades2, emptyTXCellsCount2, student, !TBHK2)}
+                                {generateTXCells(txGrades2, emptyTXCellsCount2, student,)}
 
                                 {generateOtherCells(otherGrades2, student, !TBHK2)}
 

@@ -1,11 +1,12 @@
 import axiosClient from "../axios-client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Menu from "../components/Menu";
+import AlterConfirm from "../components/Confirm";
 export default function Student() {
     const [datas, setDatas] = useState([]);
     const { setMessage } = useStateContext();
@@ -16,6 +17,8 @@ export default function Student() {
     const [totalPages, setTotalPages] = useState(0);
     const [startPage, setStartPage] = useState(0);
     const [endPage, setEndPage] = useState(0);
+    const [showConfirm, setShowConfirm] = useState(0);
+    const formRef = useRef();
     const fetchData = async (page) => {
         try {
             const response = await axiosClient.get(`/hs/all?page=${page}`);
@@ -32,14 +35,12 @@ export default function Student() {
             const newEnd = newStart + 4 > totalPages ? totalPages : currentPage + 4;
             setStartPage(newStart);
             setEndPage(newEnd);
-            console.log(newStart, newEnd, startPage, endPage);
         }
         if (currentPage < startPage) {
             const newEnd = currentPage;
             const newStart = currentPage - 4 > 0 ? currentPage - 4 : 1;
             setStartPage(newStart);
             setEndPage(newEnd);
-            console.log(newStart, newEnd, startPage, endPage);
         }
     }, [currentPage]);
     useEffect(() => {
@@ -62,59 +63,56 @@ export default function Student() {
         TrangThai: Yup.string(),
     });
     const handleSubmit = async (values) => {
-
-        if (confirm("Bạn có chắc với hành động này?")) {
-            if (showForm === 2) {
-                values.MSHS = studentForm.MSHS;
-                const updated = { ...values };
-                delete updated["MaNK"];
-                try {
-                    await axiosClient.put('/hs/update/' + values.MSHS, updated);
-                    setMessage('Đã sửa học sinh thành công');
-                    fetchData(1);
-                    showFormStudent(0);
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    setMessage('Có lỗi trong quá trình sửa học sinh');
-                }
-            } else {
-                try {
-                    var soHocSinh = 0;
-                    if (datas.length > 0) {
-                        const lastStudent = await axiosClient.get('/hs/last');
-                        soHocSinh = parseInt(lastStudent.data.substring(6, 9), 10) + 1;
-                    }
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    setMessage('Có lỗi trong quá trình thêm học sinh');
-                }
-                values.MSHS = values.MaBan + values.MaNK.replace(/-/g, '') + soHocSinh.toString().padStart(3, '0');
-                const updated = { ...values };
-                delete updated["MaNK"];
-                try {
-                    await axiosClient.post('/hs/create', updated);
-                    setMessage('Đã thêm học sinh thành công');
-                    fetchData(1);
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    setMessage('Có lỗi trong quá trình thêm học sinh');
-                }
-            }
-        }
-    };
-    const deleteStudent = async (mshs) => {
-        if (confirm("Bạn có chắc chắn với hành động này?")) {
+        if (showForm === 2) {
+            values.MSHS = studentForm.MSHS;
+            const updated = { ...values };
+            delete updated["MaNK"];
             try {
-                await axiosClient.delete('/hs/delete/' + mshs);
-                setMessage('Đã xóa học sinh thành công');
+                await axiosClient.put('/hs/update/' + values.MSHS, updated);
+                setMessage('Đã sửa học sinh thành công');
                 fetchData(1);
                 showFormStudent(0);
             } catch (error) {
                 console.error('Error submitting form:', error);
-                setMessage('Có lỗi trong quá trình xóa học sinh');
+                setMessage('Có lỗi trong quá trình sửa học sinh');
+            }
+        } else {
+            try {
+                var soHocSinh = 0;
+                if (datas.length > 0) {
+                    const lastStudent = await axiosClient.get('/hs/last');
+                    soHocSinh = parseInt(lastStudent.data.substring(6, 9), 10) + 1;
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setMessage('Có lỗi trong quá trình thêm học sinh');
+            }
+            values.MSHS = values.MaBan + values.MaNK.replace(/-/g, '') + soHocSinh.toString().padStart(3, '0');
+            const updated = { ...values };
+            delete updated["MaNK"];
+            try {
+                await axiosClient.post('/hs/create', updated);
+                setMessage('Đã thêm học sinh thành công');
+                fetchData(1);
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setMessage('Có lỗi trong quá trình thêm học sinh');
             }
         }
     };
+    // const deleteStudent = async (mshs) => {
+    //     if (confirm("Bạn có chắc chắn với hành động này?")) {
+    //         try {
+    //             await axiosClient.delete('/hs/delete/' + mshs);
+    //             setMessage('Đã xóa học sinh thành công');
+    //             fetchData(1);
+    //             showFormStudent(0);
+    //         } catch (error) {
+    //             console.error('Error submitting form:', error);
+    //             setMessage('Có lỗi trong quá trình xóa học sinh');
+    //         }
+    //     }
+    // }
     const showFormStudent = (isShow, data) => {
         if (data) {
             setStudentForm({
@@ -141,18 +139,30 @@ export default function Student() {
         setStartPage(1);
         setEndPage(5);
     }, []);
+    const triggerConfirm = () => {
+        setShowConfirm(1);
+    }
+    const onConfirm = () => {
+        if (formRef.current) {
+            formRef.current.submitForm();
+        }
+        setShowConfirm(0);
+    }
+    const onCancel = () => {
+        setShowConfirm(0);
+    }
     const search = async () => {
         const searchValue = document.getElementById('search').value;
         try {
             const searchId = await axiosClient.get('/hs/show/' + searchValue);
-            if(Object.keys(searchId.data).length === 0){
+            if (Object.keys(searchId.data).length === 0) {
                 const searchName = await axiosClient.get(`/hs/search/${searchValue}`);
-                if(Object.keys(searchName.data).length === 0){
+                if (Object.keys(searchName.data).length === 0) {
                     setMessage('Không tìm thấy kết quả');
-                }else{
+                } else {
                     setDatas(searchName.data);
                 }
-            }else{
+            } else {
                 setDatas([searchId.data]);
             }
         } catch (error) {
@@ -188,6 +198,7 @@ export default function Student() {
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
+                            innerRef={formRef}
                         >
                             {({ setValues }) => {
                                 useEffect(() => {
@@ -196,7 +207,7 @@ export default function Student() {
                                     }
                                 }, [studentForm, setValues]);
                                 return (
-                                    <Form className="relative">
+                                    <Form className="relative" ref={formRef}>
                                         <div className="columns-3 gap-3">
                                             <Field type="text" name="MaNK" className="w-full mb-1 rounded form-input" placeholder="Mã niên khóa" />
                                             <ErrorMessage className="text-red-700" name="MaNK" component="div" />
@@ -244,16 +255,19 @@ export default function Student() {
 
                                         {showForm === 1 ?
                                             <div className="flex justify-center">
-                                                <button type="submit" className="w-1/3 mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300">
+                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300">
                                                     Thêm
                                                 </button>
                                             </div>
                                             :
                                             <div className="flex justify-center">
-                                                <button type="submit" className="w-1/3 mt-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400">
+                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400">
                                                     Sửa
                                                 </button>
                                             </div>
+                                        }
+                                        {showConfirm === 1 &&
+                                            <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
                                         }
                                     </Form>
                                 );
@@ -272,6 +286,12 @@ export default function Student() {
                     </div>
                 </div>
                 <div className="my-1 flex justify-center">
+                    <button
+                        onClick={() => handlePageChange(1)}
+                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    >
+                        <FontAwesomeIcon icon={faAngleDoubleLeft} />
+                    </button>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
@@ -297,6 +317,12 @@ export default function Student() {
                         disabled={currentPage + 1 > totalPages}
                     >
                         <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(totalPages)}
+                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    >
+                        <FontAwesomeIcon icon={faAngleDoubleRight} />
                     </button>
                 </div>
                 <table className="table">

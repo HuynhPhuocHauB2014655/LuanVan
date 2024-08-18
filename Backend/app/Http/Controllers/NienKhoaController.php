@@ -19,6 +19,8 @@ class NienKhoaController extends Controller
         $nk_now = new NienKhoaHienTai();
         $nk_now->NienKhoa = $request->nk;
         $nk_now->TenNK = $request->tennk;
+        $nk_now->NgayBD = $request->ngaybd;
+        $nk_now->HanSuaDiem = $request->hansuadiem;
         $nk_now->save();
         return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
     }

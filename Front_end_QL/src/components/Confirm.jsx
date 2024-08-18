@@ -6,8 +6,8 @@ const AlterConfirm = ({ message, onConfirm, onCancel }) => {
       <div className="confirm-box">
         <p>{message}</p>
         <div className="confirm-buttons">
-          <button onClick={onConfirm} id="confirm-yes">Yes</button>
-          <button onClick={onCancel} id="confirm-no">No</button>
+          <button onClick={onConfirm} id="confirm-yes">Có</button>
+          <button onClick={onCancel} id="confirm-no">Không</button>
         </div>
       </div>
     </div>

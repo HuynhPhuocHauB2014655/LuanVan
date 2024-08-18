@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
+import AlterConfirm from "./Confirm";
 export default function Layout() {
     const { message, setMessage } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
     const { maBaoMat, setMaBaoMat } = useUserContext();
-    const [showConfirm, setShowConfirm] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(0);
     const navigate = useNavigate();
     const fetchData = async () => {
         try {
@@ -22,15 +23,15 @@ export default function Layout() {
     if (!maBaoMat) {
         return <Navigate to="/login" replace/>
     }
-    const logOut = () => {
-        setShowConfirm(true);
+    const showConfrim = () => {
+        setShowConfirm(1);
     }
     const onConfirm = () => {
         setMaBaoMat(false);
         navigate("/login");
     }
     const onCancel = () => {
-        setShowConfirm(false);
+        setShowConfirm(0);
     }
     useEffect(() => {
         fetchData();
@@ -49,20 +50,17 @@ export default function Layout() {
     }
     return (
         <div className="mx-10 bg-amber-100 relative">
-            {showConfirm && (
-                <div className="confirm-overlay">
-                <div className="confirm-box">
-                  <p>Bạn có chắc chắn với hành động này không</p>
-                  <div className="confirm-buttons">
-                    <button onClick={onConfirm} id="confirm-yes">Yes</button>
-                    <button onClick={onCancel} id="confirm-no">No</button>
-                  </div>
-                </div>
-              </div>
-            )}
             {message && <div className="fixed bg-blue-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{message}</div>}
             <header className="bg-cyan-400 py-2 rounded header relative">
-                <button className="absolute right-2 h-[30%] top-[35%]" onClick={logOut}><FontAwesomeIcon icon={faRightFromBracket} color="white" className="h-full" /></button>
+                <button 
+                    className="absolute right-2 h-[30%] top-[35%]" 
+                    onClick={showConfrim}
+                >
+                    <FontAwesomeIcon icon={faRightFromBracket} color="white" className="h-full" />
+                </button>
+                {showConfirm === 1 && 
+                        <AlterConfirm message={"Bạn có chắc chắn muốn đăng xuất không?"} onConfirm={onConfirm} onCancel={onCancel}/>
+                }
                 <p className="text-center text-2xl">Hệ thống quản lí <br /> Trường THPT Cần Thơ</p>
             </header>
             <div>

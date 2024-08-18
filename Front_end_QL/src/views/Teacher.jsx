@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axiosClient from "../axios-client";
 import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Menu from "../components/Menu";
+import AlterConfirm from "../components/Confirm";
 export default function Teacher() {
     const [teachersData, setTeachersData] = useState([]);
     const [subjectsData, setSubjectsData] = useState([]);
@@ -17,6 +18,8 @@ export default function Teacher() {
     const [totalPages, setTotalPages] = useState(0);
     const [startPage, setStartPage] = useState(0);
     const [endPage, setEndPage] = useState(0);
+    const [showConfirm, setShowConfirm] = useState(0);
+    const formRef = useRef();
     const fetchData = async (page) => {
         const teachers = await axiosClient.get(`/gv/all?page=${page}`);
         setTeachersData(teachers.data.data);
@@ -63,7 +66,6 @@ export default function Teacher() {
     });
     const handleSubmit = async (value) => {
         if (showForm == 1) {
-
             if (teachersData.length == 0) {
                 value.MSGV = "GV001";
             }
@@ -89,15 +91,15 @@ export default function Teacher() {
             }
         }
     }
-    const deleteTeacher = async (MSGV) => {
-        try {
-            const response = await axiosClient.delete("/gv/delete/" + MSGV);
-            setMessage("Đã xóa thành công");
-            fetchData();
-        } catch (error) {
-            setMessage(error.response.data.message);
-        }
-    }
+    // const deleteTeacher = async (MSGV) => {
+    //     try {
+    //         const response = await axiosClient.delete("/gv/delete/" + MSGV);
+    //         setMessage("Đã xóa thành công");
+    //         fetchData();
+    //     } catch (error) {
+    //         setMessage(error.response.data.message);
+    //     }
+    // }
     const showFormTeacher = (isShow, data) => {
         if (data) {
             setTeacherForm({
@@ -122,20 +124,32 @@ export default function Teacher() {
         const searchValue = document.getElementById('search').value;
         try {
             const searchId = await axiosClient.get('/gv/show/' + searchValue);
-            if(Object.keys(searchId.data).length === 0){
+            if (Object.keys(searchId.data).length === 0) {
                 const searchName = await axiosClient.get(`/gv/search/${searchValue}`);
-                if(Object.keys(searchName.data).length === 0){
+                if (Object.keys(searchName.data).length === 0) {
                     setMessage('Không tìm thấy kết quả');
-                }else{
+                } else {
                     setTeachersData(searchName.data);
                 }
-            }else{
+            } else {
                 setTeachersData([searchId.data]);
             }
         } catch (error) {
             console.error('Error searching data:', error);
             setMessage(error.response.data.message);
         }
+    }
+    const triggerConfirm = () => {
+        setShowConfirm(1);
+    }
+    const onConfirm = () => {
+        if (formRef.current) {
+            formRef.current.submitForm();
+        }
+        setShowConfirm(0);
+    }
+    const onCancel = () => {
+        setShowConfirm(0);
     }
     return (
         <div className="main-content relative">
@@ -148,11 +162,17 @@ export default function Teacher() {
                         <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400" onClick={() => showFormTeacher(1)}>Thêm giáo viên</button>
                     </div>
                     <div className="me-3 flex w-[25%]">
-                        <input type="text" id="search" className="form-input rounded h-9 w-full" placeholder="Tìm tên hoặc mã số giáo viên" />
+                        <input type="text" id="search" className="f-field rounded h-9 w-full" placeholder="Tìm tên hoặc mã số giáo viên" />
                         <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                     </div>
                 </div>
                 <div className="my-1 flex justify-center">
+                    <button
+                        onClick={() => handlePageChange(1)}
+                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    >
+                        <FontAwesomeIcon icon={faAngleDoubleLeft} />
+                    </button>
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
@@ -178,6 +198,12 @@ export default function Teacher() {
                         disabled={currentPage + 1 > totalPages}
                     >
                         <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
+                    <button
+                        onClick={() => handlePageChange(totalPages)}
+                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                    >
+                        <FontAwesomeIcon icon={faAngleDoubleRight} />
                     </button>
                 </div>
                 <table className="table">
@@ -215,7 +241,7 @@ export default function Teacher() {
                     </tbody>
                 </table>
                 {showForm != 0 &&
-                    <div className="absolute z-10 left-[25%] top-60 w-[50%] bg-sky-300 p-5">
+                    <div className="absolute z-10 left-[25%] top-60 w-[50%] bg-sky-300 p-5 rounded-md">
                         <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600 font-bold button-animation" onClick={() => showFormTeacher(0)}>X</button>
                         <h1 className="text-center mb-3 text-2xl font-semibold">Thêm giáo viên</h1>
                         <Formik
@@ -231,6 +257,7 @@ export default function Teacher() {
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
                             enableReinitialize={true}
+                            innerRef={formRef}
                         >
                             {({ setValues }) => {
                                 useEffect(() => {
@@ -239,55 +266,75 @@ export default function Teacher() {
                                     }
                                 }, [teacherForm, setValues]);
                                 return (
-                                    <Form className="relative">
-                                        <div className="columns-3 gap-3">
-                                            <Field type="text" name="TenGV" className="w-full mb-1 rounded form-input" placeholder="Tên giáo viên" />
-                                            <ErrorMessage className="text-red-600" name="TenGV" component="div" />
+                                    <Form className="relative" ref={formRef}>
+                                        <div className="grid grid-cols-3 grid-flow-row gap-2">
+                                            <div className="min-w-0">
+                                                <Field type="text" name="TenGV" className="f-field" placeholder="Tên giáo viên" />
+                                                <ErrorMessage className="text-red-600" name="TenGV" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="NgaySinh" className="w-full mb-1 rounded form-input" placeholder="Ngày sinh" />
-                                            <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
+                                            <div className="min-w-0">
+                                                <Field type="text" name="NgaySinh" className="f-field" placeholder="Ngày sinh" />
+                                                <ErrorMessage className="text-red-600" name="NgaySinh" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="GioiTinh" className="w-full mb-1 rounded form-select">
-                                                <option value="" defaultChecked>Giới tính</option>
-                                                <option value="Nam">Nam</option>
-                                                <option value="Nữ">Nữ</option>
-                                            </Field>
-                                            <ErrorMessage className="text-red-600" name="GioiTinh" component="div" />
+                                            <div className="min-w-0">
+                                                <Field as="select" name="GioiTinh" className="f-field">
+                                                    <option value="" defaultChecked>Giới tính</option>
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                </Field>
+                                                <ErrorMessage className="text-red-600" name="GioiTinh" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="DiaChi" className="w-full mb-1 rounded form-input" placeholder="Địa chỉ" />
-                                            <ErrorMessage className="text-red-600" name="DiaChi" component="div" />
+                                            <div className="min-w-0">
+                                                <Field type="text" name="DiaChi" className="f-field" placeholder="Địa chỉ" />
+                                                <ErrorMessage className="text-red-600" name="DiaChi" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="SDT" className="w-full mb-1 rounded form-input" placeholder="Số điện thoại" />
-                                            <ErrorMessage className="text-red-600" name="SDT" component="div" />
+                                            <div className="min-w-0">
+                                                <Field type="text" name="SDT" className="f-field" placeholder="Số điện thoại" />
+                                                <ErrorMessage className="text-red-600" name="SDT" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="ChuyenMon" className="form-select rounded w-full mb-1">
-                                                <option value="" disabled defaultChecked>Chọn chuyên môn</option>
-                                                {subjectsData.map((subject) => (
-                                                    <option key={subject.MaMH} value={subject.MaMH}>{subject.TenMH}</option>
-                                                ))}
-                                            </Field>
-                                            <ErrorMessage className="text-red-600" name="ChuyenMon" component="div" />
+                                            <div className="min-w-0">
+                                                <Field as="select" name="ChuyenMon" className="f-field">
+                                                    <option value="" disabled defaultChecked>Chọn chuyên môn</option>
+                                                    {subjectsData.map((subject) => (
+                                                        <option key={subject.MaMH} value={subject.MaMH}>{subject.TenMH}</option>
+                                                    ))}
+                                                </Field>
+                                                <ErrorMessage className="text-red-600" name="ChuyenMon" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="TrangThai" className="form-select rounded w-full">
-                                                <option value="0">Đang dạy</option>
-                                                <option value="1">Đã nghỉ</option>
-                                            </Field>
-                                            <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
+                                            <div className="min-w-0">
+                                                <Field as="select" name="TrangThai" className="f-field">
+                                                    <option value="0">Đang dạy</option>
+                                                    <option value="1">Đã nghỉ</option>
+                                                </Field>
+                                                <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
+                                            </div>
                                         </div>
 
-                                        {showForm === 1 ?
-                                            <button type="submit" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-                                                Thêm
-                                            </button> :
-                                            <button type="submit" className="mt-2 px-4 py-2 bg-cyan-500 text-white rounded">
-                                                Sửa
-                                            </button>
+                                        <div className="w-full flex justify-center">
+                                            {showForm === 1 ?
+                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-[50%] mt-2 px-4 py-2 bg-blue-500 text-white rounded-md">
+                                                    Thêm
+                                                </button> :
+                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-[50%] mt-2 px-4 py-2 bg-cyan-500 text-white rounded-md">
+                                                    Sửa
+                                                </button>
+                                            }
+                                        </div>
+                                        {showConfirm === 1 &&
+                                            <AlterConfirm message={'Bạn có chắc chắn với thao tác này không?'} onConfirm={onConfirm} onCancel={onCancel} />
                                         }
                                     </Form>
                                 );
                             }}
                         </Formik>
-                    </div>}
+                    </div>
+                }
             </div>
         </div>
     );

@@ -9,6 +9,8 @@ export default function HK_NK() {
     const [datas, setDatas] = useState([]);
     const MaNKRef = useRef();
     const TenNKRef = useRef();
+    const NgayBDRef = useRef();
+    const HanSuaDiemRef = useRef();
     const nienKhoaHienTaiRef = useRef();
     const fetchData = async () => {
         try {
@@ -24,7 +26,11 @@ export default function HK_NK() {
         fetchData();
     }, []);
     const showForm = (show) => {
-        setIsShow(show);
+        if (isShow != 0) {
+            setIsShow(0);
+        } else {
+            setIsShow(show);
+        }
     };
 
     const [isChecked, setIsChecked] = useState(false);
@@ -83,8 +89,10 @@ export default function HK_NK() {
         event.preventDefault();
         const MaNK = nienKhoaHienTaiRef.current.value;
         const TenNK = datas.find((item) => item.MaNK === MaNK).TenNK;
+        const NgayBD = NgayBDRef.current.value;
+        const HanSuaDiem = HanSuaDiemRef.current.value;
         try {
-            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK,'tennk': TenNK } });
+            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK, 'tennk': TenNK, "ngaybd": NgayBD, 'hansuadiem': HanSuaDiem } });
             setMessage(response.data);
             fetchData();
         } catch (error) {
@@ -94,7 +102,7 @@ export default function HK_NK() {
     }
     return (
         <div className="main-content">
-            <Menu/>
+            <Menu />
             <div className='right-part'>
                 <h2 className="page-name">Học kì - Niên khóa</h2>
                 <div className="button-nav">
@@ -114,16 +122,33 @@ export default function HK_NK() {
                 }
                 {isShow === 2 &&
                     <form onSubmit={submitNKHientai} className="mt-2">
-                        <select ref={nienKhoaHienTaiRef}>
-                            {datas.map((item) => (
-                                <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
-                            ))}
-                        </select>
-                        <button type="submit" className="border px-3 py-1 ms-3 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
+                        <div className="grid grid-cols-3 grid-flow-row space-x-2 w-[80%]">
+                            <div>
+                                <label className="f-label" htmlFor="nienkhoahientai">Chọn niên khóa</label>
+                                <select ref={nienKhoaHienTaiRef} name="nienkhoahientai" required className="f-field">
+                                    {datas.map((item) => (
+                                        <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="f-label" htmlFor="startDate">Ngày bắt đầu năm học</label>
+                                <input type="datetime-local" name="startDate" className="f-field block" ref={NgayBDRef} />
+                            </div>
+                            <div>
+                                <label className="f-label" htmlFor="endDate">Hạn chỉnh sửa điểm</label>
+                                <input type="datetime-local" name="endDate" className="f-field block" ref={HanSuaDiemRef} />
+                            </div>
+                        </div>
+                        <button type="submit" className="border px-3 mt-3 py-1 border-green-600 rounded bg-white hover:bg-green-600 text-slate-950">Lưu</button>
                     </form>
                 }
                 <div className="hk_nk_content">
-                    <h1 className="text-2xl font-bold text-red-600 mt-2">Niên khóa hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
+                    <div>
+                        <h1 className="text-2xl font-bold text-red-600 mt-2">Niên khóa hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
+                        <p className="text-xl ms-2">- Ngày bắt đầu năm học: {nienKhoa ? nienKhoa.NgayBD : "Chưa đặt"}</p>
+                        <p className="text-xl ms-2">- Hạn cuối sửa điểm: {nienKhoa ? nienKhoa.HanSuaDiem : "Chưa đặt"}</p>
+                    </div>
                     <h2 className="text-2xl mt-2 font-semibold">Danh sách niên khóa</h2>
                     <table className="table-auto border-collapse border border-slate-500 ">
                         <thead>

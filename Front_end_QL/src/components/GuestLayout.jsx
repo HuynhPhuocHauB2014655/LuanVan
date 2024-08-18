@@ -57,13 +57,13 @@ export default function GuestLayout() {
                     enableReinitialize={true}
                     onSubmit={handleSubmit}
                 >
-                    <Form className="border-2 rounded w-[30%] flex justify-center m-auto text-center py-10 border-cyan-500 bg-slate-50">
-                        <div className="columns-1">
-                            <label htmlFor="maBaoMat" className="mb-3 block text-xl font-serif text-blue-500">Nhập mã bảo mật</label>
-                            <Field name="maBaoMat" type="password" className="rounded border-blue-500 block mb-3" />
+                    <Form className="border-2 rounded min-w-[30%] px-10 m-auto text-center py-10 border-cyan-500 bg-white space-y-2">
+                        <div className="w-[60%] mx-auto space-y-2">
+                            <label htmlFor="maBaoMat" className="f-lable">Nhập mã bảo mật</label>
+                            <Field name="maBaoMat" type="password" className="f-field" />
                             <ErrorMessage className="text-red-700 block mb-2" name="maBaoMat" component="div" />
-                            <button type="submit" className="button border-blue-400 hover:bg-cyan-300">Đăng nhập</button>
                         </div>
+                        <button type="submit" className="f-button">Đăng nhập</button>
                     </Form>
                 </Formik>
             </div>
