@@ -41,25 +41,25 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
     const generateTXCells = (grades, emptyCellsCount, student) => {
         if (grades.length == 0) {
             const cells = [...Array(4)].map((_, i) => (
-                <td key={i} className="bd-td-normal"></td>
+                <td key={i} className="bd-td-normal">-</td>
             ));
             return cells;
         } else {
             const cells = grades.map((data, index) => (
-                data.Diem ?
+                data.Diem >=0 ?
                     show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
-                            {data.Diem}
+                            {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                         </td> :
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">
-                            {data.Diem}
+                            {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                         </td>
                     :
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">-
                     </td>
             ));
             for (let i = 0; i < emptyCellsCount; i++) {
-                cells.push(<td key={`tx-empty-${student.MSHS}-${i + cells.length}`} className="bd-td-normal"></td>);
+                cells.push(<td key={`tx-empty-${student.MSHS}-${i + cells.length}`} className="bd-td-normal">-</td>);
             }
             return cells;
         }
@@ -69,22 +69,22 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
         if (grades.length == 0) {
             const cells = loaiDiem.map((data) => (
                 data.MaLoai != 'tx' &&
-                <td key={data.MaLoai} className="bd-td-normal">
+                <td key={data.MaLoai} className="bd-td-normal">-
                 </td>
             ))
             return cells;
         } else {
             return grades.map((data, index) => (
-                data.Diem ?
+                data.Diem >=0?
                     show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
-                            {data.Diem}
+                            {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                         </td> :
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">
-                            {data.Diem}
+                            {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                         </td>
                     :
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-normal">-
                     </td>
             ));
         }
@@ -167,15 +167,15 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
 
                                 {generateOtherCells(otherGrades1, student, !TBHK1)}
 
-                                <td className="bd-td-normal">{TBHK1?.Diem >= 0 ? TBHK1?.Diem : ""}</td>
+                                <td className="bd-td-normal">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
 
-                                {generateTXCells(txGrades2, emptyTXCellsCount2, student,)}
+                                {generateTXCells(txGrades2, emptyTXCellsCount2, student)}
 
-                                {generateOtherCells(otherGrades2, student, !TBHK2)}
+                                {generateOtherCells(otherGrades2, student, )}
 
-                                <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.Diem : ""}</td>
+                                <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
 
-                                <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.Diem : ""}</td>
+                                <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>
                         );
                     })}

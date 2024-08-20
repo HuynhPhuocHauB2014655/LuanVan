@@ -12,7 +12,7 @@ use App\Http\Controllers\LopController;
 use App\Http\Controllers\TKBController;
 use App\Http\Controllers\TaiKhoanController;
 use App\Http\Controllers\DiemController;
-
+use App\Http\Controllers\RenLuyenController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -120,8 +120,17 @@ Route::post('/diem/get',[DiemController::class,'diemMH']);
 Route::post('/diem/cn',[DiemController::class,'diemLH']);
 Route::post('/diem/getCN',[DiemController::class,'diemCN']);
 Route::post('/diem/cn/getCN',[DiemController::class,'diemCNLopHoc']);
+Route::post('/diem/tb',[DiemController::class,'DiemTB']);
 Route::post('/diem/add',[DiemController::class,'AddDiem']);
 Route::post('/diem/update',[DiemController::class,'updateDiem']);
 Route::delete('/diem/delete/{id}',[DiemController::class,'deleteDiem']);
-Route::post('/diem/tk/hocky',[DiemController::class,'TongKetDiemHK']);
-Route::post('/diem/tk/canam',[DiemController::class,'TongKetDiemCN']);
+Route::post('/diem/mon/hocky',[DiemController::class,'TongKetMonHK']);
+Route::post('/diem/mon/canam',[DiemController::class,'TongKetMonCN']);
+Route::post('/diem/tk/hocki',[DiemController::class,'TongKetHocKi']);
+Route::post('/diem/tk/namhoc',[DiemController::class,'TongKetNamHoc']);
+Route::get('/diem',[DiemController::class,'NhapDiem']);
+
+
+//ren luyen route
+Route::get('/rl/index',[RenLuyenController::class,'index']);
+Route::post('/rl/add',[RenLuyenController::class,'addRL']);

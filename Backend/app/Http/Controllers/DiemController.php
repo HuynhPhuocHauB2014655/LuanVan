@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Diem;
 use App\Models\LoaiDiem;
-use App\Models\TBMonCN;
 use App\Models\HocSinh;
 use App\Models\Lop;
+use App\Models\HocLop;
+use App\Models\MonHoc;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class DiemController extends Controller
@@ -35,7 +36,7 @@ class DiemController extends Controller
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })
-        ->where('MaNK', $request->MaNK)->orderBy('MSHS')
+        ->where('MaHK', $request->MaHK)->where("MaLoai","tbcn")->orderBy('MSHS')
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
@@ -59,6 +60,14 @@ class DiemController extends Controller
         ->where('MaHK', $request->MaHK)->orderBy('MSHS')
         ->get();
         return response()->json($diem, Response::HTTP_OK);
+    }
+    public function DiemTB(Request $rq)
+    {
+        $diemTB = HocLop::with(['hocSinh.lop','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2'])
+        ->whereHas('hocSinh.lop', function($query) use ($rq) {
+            $query->where('lop.MaLop', $rq->MaLop);
+        })->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
+        return response()->json($diemTB, Response::HTTP_OK);
     }
     public function AddDiem(Request $request)
     {
@@ -109,7 +118,7 @@ class DiemController extends Controller
             return response()->json("Điểm không tồn tại", 404);
         }
     }
-    public function TongKetDiemHK(Request $request)
+    public function TongKetMonHK(Request $request)
     {
         $lop = Lop::where("MaLop",$request->MaLop)->first();
         $hocsinh = $lop->hocSinh;
@@ -132,32 +141,43 @@ class DiemController extends Controller
                 ->where('MaLoai', 'ck')
                 ->first();
     
-            if ($diemTX->isNotEmpty()) {
+            if ($diemTX->isNotEmpty() && $diemGK && $diemCK) {
                 $tongTx = $diemTX->sum('Diem');
-                $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() + 5),1);
-            } else {
                 $tbhk = 0;
-            }
-            $checkDiemHK = Diem::where('MSHS',$hs->MSHS)
-            ->where('MaHK',$request->MaHK)
-            ->where('MaMH',$request->MaMH)
-            ->where('MaLoai',substr($request->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2")->first();
-            if($checkDiemHK){
-                $checkDiemHK->Diem = $tbhk;
-                $checkDiemHK->save();
+                if($request->MaMH == "CB4" || $request->MaMH == "CB5")
+                {
+                    $tong = $tongTx + $diemGK->Diem + $diemCK->Diem;
+                    if($tong == $diemTX->count()+2){
+                        $tbhk = 1;
+                    }else{
+                        $tbhk = 0;
+                    }
+                }else{
+                    $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() + 5),1);
+                }
+                $checkDiemHK = Diem::where('MSHS',$hs->MSHS)
+                ->where('MaHK',$request->MaHK)
+                ->where('MaMH',$request->MaMH)
+                ->where('MaLoai',substr($request->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2")->first();
+                if($checkDiemHK){
+                    $checkDiemHK->Diem = $tbhk;
+                    $checkDiemHK->save();
+                }else{
+                    $diemHk = new Diem();
+                    $diemHk->MSHS = $hs->MSHS;
+                    $diemHk->MaHK = $request->MaHK;
+                    $diemHk->MaMH = $request->MaMH;
+                    $diemHk->MaLoai = substr($request->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2";
+                    $diemHk->Diem = $tbhk;
+                    $diemHk->save();
+                }
             }else{
-                $diemHk = new Diem();
-                $diemHk->MSHS = $hs->MSHS;
-                $diemHk->MaHK = $request->MaHK;
-                $diemHk->MaMH = $request->MaMH;
-                $diemHk->MaLoai = substr($request->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2";
-                $diemHk->Diem = $tbhk;
-                $diemHk->save();
+                return response()->json("Có học sinh chưa đủ cột điểm yêu cầu",402);
             }
         }
         return response()->json("Đã tính điểm thành công!",200);
     }
-    public function TongKetDiemCN(Request $request){
+    public function TongKetMonCN(Request $request){
         $lop = Lop::where("MaLop",$request->MaLop)->first();
         $hocsinh = $lop->hocSinh;
         foreach ($hocsinh as $hs){
@@ -171,25 +191,218 @@ class DiemController extends Controller
             ->where('MaMH', $request->MaMH)
             ->where('MaLoai', 'tbhk2')
             ->first();
-            $tbcn = round(($tbhk1->Diem + $tbhk2->Diem*2)/3,1);
-            $checkCN = Diem::where('MSHS',$hs->MSHS)
-            ->where('MaHK','2' . $request->MaNK)
-            ->where('MaMH',$request->MaMH)
-            ->where('MaLoai','tbcn')->first();
-            if($checkCN){
-                $checkCN->Diem = $tbcn;
-                $checkCN->save();
-            }else
-            {
-                $diemCN = new Diem();
-                $diemCN->MSHS = $hs->MSHS;
-                $diemCN->MaHK = '2' . $request->MaNK;
-                $diemCN->MaMH = $request->MaMH;
-                $diemCN->Diem = $tbcn;
-                $diemCN->MaLoai = "tbcn";
-                $diemCN->save();
+            if ($tbhk1 && $tbhk2) {
+                $tbcn=0;
+                if($request->MaMH == "CB4" || $request->MaMH == "CB5"){
+                   $tbcn = $tbhk2->Diem;
+                }else{
+                    $tbcn = round(($tbhk1->Diem + $tbhk2->Diem*2)/3,1);
+                };
+                $checkCN = Diem::where('MSHS',$hs->MSHS)
+                ->where('MaHK','2' . $request->MaNK)
+                ->where('MaMH',$request->MaMH)
+                ->where('MaLoai','tbcn')->first();
+                if($checkCN){
+                    $checkCN->Diem = $tbcn;
+                    $checkCN->save();
+                }else
+                {
+                    $diemCN = new Diem();
+                    $diemCN->MSHS = $hs->MSHS;
+                    $diemCN->MaHK = '2' . $request->MaNK;
+                    $diemCN->MaMH = $request->MaMH;
+                    $diemCN->Diem = $tbcn;
+                    $diemCN->MaLoai = "tbcn";
+                    $diemCN->save();
+                }
+            }else{
+                return response()->json("Có học sinh chưa đủ cột điểm yêu cầu",402);
             }
         }
         return response()->json("Đã cập nhật điểm thành công",200);
-    } 
+    }
+    public function TongKetHocKi(Request $rq){
+        $MaLoai = substr($rq->MaHK, 0, 1) == "1" ? "tbhk1" : "tbhk2";
+        $lop = Lop::where("MaLop",$rq->MaLop)->first();
+        $hocsinh = $lop->hocSinh;
+        foreach ($hocsinh as $hs){
+            $data = HocLop::where('MSHS', $hs->MSHS)->where('MaLop',$rq->MaLop)
+                ->where('MaNK', substr($rq->MaHK, 1, 6))
+                ->first();
+            $tbhk = Diem::where('MSHS', $hs->MSHS)->whereNotIn("MaMH",["CB4","CB5"])->where('MaHK',$rq->MaHK)->where('MaLoai', $MaLoai)->get();
+            $danhgia = Diem::where('MSHS', $hs->MSHS)->whereIn("MaMH",["CB4","CB5"])->where('MaHK',$rq->MaHK)->where('MaLoai', $MaLoai)->get();
+            if ($tbhk->count() === 8 && $danhgia->count() === 2) {
+                $diemTbHk = round($tbhk->avg('Diem'),1);
+                $hocLuc = 0;
+                if($danhgia->sum("Diem") == 2 && $tbhk->where('Diem',"<",6.5)->isEmpty() && $tbhk->where('Diem',">=",8.0)->count() >= 6)
+                {
+                    $hocLuc = 4;
+                }elseif ($danhgia->sum("Diem") == 2 && $tbhk->where('Diem',"<",5.0)->isEmpty() && $tbhk->where('Diem',">=",6.5)->count() >= 6) {
+                    $hocLuc = 3;
+                }elseif($danhgia->sum("Diem") == 1 && $tbhk->where('Diem',"<",3.5)->isEmpty() && $tbhk->where('Diem',">=",5.0)->count() >= 6){
+                    $hocLuc = 2;
+                }else{
+                    $hocLuc = 1;
+                }
+                if($MaLoai == "tbhk1"){
+                    $data->Diem_TB_HKI = $diemTbHk;
+                    $data->MaHL_HK1 = $hocLuc;
+                }else{
+                    $data->Diem_TB_HKII = $diemTbHk;
+                    $data->MaHL_HK2 = $hocLuc;
+                }
+                $data->save();
+            }
+            else{
+                return response()->json("Có học sinh chưa đủ cột điểm yêu cầu",402);
+            }
+        }
+        return response()->json("Đã cập nhật điểm thành công",200);
+    }
+    public function TongKetNamHoc(Request $rq){
+        $lop = Lop::where("MaLop",$rq->MaLop)->first();
+        $hocsinh = $lop->hocSinh;
+        foreach ($hocsinh as $hs){
+            $data = HocLop::where('MSHS', $hs->MSHS)->where('MaLop',$rq->MaLop)
+                ->where('MaNK', $rq->MaNK)
+                ->first();
+            $tbcn = Diem::where('MSHS', $hs->MSHS)->whereNotIn("MaMH",["CB4","CB5"])->where('MaHK', '2' . $rq->MaNK)->where('MaLoai', 'tbcn')->get();
+            $danhgia = Diem::where('MSHS', $hs->MSHS)->whereIn("MaMH",["CB4","CB5"])->where('MaHK','2' . $rq->MaNK)->where('MaLoai', 'tbcn')->get();
+            if ($tbcn->count() === 8) {
+                $cn = round($tbcn->avg('Diem'),1);
+                $hocLuc = 0;
+                if($danhgia->sum("Diem") == 2 && $tbcn->where('Diem',"<",6.5)->isEmpty() && $tbcn->where('Diem',">=",8.0)->count() >= 6)
+                {
+                    $hocLuc = 4;
+                }elseif ($danhgia->sum("Diem") == 2 && $tbcn->where('Diem',"<",5.0)->isEmpty() && $tbcn->where('Diem',">=",6.5)->count() >= 6) {
+                    $hocLuc = 3;
+                }elseif($danhgia->sum("Diem") == 1 && $tbcn->where('Diem',"<",3.5)->isEmpty() && $tbcn->where('Diem',">=",5.0)->count() >= 6){
+                    $hocLuc = 2;
+                }else{
+                    $hocLuc = 1;
+                }
+                $data->Diem_TB_CN = $cn;
+                $data->MaHL = $hocLuc;
+                $data->save();
+            }
+            else{
+                return response()->json("Có học sinh chưa đủ cột điểm yêu cầu",402);
+            }
+        }
+        return response()->json("Đã cập nhật điểm thành công",200);
+    }
+    
+    // Ham test nhap diem
+
+    public function NhapDiem(){
+        $hs = HocSinh::all();
+        foreach ($hs as $hs){
+            if($hs->MaBan == "XH"){
+                $monhoc = MonHoc::whereIn('MaMH',['CB1','CB2','CB3'])
+                ->orWhere('MaMH', 'like', 'XH%')
+                ->orWhere('MaMH', '=', 'TN1')
+                ->orWhere('MaMH', '=', 'TC1')->get();
+                foreach($monhoc as $mh){
+                    $diemtx = new Diem();
+                    $diemtx->MSHS = $hs->MSHS;
+                    $diemtx->MaMH = $mh->MaMH;
+                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaLoai = "tx";
+                    $diemtx->Diem = rand(1,10);
+                    $diemtx->save();
+                    $diemgk = new Diem();
+                    $diemgk->MSHS = $hs->MSHS;
+                    $diemgk->MaMH = $mh->MaMH;
+                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaLoai = "gk";
+                    $diemgk->Diem = rand(1,10);
+                    $diemgk->save();
+                    $diemck = new Diem();
+                    $diemck->MSHS = $hs->MSHS;
+                    $diemck->MaMH = $mh->MaMH;
+                    $diemck->MaHK = "122-23";
+                    $diemck->MaLoai = "ck";
+                    $diemck->Diem = rand(1,10);
+                    $diemck->save();
+                }
+                $monhocDG = MonHoc::whereIn('MaMH',['CB4','CB5'])->get();
+                foreach($monhocDG as $mh){
+                    $diemtx = new Diem();
+                    $diemtx->MSHS = $hs->MSHS;
+                    $diemtx->MaMH = $mh->MaMH;
+                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaLoai = "tx";
+                    $diemtx->Diem = rand(0,1);
+                    $diemtx->save();
+                    $diemgk = new Diem();
+                    $diemgk->MSHS = $hs->MSHS;
+                    $diemgk->MaMH = $mh->MaMH;
+                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaLoai = "gk";
+                    $diemgk->Diem = rand(0,1);
+                    $diemgk->save();
+                    $diemck = new Diem();
+                    $diemck->MSHS = $hs->MSHS;
+                    $diemck->MaMH = $mh->MaMH;
+                    $diemck->MaHK = "122-23";
+                    $diemck->MaLoai = "ck";
+                    $diemck->Diem = rand(0,1);
+                    $diemck->save();
+                }
+            }else{
+                $monhoc = MonHoc::whereIn('MaMH',['CB1','CB2','CB3'])
+                ->orWhere('MaMH', 'like', 'TN%')
+                ->orWhere('MaMH', '=', 'XH1')
+                ->orWhere('MaMH', '=', 'TC2')->get();
+                foreach($monhoc as $mh){
+                    $diemtx = new Diem();
+                    $diemtx->MSHS = $hs->MSHS;
+                    $diemtx->MaMH = $mh->MaMH;
+                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaLoai = "tx";
+                    $diemtx->Diem = rand(1,10);
+                    $diemtx->save();
+                    $diemgk = new Diem();
+                    $diemgk->MSHS = $hs->MSHS;
+                    $diemgk->MaMH = $mh->MaMH;
+                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaLoai = "gk";
+                    $diemgk->Diem = rand(1,10);
+                    $diemgk->save();
+                    $diemck = new Diem();
+                    $diemck->MSHS = $hs->MSHS;
+                    $diemck->MaMH = $mh->MaMH;
+                    $diemck->MaHK = "122-23";
+                    $diemck->MaLoai = "ck";
+                    $diemck->Diem = rand(1,10);
+                    $diemck->save();
+                }
+                $monhocDG = MonHoc::whereIn("MaMH",['CB4','CB5'])->get();
+                foreach($monhocDG as $mh){
+                    $diemtx = new Diem();
+                    $diemtx->MSHS = $hs->MSHS;
+                    $diemtx->MaMH = $mh->MaMH;
+                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaLoai = "tx";
+                    $diemtx->Diem = rand(0,1);
+                    $diemtx->save();
+                    $diemgk = new Diem();
+                    $diemgk->MSHS = $hs->MSHS;
+                    $diemgk->MaMH = $mh->MaMH;
+                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaLoai = "gk";
+                    $diemgk->Diem = rand(0,1);
+                    $diemgk->save();
+                    $diemck = new Diem();
+                    $diemck->MSHS = $hs->MSHS;
+                    $diemck->MaMH = $mh->MaMH;
+                    $diemck->MaHK = "122-23";
+                    $diemck->MaLoai = "ck";
+                    $diemck->Diem = rand(0,1);
+                    $diemck->save();
+                }
+            }
+        }
+        return response()->json("OK",200);
+    }
 }

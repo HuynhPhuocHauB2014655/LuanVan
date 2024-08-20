@@ -148,47 +148,46 @@ export default function ClassInfo() {
         "Học kì 2": 2 + nienKhoa.NienKhoa
     };
     const CheckTongKet = () => {
-        // let checkHK1 = true;
-        // let checkHK2 = true;
-        // let checkCN = true;
-        // classData.lop.hoc_sinh.map((student) => {
-        //     const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-        //     const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-        //     const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
-        //     const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
-        //     const TBHK1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk1");
-        //     const TBHK2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk2");
-        //     if ((txGrades1.length == 0 || otherGrades1.length < 2)) {
-        //         checkHK1 = false;
-        //     }
-        //     if ((txGrades2.length == 0 || otherGrades2.length < 2)) {
-        //         checkHK2 = false;
-        //     }
-        //     if (!TBHK1.Diem || !TBHK2.Diem) {
-        //         checkCN = false;
-        //     }
-        // })
-        // if (checkHK1) {
-        //     setDisableHK1(false);
-        //     setMaHK1(1 + nienKhoa.NienKhoa);
-        // }
-        // else if (checkHK2) {
-        //     setDisableHK2(false);
-        //     setMaHK2(2 + nienKhoa.NienKhoa);
-        // }
-        // else {
-        //     setDisableHK1(true);
-        //     setDisableHK2(true);
-        //     setMaHK1("");
-        //     setMaHK2("");
-        // }
-        // if (checkCN) {
-        //     setDisableNH(false);
-        // } else {
-        //     setDisableNH(true);
-        // }
-        setMaHK1(1 + nienKhoa.NienKhoa);
-        setMaHK2(2 + nienKhoa.NienKhoa);
+        let checkHK1 = true;
+        let checkHK2 = true;
+        let checkCN = true;
+        classData.lop.hoc_sinh.map((student) => {
+            const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
+            const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
+            const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
+            const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai != "tx");
+            const TBHK1 = diemHK1.find((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk1");
+            const TBHK2 = diemHK2.find((item) => item.MSHS === student.MSHS && item.MaLoai == "tbhk2");
+            if ((txGrades1.length == 0 || otherGrades1.length < 2)) {
+                checkHK1 = false;
+            }
+            if ((txGrades2.length == 0 || otherGrades2.length < 2)) {
+                checkHK2 = false;
+            }
+            if (!TBHK1 || !TBHK2) {
+                checkCN = false;
+            }
+        })
+        if (checkHK1) {
+            setDisableHK1(false);
+            setMaHK1(1 + nienKhoa.NienKhoa);
+        }else{
+            setDisableHK1(true);
+            setMaHK1("");
+        }
+        if (checkHK2) {
+            setDisableHK2(false);
+            setMaHK2(2 + nienKhoa.NienKhoa);
+        }
+        else {
+            setDisableHK2(true);
+            setMaHK2("");
+        }
+        if (checkCN) {
+            setDisableNH(false);
+        } else {
+            setDisableNH(true);
+        }
         setShowButton(!showButton);
     }
     const changeConfirm = (type) => {
@@ -244,13 +243,14 @@ export default function ClassInfo() {
             MaMH: classData.MaMH
         }
         try {
-            const response = await axiosClient.post("/diem/tk/canam", payload);
+            const response = await axiosClient.post("/diem/mon/canam", payload);
             setMessage(response.data);
         } catch (error) {
             console.error('Error submitting data:', error);
             setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
+            setShowButton(false);
         }
     }
     const TongKetHK = async (maHK) => {
@@ -260,13 +260,14 @@ export default function ClassInfo() {
             MaMH: classData.MaMH
         }
         try {
-            const response = await axiosClient.post("/diem/tk/hocky", payload);
+            const response = await axiosClient.post("/diem/mon/hocky", payload);
             setMessage(response.data);
         } catch (error) {
             console.error('Error submitting data:', error);
             setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
+            setShowButton(false);
         }
     }
     return (
@@ -297,37 +298,39 @@ export default function ClassInfo() {
                 {show === 1 && <HocSinhTable datas={classData.lop.hoc_sinh} />}
                 {show === 2 && (
                     <div>
-                        <div className="flex justify-between space-x-2 my-2">
+                        <div className="flex justify-between my-2 w-full">
                             <div className="space-x-2 flex">
                                 <button onClick={CheckTongKet} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
-                                {showButton && <div className="space-x-2">
+                                {showButton && 
+                                <div className="space-x-2">
                                     <button
                                         type="button"
-                                        className={!disableNH ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        // disabled={disableNH}
+                                        className={!disableNH ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                        disabled={disableNH}
                                         onClick={() => changeConfirm('tknh')}
                                     >
                                         Tổng kết năm học
                                     </button>
                                     <button
                                         type="button"
-                                        className={!disableHK1 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        // disabled={disableHK1}
+                                        className={!disableHK1 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                        disabled={disableHK1}
                                         onClick={() => changeConfirm('tkhk1')}
                                     >
                                         Tổng kết học kì 1
                                     </button>
                                     <button
                                         type="button"
-                                        className={!disableHK2 ? "button button-animation border-blue-600 hover:bg-blue-600" : "button border-slate-500 text-slate-500"}
-                                        // disabled={disableHK2}
+                                        className={!disableHK2 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                        disabled={disableHK2}
                                         onClick={() => changeConfirm('tkhk2')}
                                     >
                                         Tổng kết học kì 2
                                     </button>
                                 </div>}
                             </div>
-                            <div className="space-x-2 flex">
+                            {(classData?.MaMH === "CB4" || classData?.MaMH === "CB5") && <div className=" text-red-800 text-xl">*Điểm 0 = Chưa đạt, 1 = Đạt</div>}
+                            <div className="space-x-2 flex justify-end ">
                                 {showForm === 2 && <div className="text-red-500 shadow-lag mt-1 text-xl">Nhấp chọn điểm cần sửa</div>}
                                 {showForm !== 2 ? (
                                     <button className="button button-animation border-blue-600 hover:bg-blue-600" onClick={() => setShowForm(2)}>Sửa điểm</button>
@@ -370,7 +373,7 @@ export default function ClassInfo() {
                                             Diem: Yup.number().typeError("Không đúng định dạng")
                                                 .required('Bắt buộc')
                                                 .min(0, "Điểm không hợp lệ")
-                                                .max(10, "Điểm không hợp lệ"),
+                                                .max(classData.MaMH === "CB4" || classData.MaMH === "CB5" ? 1 : 10, "Điểm không hợp lệ"),
                                             MaHK: Yup.string().required('Bắt buộc'),
                                             MaLoai: Yup.string().required('Bắt buộc'),
                                         })}
@@ -452,6 +455,6 @@ export default function ClassInfo() {
                     </Draggable>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
