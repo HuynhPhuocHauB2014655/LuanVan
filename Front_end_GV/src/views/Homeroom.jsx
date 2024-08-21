@@ -1,6 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useUserContext } from "../context/userContext";
-import { useEffect } from "react";
 import axiosClient from "../axios-client";
 import { useStateContext } from "../context/Context";
 import Loading from "../components/Loading";
@@ -11,6 +10,7 @@ import Draggable from "react-draggable";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import AlterConfirm from "../components/Confirm";
+import RenLuyenForm from "../components/RenLuyenForm";
 
 export default function Homeroom() {
     const { userName } = useUserContext();
@@ -30,11 +30,17 @@ export default function Homeroom() {
     const [disableHK1, setDisableHK1] = useState(false);
     const [disableHK2, setDisableHK2] = useState(false);
     const [disableCN, setDisableCN] = useState(false);
+    const [disableRL, setDisableRL] = useState(false);
+    const [disableTT, setDisableTT] = useState(false);
     const [showButton, setShowButton] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [change,setChange] = useState(false);
+    const [renLuyenHeHT, setRenLuyenHeHT] = useState([]);
+    const [renLuyenHeRL, setRenLuyenHeRL] = useState([]);
+    const [monRLH, setMonRLH] = useState([]);
+    const [diemRLH, setDiemRLH] = useState([]);
+    const [change, setChange] = useState(false);
+    const [hanSuaDiem, setHanSuaDiem] = useState(true);
+    const [initialValues, setInitialValues] = useState();
     const dragRef = useRef();
-    const formRef = useRef();
     const [count, setCount] = useState({
         Siso: 0,
         Nam: 0,
@@ -81,9 +87,41 @@ export default function Homeroom() {
             }
         }
     }
+    const getDiemDuoi5 = async () => {
+        const payload = {
+            MaLop: datas.lop[0].MaLop,
+            MaHK: "2" + nienKhoa.NienKhoa,
+        }
+        try {
+            const response = await axiosClient.post('/diem/mon/rlh', payload);
+            setMonRLH(response.data);
+            var array = [];
+            response.data.map((item)=>{
+                array.push(item.MaMH);
+            })
+            const payload2 = {
+                monRLH: array,
+                MaLop: datas.lop[0].MaLop,
+                MaHK:"2"+ nienKhoa.NienKhoa
+            }
+            const res = await axiosClient.post('/diem/rlh', payload2);
+            setDiemRLH(res.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
     const handleSubState = (view) => {
-        if (view == 3 || view == 4) {
+        if (view >= 3) {
             fetchDiemTB();
+        }
+        if (view == 4) {
+            const date = new Date();
+            if (date > new Date(nienKhoa.HanSuaDiem)) {
+                setHanSuaDiem(false);
+            }
+        }
+        if (view == 6) {
+            getDiemDuoi5();
         }
         setSubState(view);
     }
@@ -95,6 +133,18 @@ export default function Homeroom() {
         try {
             const response = await axiosClient.post(`/diem/tb`, payload);
             setDiemTB(response.data);
+            response.data.map((item) => {
+                if (item.MaRL_HK1 == 0 || item.MaRL_HK2 == 0) {
+                    setDisableRL(true);
+                }
+                if (item.MaRL == 0 || item.MaHL == 0) {
+                    setDisableTT(true);
+                }
+            })
+            const rlhht = response.data.filter(item => item.MaTT == 2 && item.MaHL == 1);
+            setRenLuyenHeHT(rlhht);
+            const rlhrl = response.data.filter(item => item.MaTT == 2 && item.MaRL == 1);
+            setRenLuyenHeRL(rlhrl);
         } catch (error) {
             console.error(error);
         }
@@ -197,28 +247,71 @@ export default function Homeroom() {
         try {
             const res = await axiosClient.post('/rl/add', payload);
             setMessage(res.data);
-        }catch(error){
+        } catch (error) {
             setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
-        }finally{
+        } finally {
             fetchDiemTB();
         }
     }
-    const updateRL = (data) => {
-        console.log(data);
+    const showUpdateRL = (data, HK) => {
+        setInitialValues({
+            MSHS: data.MSHS,
+            RenLuyen: HK == 1 ? data.MaRL_HK1 : data.MaRL_HK2,
+            LoaiRL: HK,
+        })
+        setShowForm(2);
     }
-    const onConfirm = () => {
-        setShowConfirm(0);
-        formRef.current.submitForm();
-    }
-    const onCancel = () => {
-        setShowConfirm(0);
+    const handelUpdateRL = async (value) => {
+        const payload = {
+            MaNK: nienKhoa.NienKhoa,
+            MSHS: value.MSHS,
+            MaLop: datas.lop[0].MaLop,
+            RenLuyen: value.RenLuyen,
+            LoaiRL: value.LoaiRL,
+        }
+        try {
+            const res = await axiosClient.post('/rl/update', payload);
+            setMessage(res.data);
+        } catch (error) {
+            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        } finally {
+            fetchDiemTB();
+        }
     }
     const SetShowForm = (show) => {
+        if (show == 1) {
+            setInitialValues({
+                MSHS: '',
+                RenLuyen: '',
+                LoaiRL: '',
+            })
+        }
         setShowForm(show);
     }
-    const SetChange = (c) =>{
+    const SetChange = (c) => {
         setChange(c);
     }
+    const danhGiaRLCN = async () => {
+        try {
+            const res = await axiosClient.get(`/rl/${datas.lop[0].MaLop}`);
+            setMessage(res.data);
+        } catch (error) {
+            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        } finally {
+            fetchDiemTB();
+        }
+    }
+    const xetLenLop = async () => {
+        try {
+            const res = await axiosClient.get(`/tk/${datas.lop[0].MaLop}`);
+            setMessage(res.data);
+        } catch (error) {
+            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        } finally {
+            fetchDiemTB();
+        }
+    }
+    console.log(diemTB);
     return (
         <div className="main-content">
             <Menu />
@@ -240,7 +333,7 @@ export default function Homeroom() {
                             {state == 1 ? <HocSinhTable datas={datas.lop[0]?.hoc_sinh} />
                                 :
                                 <div className="">
-                                    <div className="w-full mx-auto grid grid-cols-5 grid-flow-row mt-2">
+                                    <div className="w-full mx-auto grid grid-rows-1 grid-flow-col mt-2">
                                         <button
                                             className={subState == 1 ? "sub-head-active rounded-s-md" : "sub-head rounded-s-md"}
                                             onClick={() => handleSubState(1)}>Điểm chi tiết
@@ -258,8 +351,16 @@ export default function Homeroom() {
                                             onClick={() => handleSubState(4)}>Rèn luyện
                                         </button>
                                         <button
-                                            className={subState == 5 ? "sub-head-active rounded-e-md" : "sub-head rounded-e-md"}
-                                            onClick={() => handleSubState(5)}>Khen thưởng
+                                            className={subState == 5 ? "sub-head-active" : "sub-head"}
+                                            onClick={() => handleSubState(5)}>Xét lên lớp
+                                        </button>
+                                        <button
+                                            className={subState == 6 ? "sub-head-active" : "sub-head"}
+                                            onClick={() => handleSubState(6)}>Rèn luyện hè
+                                        </button>
+                                        <button
+                                            className={subState == 7 ? "sub-head-active rounded-e-md" : "sub-head rounded-e-md"}
+                                            onClick={() => handleSubState(7)}>Khen thưởng
                                         </button>
                                     </div>
                                     {subState == 1 &&
@@ -397,11 +498,18 @@ export default function Homeroom() {
                                     {subState == 4 &&
                                         <div className="relative">
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Đánh giá rèn luyện</h2>
-                                            <div className="flex justify-end my-2">
-                                                {change && <div className="text-red-400 text-xl me-2 mt-2">Nhấp vào mục tiêu cần sửa</div>}
-                                                <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={()=>SetChange(!change)}>{change ? <p className="text-red-500">Hủy</p> : <p>Sửa rèn luyện</p>}</button>
-                                                <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={()=>SetShowForm(1)}>Xét rèn luyện</button>
-                                            </div>
+                                            {hanSuaDiem ?
+                                                <div className="flex justify-between my-2">
+                                                    <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" disabled={disableRL} onClick={danhGiaRLCN}>Xét rèn luyện cả năm</button>
+                                                    <div className="flex">
+                                                        {change && <div className="text-red-400 text-xl me-2 mt-2">Nhấp vào mục tiêu cần sửa</div>}
+                                                        <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetChange(!change)}>{change ? <p className="text-red-500">Hủy</p> : <p>Sửa rèn luyện</p>}</button>
+                                                        <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetShowForm(1)}>Xét rèn luyện</button>
+                                                    </div>
+                                                </div>
+                                                :
+                                                <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                                            }
                                             <table className="table-auto text-center w-full">
                                                 <thead>
                                                     <tr>
@@ -421,118 +529,170 @@ export default function Homeroom() {
                                                                     <td className="border border-black">{hs.MSHS}</td>
                                                                     <td className="border border-black">{hs.HoTen}</td>
                                                                     {change && data.ren_luyen_h_k1.MaRL > 0 ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => updateRL(data)}>{data.ren_luyen_h_k1.TenRL}</td>
+                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 1)}>{data.ren_luyen_h_k1.TenRL}</td>
                                                                         :
                                                                         <td className="border border-black">{data.ren_luyen_h_k1.TenRL}</td>
                                                                     }
-                                                                    {change && data.ren_luyen_h_k2.MaRl > 0  ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => updateRL(data)}>{data.ren_luyen_h_k2.TenRL}</td>
+                                                                    {change && data.ren_luyen_h_k2.MaRL > 0 ?
+                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.ren_luyen_h_k2.TenRL}</td>
                                                                         :
                                                                         <td className="border border-black">{data.ren_luyen_h_k2.TenRL}</td>
                                                                     }
-                                                                    {change && data.ren_luyen.MaRL > 0  ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => updateRL(data)}>{data.ren_luyen.TenRL}</td>
-                                                                        :
-                                                                        <td className="border border-black">{data.ren_luyen.TenRL}</td>
-                                                                    }
+                                                                    <td className="border border-black">{data.ren_luyen.TenRL}</td>
                                                                 </tr>
                                                             )
                                                         }
                                                     })}
                                                 </tbody>
                                             </table>
-                                            {showForm &&
+                                            {showForm == 1 &&
                                                 <Draggable nodeRef={dragRef} handle=".drag-handle">
-                                                    <div className="z-10 absolute w-1/2 top-16 left-1/4" ref={dragRef}>
-                                                        <div className="border-2 border-black rounded-lg bg-white">
-                                                            <div className="absolute top-0 right-0">
-                                                                <button className="X-button" onClick={() => setShowForm(0)}>X</button>
-                                                            </div>
-                                                            <div className="drag-handle cursor-move p-2 text-center text-xl border-b-2 border-slate-100 text-white bg-slate-400">Xét rèn luyện</div>
-                                                            <div className="p-4">
-                                                                <Formik
-                                                                    initialValues={{
-                                                                        MSHS: '',
-                                                                        RenLuyen: '',
-                                                                        LoaiRL: '',
-                                                                    }}
-                                                                    validationSchema={
-                                                                        Yup.object().shape({
-                                                                            MSHS: Yup.string().required('Bắt buộc'),
-                                                                            RenLuyen: Yup.string().required('Bắt buộc'),
-                                                                            LoaiRL: Yup.string().required('Bắt buộc'),
-                                                                        })
-                                                                    }
-                                                                    enableReinitialize={true}
-                                                                    onSubmit={handleSubmit}
-                                                                    innerRef={formRef}
-                                                                >
-                                                                    <Form className="flex items-center justify-center">
-                                                                        <div className="w-full max-w-lg p-3 space-y-4">
-                                                                            <div className="grid grid-cols-1 grid-flow-row">
-                                                                                <div className="w-[80%] mx-auto">
-                                                                                    <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
-                                                                                        Mã học sinh
-                                                                                    </label>
-                                                                                    <Field
-                                                                                        type="text"
-                                                                                        name="MSHS"
-                                                                                        className="f-field"
-                                                                                        placeholder="Nhập mã học sinh"
-                                                                                    />
-                                                                                    <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
-                                                                                </div>
-                                                                                <div className="w-[80%] mx-auto">
-                                                                                    <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="RenLuyen">
-                                                                                        Đánh giá rèn luyện
-                                                                                    </label>
-                                                                                    <Field
-                                                                                        as="select"
-                                                                                        name="RenLuyen"
-                                                                                        className="f-field"
-                                                                                    >
-                                                                                        <option value="">Chọn đánh giá</option>
-                                                                                        <option value="1">Chưa đạt</option>
-                                                                                        <option value="2">Đạt</option>
-                                                                                        <option value="3">Khá</option>
-                                                                                        <option value="4">Tốt</option>
-                                                                                    </Field>
-                                                                                    <ErrorMessage className="text-red-700 block mb-2" name="RenLuyen" component="div" />
-                                                                                </div>
-                                                                                <div className="w-[80%] mx-auto">
-                                                                                    <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="LoaiRL">
-                                                                                        Học kì
-                                                                                    </label>
-                                                                                    <Field
-                                                                                        as="select"
-                                                                                        name="LoaiRL"
-                                                                                        className="f-field"
-                                                                                    >
-                                                                                        <option value="">Chọn học kì</option>
-                                                                                        <option value="1">Học kì 1</option>
-                                                                                        <option value="2">Học kì 2</option>
-                                                                                    </Field>
-                                                                                    <ErrorMessage className="text-red-700 block mb-2" name="LoaiRL" component="div" />
-                                                                                </div>
-                                                                            </div>
-                                                                            <button
-                                                                                type="button"
-                                                                                className="f-button"
-                                                                                onClick={()=>setShowConfirm(1)}
-                                                                            >
-                                                                                Lưu
-                                                                            </button>
-                                                                        </div>
-                                                                    </Form>
-                                                                </Formik>
-                                                            </div>
-                                                        </div>
+                                                    <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
+                                                        <RenLuyenForm initialValues={initialValues} handler={handleSubmit} showForm={setShowForm} disable={false} />
                                                     </div>
                                                 </Draggable>
                                             }
-                                            {showConfirm === 1 &&
-                                                <AlterConfirm message={'Bạn có chắc chắn muốn đăng xuất không?'} onConfirm={onConfirm} onCancel={onCancel} />
+                                            {showForm == 2 &&
+                                                <Draggable nodeRef={dragRef} handle=".drag-handle">
+                                                    <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
+                                                        <RenLuyenForm initialValues={initialValues} handler={handelUpdateRL} showForm={setShowForm} disable={true} />
+                                                    </div>
+                                                </Draggable>
                                             }
+                                        </div>
+                                    }
+                                    {subState == 5 &&
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Xét lên lớp</h2>
+                                            <div className="my-2">
+                                                <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
+                                            </div>
+                                            <table className="table-auto text-center w-full">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="border border-black">Mã số học sinh</th>
+                                                        <th className="border border-black">Tên học sinh</th>
+                                                        <th className="border border-black">Xếp loại cả năm</th>
+                                                        <th className="border border-black">Rèn luyện cả năm</th>
+                                                        <th className="border border-black">Trạng thái</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {datas.lop[0]?.hoc_sinh.map((hs) => {
+                                                        const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
+                                                        if (data) {
+                                                            return (
+                                                                <tr key={hs.MSHS}>
+                                                                    <td className="border border-black">{hs.MSHS}</td>
+                                                                    <td className="border border-black">{hs.HoTen}</td>
+                                                                    <td className="border border-black">{data.hoc_luc.TenHL}</td>
+                                                                    <td className="border border-black">{data.ren_luyen.TenRL}</td>
+                                                                    <td className="border border-black">{data.trang_thai.TenTT}</td>
+                                                                </tr>
+                                                            )
+                                                        }
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    {subState == 6 &&
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Rèn luyện hè</h2>
+                                            {renLuyenHeHT.length > 0 || renLuyenHeRL.length > 0 ?
+                                                <div>
+                                                    <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện kết quả học tập trong hè</h1>
+                                                    {renLuyenHeHT.length > 0 &&
+                                                        <div>
+                                                            <table className="table-auto w-full">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th className="border border-black">Mã số học sinh</th>
+                                                                        <th className="border border-black">Tên học sinh</th>
+                                                                        <th className="border border-black">Môn học cần rèn luyện lại</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {renLuyenHeHT?.map((hs) => {
+                                                                        const data = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && diem.MaMH != "CB4" && diem.MaMH != "CB5");
+                                                                        const data1 = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && (diem.MaMH == "CB4" || diem.MaMH == "CB5") && diem.Diem == 0);
+                                                                        if (data) {
+                                                                            return (
+                                                                                <tr key={hs.MSHS}>
+                                                                                    <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
+                                                                                    <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
+                                                                                    <td className="border border-black">
+                                                                                        <div className=" space-x-2">
+                                                                                            {data.map((item, index) => (
+                                                                                                <span key={index}>{item?.mon_hoc.TenMH}</span>
+                                                                                            ))}
+                                                                                            {data1.map((item, index) => (
+                                                                                                <span key={index}>{item?.mon_hoc.TenMH}</span>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            )
+                                                                        }
+                                                                    })}
+                                                                </tbody>
+                                                            </table>
+                                                            <h1 className="text-2xl my-2 font-semibold">Kết quả rèn luyện hè</h1>
+                                                            {renLuyenHeHT.map((hs) => (
+                                                                <div  key={hs.MSHS} className="ms-3">
+                                                                    <h1 className="text-xl my-2 ">Học sinh:{hs.hoc_sinh.HoTen}</h1>
+                                                                    <table className="table-auto">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th className="border border-black px-2">Tên môn</th>
+                                                                                <th className="border border-black px-2">Điểm rèn luyện lại</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data)=>(
+                                                                                <tr key={data.MaMH}>
+                                                                                    <td className="border border-black px-2">{data?.mon_hoc.TenMH}</td>
+                                                                                    <td className="border border-black px-2 text-center">{diemRLH.find(item => item.MaMH = data.MaMH)?.Diem || "-"}</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    }
+                                                    <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện lại điểm rèn luyện trong hè</h1>
+                                                    {renLuyenHeRL.length > 0 &&
+                                                        <table className="table-auto text-center w-full">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="border border-black">Mã số học sinh</th>
+                                                                    <th className="border border-black">Tên học sinh</th>
+                                                                    <th className="border border-black">Xét rèn luyện lại</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {renLuyenHeRL?.map((hs) => {
+                                                                    return (
+                                                                        <tr key={hs.MSHS}>
+                                                                            <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
+                                                                            <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
+                                                                            <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    }
+                                                </div>
+                                                :
+                                                <div className="text-2xl text-green-300 font-bold text-center">Không có học sinh phải rèn luyện thêm trong hè</div>
+                                            }
+                                        </div>
+                                    }
+                                    {subState == 7 &&
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
                                         </div>
                                     }
                                 </div>

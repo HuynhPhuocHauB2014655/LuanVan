@@ -26,7 +26,7 @@ class DiemController extends Controller
         })
         ->where('MaHK', $request->MaHK)
         ->where('MaMH', $request->MaMH)
-        ->where('MaLoai',"tbcn")
+        ->whereIn('MaLoai',["tbcn","rlh"])
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
@@ -36,7 +36,7 @@ class DiemController extends Controller
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })
-        ->where('MaHK', $request->MaHK)->where("MaLoai","tbcn")->orderBy('MSHS')
+        ->where('MaHK', $request->MaHK)->whereIn('MaLoai',["tbcn","rlh"])->orderBy('MSHS')
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
@@ -61,9 +61,38 @@ class DiemController extends Controller
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
+    public function MonRLH(Request $request)
+    {
+        $diem1 = Diem::with(['hocSinh.lop','monHoc'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaHK', $request->MaHK)->whereNotIn("MaMH",["CB4","CB5"])->where("MaLoai","tbcn")->where("Diem","<",5.0)->orderBy('MSHS')
+        ->get();
+        $diem2 = Diem::with(['hocSinh.lop','monHoc'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaHK', $request->MaHK)->whereIn("MaMH",["CB4","CB5"])->where("MaLoai","tbcn")->where("Diem",0)->orderBy('MSHS')
+        ->get();
+        $mergedDiem = $diem1->merge($diem2);
+        $mergedDiem = $mergedDiem->unique()->sortBy('MSHS');
+        return response()->json($mergedDiem, Response::HTTP_OK);
+    }
+    public function DiemRLH(Request $request)
+    {
+        $monRLH = $request->input('monRLH', []);
+        $diem = Diem::with(['hocSinh.lop','monHoc'])
+        ->whereHas('hocSinh.lop', function($query) use ($request) {
+            $query->where('lop.MaLop', $request->MaLop);
+        })
+        ->where('MaHK', $request->MaHK)->whereIn('MaMH', $monRLH)->where("MaLoai","rlh")->orderBy('MSHS')
+        ->get();
+        return response()->json($diem, Response::HTTP_OK);
+    }
     public function DiemTB(Request $rq)
     {
-        $diemTB = HocLop::with(['hocSinh.lop','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2'])
+        $diemTB = HocLop::with(['renLuyenLai','hocSinh.lop','hocSinh','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2','trangThai'])
         ->whereHas('hocSinh.lop', function($query) use ($rq) {
             $query->where('lop.MaLop', $rq->MaLop);
         })->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
@@ -71,6 +100,14 @@ class DiemController extends Controller
     }
     public function AddDiem(Request $request)
     {
+        $hocsinh = HocSinh::find($request->MSHS);
+        if(!$hocsinh){
+            return response()->json('Học sinh không tồn tại',404);
+        };
+        $exits = HocLop::where("MSHS",$request->MSHS)->where("MaLop",$request->MaLop)->first();
+        if(!$exits){
+            return response()->json('Học sinh không thuộc lớp này',401);
+        }
         if($request->MaLoai == "tx")
         {
             $txCount = Diem::where('MSHS',$request->MSHS)
@@ -306,23 +343,23 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaHK = "222-23";
                     $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(1,10);
+                    $diemtx->Diem = rand(6,10);
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaHK = "222-23";
                     $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(1,10);
+                    $diemgk->Diem = rand(6,10);
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "122-23";
+                    $diemck->MaHK = "222-23";
                     $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(1,10);
+                    $diemck->Diem = rand(6,10);
                     $diemck->save();
                 }
                 $monhocDG = MonHoc::whereIn('MaMH',['CB4','CB5'])->get();
@@ -330,23 +367,23 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaHK = "222-23";
                     $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(0,1);
+                    $diemtx->Diem = 1;
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaHK = "222-23";
                     $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(0,1);
+                    $diemgk->Diem = 1;
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "122-23";
+                    $diemck->MaHK = "222-23";
                     $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(0,1);
+                    $diemck->Diem = 1;
                     $diemck->save();
                 }
             }else{
@@ -358,23 +395,23 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaHK = "222-23";
                     $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(1,10);
+                    $diemtx->Diem = rand(6,10);
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaHK = "222-23";
                     $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(1,10);
+                    $diemgk->Diem = rand(6,10);
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "122-23";
+                    $diemck->MaHK = "222-23";
                     $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(1,10);
+                    $diemck->Diem = rand(6,10);
                     $diemck->save();
                 }
                 $monhocDG = MonHoc::whereIn("MaMH",['CB4','CB5'])->get();
@@ -382,23 +419,23 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "122-23";
+                    $diemtx->MaHK = "222-23";
                     $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(0,1);
+                    $diemtx->Diem = 1;
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "122-23";
+                    $diemgk->MaHK = "222-23";
                     $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(0,1);
+                    $diemgk->Diem = 1;
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "122-23";
+                    $diemck->MaHK = "222-23";
                     $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(0,1);
+                    $diemck->Diem = 1;
                     $diemck->save();
                 }
             }

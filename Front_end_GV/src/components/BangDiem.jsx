@@ -113,7 +113,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         <th className="border border-black"></th>
                         <th className="border border-black" colSpan={7}>Học kì I</th>
                         <th className="border border-black" colSpan={7}>Học kì II</th>
-                        <th className="border border-black">Cả năm</th>
+                        <th className="border border-black" colSpan={2}>Cả năm</th>
                     </tr>
                     <tr>
                     <th className="border border-black">STT</th>
@@ -141,6 +141,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                 </th>
                         ))}
                         <th className="border border-black">Trung bình học kì 2</th>
+                        <th className="border border-black">Rèn luyện hè</th>
                         <th className="border border-black">Trung bình cả năm</th>
                     </tr>
                 </thead>
@@ -152,7 +153,8 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && (item.MaLoai === "ck" || item.MaLoai === "gk") );
                         const TBHK1 = diemHK1.find((item) => item.MSHS === student.MSHS && item.MaLoai === "tbhk1");
                         const TBHK2 = diemHK2.find((item) => item.MSHS === student.MSHS && item.MaLoai === "tbhk2");
-                        const TBCN = diemCN.find((item) => item.MSHS === student.MSHS);
+                        const TBCN = diemCN.find((item) => item.MSHS === student.MSHS && item.MaLoai == 'tbcn');
+                        const RLH = diemCN.find((item) => item.MSHS === student.MSHS && item.MaLoai == 'rlh');
                         const emptyTXCellsCount1 = 4 - (countTX1[student.MSHS] || 0);
                         const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
                         return (
@@ -174,6 +176,8 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                 {generateOtherCells(otherGrades2, student, )}
 
                                 <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
+
+                                <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
 
                                 <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>

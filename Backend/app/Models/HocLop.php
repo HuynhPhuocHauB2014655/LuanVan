@@ -58,4 +58,10 @@ class HocLop extends Model
     public function renLuyenHK2(): BelongsTo{
         return $this->belongsTo(RenLuyen::class,'MaRL_HK2','MaRL');
     }
+    public function renLuyenLai(): BelongsTo{
+        return $this->belongsTo(RenLuyen::class,'MaRLL','MaRL');
+    }
+    public function trangThai(): BelongsTo{
+        return $this->belongsTo(TrangThai::class,'MaTT','MaTT');
+    }
 }

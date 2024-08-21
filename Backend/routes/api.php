@@ -128,9 +128,14 @@ Route::post('/diem/mon/hocky',[DiemController::class,'TongKetMonHK']);
 Route::post('/diem/mon/canam',[DiemController::class,'TongKetMonCN']);
 Route::post('/diem/tk/hocki',[DiemController::class,'TongKetHocKi']);
 Route::post('/diem/tk/namhoc',[DiemController::class,'TongKetNamHoc']);
+Route::post('/diem/mon/rlh',[DiemController::class,'monRLH']);
+Route::post('/diem/rlh',[DiemController::class,'diemRLH']);
 Route::get('/diem',[DiemController::class,'NhapDiem']);
 
 
 //ren luyen route
 Route::get('/rl/index',[RenLuyenController::class,'index']);
 Route::post('/rl/add',[RenLuyenController::class,'addRL']);
+Route::post('/rl/update',[RenLuyenController::class,'updateRL']);
+Route::get('/rl/{MaLop}',[RenLuyenController::class,'xetRLCaNam']);
+Route::get('/tk/{MaLop}',[RenLuyenController::class,'xetLenLop']);

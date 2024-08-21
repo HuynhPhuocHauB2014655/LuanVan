@@ -26,6 +26,7 @@ export default function ClassInfo() {
     const [disableHK2, setDisableHK2] = useState(true);
     const [disableNH, setDisableNH] = useState(true);
     const [showConfirm, setShowConfrim] = useState(false);
+    const [hanSuaDiem, setHanSuaDiem] = useState(true);
     const [type, setType] = useState(0);
     const [data, setData] = useState();
     const [content, setContent] = useState("");
@@ -74,7 +75,12 @@ export default function ClassInfo() {
         if (view === 2) {
             setLoading(true);
             fetchDiem();
+            const date = new Date();
+            if (new Date(nienKhoa.HanSuaDiem) < date) {
+                setHanSuaDiem(false);
+            }
             setLoading(false);
+
         }
         setShow(view);
     };
@@ -125,7 +131,8 @@ export default function ClassInfo() {
             MaMH: classData.MaMH,
             MSHS: value.MSHS,
             Diem: value.Diem,
-            MaLoai: value.MaLoai
+            MaLoai: value.MaLoai,
+            MaLop: classData.MaLop,
         };
         setData(payload);
         changeConfirm('add');
@@ -171,7 +178,7 @@ export default function ClassInfo() {
         if (checkHK1) {
             setDisableHK1(false);
             setMaHK1(1 + nienKhoa.NienKhoa);
-        }else{
+        } else {
             setDisableHK1(true);
             setMaHK1("");
         }
@@ -270,6 +277,7 @@ export default function ClassInfo() {
             setShowButton(false);
         }
     }
+    console.log(diemCN);
     return (
         <div className="main-content relative">
             {showConfirm &&
@@ -298,48 +306,52 @@ export default function ClassInfo() {
                 {show === 1 && <HocSinhTable datas={classData.lop.hoc_sinh} />}
                 {show === 2 && (
                     <div>
-                        <div className="flex justify-between my-2 w-full">
-                            <div className="space-x-2 flex">
-                                <button onClick={CheckTongKet} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
-                                {showButton && 
-                                <div className="space-x-2">
-                                    <button
-                                        type="button"
-                                        className={!disableNH ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                        disabled={disableNH}
-                                        onClick={() => changeConfirm('tknh')}
-                                    >
-                                        Tổng kết năm học
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={!disableHK1 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                        disabled={disableHK1}
-                                        onClick={() => changeConfirm('tkhk1')}
-                                    >
-                                        Tổng kết học kì 1
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={!disableHK2 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                        disabled={disableHK2}
-                                        onClick={() => changeConfirm('tkhk2')}
-                                    >
-                                        Tổng kết học kì 2
-                                    </button>
-                                </div>}
+                        {hanSuaDiem ?
+                            <div className="flex justify-between my-2 w-full">
+                                <div className="space-x-2 flex">
+                                    <button onClick={CheckTongKet} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
+                                    {showButton &&
+                                        <div className="space-x-2">
+                                            <button
+                                                type="button"
+                                                className={!disableNH ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                disabled={disableNH}
+                                                onClick={() => changeConfirm('tknh')}
+                                            >
+                                                Tổng kết năm học
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={!disableHK1 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                disabled={disableHK1}
+                                                onClick={() => changeConfirm('tkhk1')}
+                                            >
+                                                Tổng kết học kì 1
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={!disableHK2 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                disabled={disableHK2}
+                                                onClick={() => changeConfirm('tkhk2')}
+                                            >
+                                                Tổng kết học kì 2
+                                            </button>
+                                        </div>}
+                                </div>
+                                {(classData?.MaMH === "CB4" || classData?.MaMH === "CB5") && <div className=" text-red-800 text-xl">*Điểm 0 = Chưa đạt, 1 = Đạt</div>}
+                                <div className="space-x-2 flex justify-end ">
+                                    {showForm === 2 && <div className="text-red-500 shadow-lag mt-1 text-xl">Nhấp chọn điểm cần sửa</div>}
+                                    {showForm !== 2 ? (
+                                        <button className="button button-animation border-blue-600 hover:bg-blue-600" onClick={() => setShowForm(2)}>Sửa điểm</button>
+                                    ) : (
+                                        <button className="button button-animation border-red-600 hover:bg-red-600" onClick={() => setShowForm(0)}>Hủy</button>
+                                    )}
+                                    <button className="button button-animation border-blue-600" onClick={() => setShowForm(1)}>Nhập điểm</button>
+                                </div>
                             </div>
-                            {(classData?.MaMH === "CB4" || classData?.MaMH === "CB5") && <div className=" text-red-800 text-xl">*Điểm 0 = Chưa đạt, 1 = Đạt</div>}
-                            <div className="space-x-2 flex justify-end ">
-                                {showForm === 2 && <div className="text-red-500 shadow-lag mt-1 text-xl">Nhấp chọn điểm cần sửa</div>}
-                                {showForm !== 2 ? (
-                                    <button className="button button-animation border-blue-600 hover:bg-blue-600" onClick={() => setShowForm(2)}>Sửa điểm</button>
-                                ) : (
-                                    <button className="button button-animation border-red-600 hover:bg-red-600" onClick={() => setShowForm(0)}>Hủy</button>
-                                )}
-                                <button className="button button-animation border-blue-600" onClick={() => setShowForm(1)}>Nhập điểm</button>
-                            </div>
-                        </div>
+                            :
+                            <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                        }
                         <BangDiem
                             hocSinh={classData.lop.hoc_sinh}
                             loaiDiem={loaiDiemHK}
