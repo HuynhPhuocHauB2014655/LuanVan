@@ -7,14 +7,14 @@ import Menu from "../components/Menu";
 import HocSinhTable from "../components/HocSinhTable";
 import BangDiem from "../components/BangDiem";
 import Draggable from "react-draggable";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import AlterConfirm from "../components/Confirm";
 import RenLuyenForm from "../components/RenLuyenForm";
 
 export default function Homeroom() {
     const { userName } = useUserContext();
-    const { nienKhoa, setMessage } = useStateContext();
+    const { nienKhoa, setMessage, setError } = useStateContext();
     const [loading, setLoading] = useState(true);
     const [datas, setDatas] = useState([]);
     const [state, setState] = useState(1);
@@ -35,105 +35,60 @@ export default function Homeroom() {
     const [showButton, setShowButton] = useState(false);
     const [renLuyenHeHT, setRenLuyenHeHT] = useState([]);
     const [renLuyenHeRL, setRenLuyenHeRL] = useState([]);
+    const [dsKhenThuong, setDSKhenThuong] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(0);
     const [monRLH, setMonRLH] = useState([]);
     const [diemRLH, setDiemRLH] = useState([]);
     const [change, setChange] = useState(false);
     const [hanSuaDiem, setHanSuaDiem] = useState(true);
     const [initialValues, setInitialValues] = useState();
+    const [hoten, setHoten] = useState();
     const dragRef = useRef();
     const [count, setCount] = useState({
         Siso: 0,
         Nam: 0,
         Nu: 0,
     });
-    useEffect(() => {
-        const fetchData = async () => {
-            const payload = {
-                MaNK: nienKhoa.NienKhoa,
-                MSGV: userName,
-            }
-            try {
-                const response = await axiosClient.post(`/gv/show/cn`, payload);
-                setDatas(response.data);
-                const renluyen = await axiosClient.get('/rl/index');
-                setRenLuyen(renluyen.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [userName, nienKhoa]);
-    const handleState = async (view) => {
-        if (view == 2) {
-            fetchSubjects();
+    const fetchData = async () => {
+        const payload = {
+            MaNK: nienKhoa.NienKhoa,
+            MSGV: userName,
         }
-        setState(view);
-    }
-    const fetchSubjects = async () => {
-        if (datas && datas.lop) {
+        try {
+            const response = await axiosClient.post(`/gv/show/cn`, payload);
+            setDatas(response.data);
+            const renluyen = await axiosClient.get('/rl/index');
+            setRenLuyen(renluyen.data);
             var urlMH = '';
-            if (datas.lop[0].MaLop.substring(0, 1) === "C") {
+            if (response.data?.lop[0].MaLop.substring(0, 1) === "C") {
                 urlMH = '/mh/xh';
             } else {
                 urlMH = '/mh/tn';
             }
-            try {
-                const response = await axiosClient.get(urlMH);
-                setSubjects(response.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            const sujs = await axiosClient.get(urlMH);
+            setSubjects(sujs.data);
+
+            const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
+            const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
+            const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
+            const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
+                axiosClient.post("/diem/cn", payloadHK1),
+                axiosClient.post("/diem/cn", payloadHK2),
+                axiosClient.post("/diem/cn/getCN", payloadCN),
+                axiosClient.get('/diem/loaidiem')
+            ]);
+            setDiemHK1(diemHk1.data);
+            setDiemHK2(diemHk2.data);
+            setDiemCN(diemCn.data);
+            setLoaiDiem(data.data);
+
+            const payload1 = {
+                MaNK: nienKhoa.NienKhoa,
+                MaLop: response.data?.lop[0].MaLop
             }
-        }
-    }
-    const getDiemDuoi5 = async () => {
-        const payload = {
-            MaLop: datas.lop[0].MaLop,
-            MaHK: "2" + nienKhoa.NienKhoa,
-        }
-        try {
-            const response = await axiosClient.post('/diem/mon/rlh', payload);
-            setMonRLH(response.data);
-            var array = [];
-            response.data.map((item)=>{
-                array.push(item.MaMH);
-            })
-            const payload2 = {
-                monRLH: array,
-                MaLop: datas.lop[0].MaLop,
-                MaHK:"2"+ nienKhoa.NienKhoa
-            }
-            const res = await axiosClient.post('/diem/rlh', payload2);
-            setDiemRLH(res.data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-    const handleSubState = (view) => {
-        if (view >= 3) {
-            fetchDiemTB();
-        }
-        if (view == 4) {
-            const date = new Date();
-            if (date > new Date(nienKhoa.HanSuaDiem)) {
-                setHanSuaDiem(false);
-            }
-        }
-        if (view == 6) {
-            getDiemDuoi5();
-        }
-        setSubState(view);
-    }
-    const fetchDiemTB = async () => {
-        const payload = {
-            MaNK: nienKhoa.NienKhoa,
-            MaLop: datas.lop[0].MaLop
-        }
-        try {
-            const response = await axiosClient.post(`/diem/tb`, payload);
-            setDiemTB(response.data);
-            response.data.map((item) => {
+            const diemtb = await axiosClient.post(`/diem/tb`, payload1);
+            setDiemTB(diemtb.data);
+            diemtb.data.map((item) => {
                 if (item.MaRL_HK1 == 0 || item.MaRL_HK2 == 0) {
                     setDisableRL(true);
                 }
@@ -141,39 +96,71 @@ export default function Homeroom() {
                     setDisableTT(true);
                 }
             })
-            const rlhht = response.data.filter(item => item.MaTT == 2 && item.MaHL == 1);
+            const rlhht = diemtb.data.filter(item => (item.MaTT == 2 && item.MaHL == 1) || item.MaHLL != 0);
             setRenLuyenHeHT(rlhht);
-            const rlhrl = response.data.filter(item => item.MaTT == 2 && item.MaRL == 1);
+            const rlhrl = diemtb.data.filter(item => (item.MaTT == 2 && item.MaRL == 1) || item.MaRLL != 0);
             setRenLuyenHeRL(rlhrl);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-    useEffect(() => {
-        if (state == 2 && subjects.length > 0) {
-            const fetchDiem = async () => {
-                const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
-                const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
-                const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
 
-                try {
-                    const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
-                        axiosClient.post("/diem/cn", payloadHK1),
-                        axiosClient.post("/diem/cn", payloadHK2),
-                        axiosClient.post("/diem/cn/getCN", payloadCN),
-                        axiosClient.get('/diem/loaidiem')
-                    ]);
-                    setDiemHK1(diemHk1.data);
-                    setDiemHK2(diemHk2.data);
-                    setDiemCN(diemCn.data);
-                    setLoaiDiem(data.data);
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            };
-            fetchDiem();
+
+            const date = new Date();
+            if (date > new Date(nienKhoa.HanSuaDiem)) {
+                setHanSuaDiem(false);
+            }
+            const payload2 = {
+                MaLop: response.data.lop[0].MaLop,
+                MaHK: "2" + nienKhoa.NienKhoa,
+            }
+            const diemduoi5 = await axiosClient.post('/diem/mon/rlh', payload2);
+            setMonRLH(diemduoi5.data);
+            var monDuoi5 = [];
+            diemduoi5.data.map((item) => {
+                monDuoi5.push(item.MaMH);
+            })
+            const payload3 = {
+                monRLH: monDuoi5,
+                MaLop: response.data.lop[0].MaLop,
+                MaHK: "2" + nienKhoa.NienKhoa
+            }
+            const res = await axiosClient.post('/diem/rlh', payload3);
+            setDiemRLH(res.data);
+            if (!diemtb.data.find(item => item.MaHL == 0 || item.MaRL == 0)) {
+                var array = [];
+                diemtb.data.map((hs) => {
+                    if (hs.MaHL == 4 && hs.MaRL == 4) {
+                        if (diemTB.filter(item => item.MSHS == hs.MSHS && item.Diem_TB_CN >= 9).length >= 6) {
+                            array.push({
+                                MSHS: hs.MSHS,
+                                HoTen: hs.hoc_sinh.HoTen,
+                                KhenThuong: "Học sinh Xuất sắc",
+                                MaLop: response.data.lop[0].MaLop,
+                            })
+                        } else {
+                            array.push({
+                                MSHS: hs.MSHS,
+                                HoTen: hs.hoc_sinh.HoTen,
+                                KhenThuong: "Học sinh Giỏi",
+                                MaLop: response.data.lop[0].MaLop,
+                            })
+                        }
+                    }
+                })
+                setDSKhenThuong(array);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
         }
-    }, [subjects])
+    };
+    useEffect(() => {
+        fetchData();
+    }, [userName, nienKhoa]);
+    const handleState = async (view) => {
+        setState(view);
+    }
+    const handleSubState = (view) => {
+        setSubState(view);
+    }
     useEffect(() => {
         if (datas && Object.keys(datas).length > 0) {
             const newCount = {
@@ -197,9 +184,9 @@ export default function Homeroom() {
             const res = await axiosClient.post('/diem/tk/hocki', payload);
             setMessage(res.data);
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
             changeShowButton();
         }
     }
@@ -211,11 +198,11 @@ export default function Homeroom() {
         try {
             const res = await axiosClient.post('/diem/tk/namhoc', payload);
             setMessage(res.data);
-            fetchDiemTB();
+            fetchData();
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
             changeShowButton();
         }
     }
@@ -248,9 +235,9 @@ export default function Homeroom() {
             const res = await axiosClient.post('/rl/add', payload);
             setMessage(res.data);
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
         }
     }
     const showUpdateRL = (data, HK) => {
@@ -273,9 +260,9 @@ export default function Homeroom() {
             const res = await axiosClient.post('/rl/update', payload);
             setMessage(res.data);
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
         }
     }
     const SetShowForm = (show) => {
@@ -296,9 +283,9 @@ export default function Homeroom() {
             const res = await axiosClient.get(`/rl/${datas.lop[0].MaLop}`);
             setMessage(res.data);
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
         }
     }
     const xetLenLop = async () => {
@@ -306,16 +293,25 @@ export default function Homeroom() {
             const res = await axiosClient.get(`/tk/${datas.lop[0].MaLop}`);
             setMessage(res.data);
         } catch (error) {
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchDiemTB();
+            fetchData();
         }
     }
-    console.log(diemTB);
+    const getName = (event) => {
+        const Mshs = event.target.value;
+        const hocsinh = diemTB.find(hs => hs.MSHS == Mshs);
+        if (hocsinh) {
+            setHoten(hocsinh.hoc_sinh.HoTen || '');
+        } else {
+            setHoten('');
+        }
+    }
+    // console.log(datas);
     return (
         <div className="main-content">
             <Menu />
-            <div className="right-part">
+            <div className="right-part relative">
                 <h1 className="page-name">Quản lí lớp chủ nhiệm</h1>
                 <div>
                     {Object.keys(datas).length > 0 ?
@@ -403,7 +399,6 @@ export default function Homeroom() {
                                                                     const tbhk1 = diemHK1?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk1" && diem.MSHS === hs.MSHS);
                                                                     const tbhk2 = diemHK2?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk2" && diem.MSHS === hs.MSHS);
                                                                     const tbcn = diemCN?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbcn" && diem.MSHS === hs.MSHS);
-
                                                                     let diemhk1, diemhk2, diemcn;
                                                                     if (item.MaMH === "CB4" || item.MaMH === "CB5") {
                                                                         diemhk1 = tbhk1?.Diem == 0 ? "Chưa đạt" : tbhk1?.Diem == 1 ? "Đạt" : "-";
@@ -470,6 +465,7 @@ export default function Homeroom() {
                                                             <th className="border border-black">Xếp loại HK2</th>
                                                             <th className="border border-black">Điểm trung bình cả năm</th>
                                                             <th className="border border-black">Xếp loại cả năm</th>
+                                                            <th className="border border-black">Xếp loại sau rèn luyện hè</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -486,6 +482,7 @@ export default function Homeroom() {
                                                                         <td className="border border-black">{data.hoc_luc_h_k2.TenHL}</td>
                                                                         <td className="border border-black">{data.Diem_TB_CN || "-"}</td>
                                                                         <td className="border border-black">{data.hoc_luc.TenHL}</td>
+                                                                        <td className="border border-black">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
                                                                     </tr>
                                                                 )
                                                             }
@@ -518,6 +515,7 @@ export default function Homeroom() {
                                                         <th className="border border-black">Rèn luyện HK1</th>
                                                         <th className="border border-black">Rèn luyện HK2</th>
                                                         <th className="border border-black">Rèn luyện cả năm</th>
+                                                        <th className="border border-black">Rèn luyện lại trong hè</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -539,6 +537,11 @@ export default function Homeroom() {
                                                                         <td className="border border-black">{data.ren_luyen_h_k2.TenRL}</td>
                                                                     }
                                                                     <td className="border border-black">{data.ren_luyen.TenRL}</td>
+                                                                    {change && data.ren_luyen_h_k2.MaRL > 0 ?
+                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                                        :
+                                                                        <td className="border border-black">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                                    }
                                                                 </tr>
                                                             )
                                                         }
@@ -604,7 +607,7 @@ export default function Homeroom() {
                                                     <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện kết quả học tập trong hè</h1>
                                                     {renLuyenHeHT.length > 0 &&
                                                         <div>
-                                                            <table className="table-auto w-full">
+                                                            <table className="table-auto w-[70%]">
                                                                 <thead>
                                                                     <tr>
                                                                         <th className="border border-black">Mã số học sinh</th>
@@ -638,32 +641,36 @@ export default function Homeroom() {
                                                                 </tbody>
                                                             </table>
                                                             <h1 className="text-2xl my-2 font-semibold">Kết quả rèn luyện hè</h1>
-                                                            {renLuyenHeHT.map((hs) => (
-                                                                <div  key={hs.MSHS} className="ms-3">
-                                                                    <h1 className="text-xl my-2 ">Học sinh:{hs.hoc_sinh.HoTen}</h1>
-                                                                    <table className="table-auto">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th className="border border-black px-2">Tên môn</th>
-                                                                                <th className="border border-black px-2">Điểm rèn luyện lại</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data)=>(
-                                                                                <tr key={data.MaMH}>
-                                                                                    <td className="border border-black px-2">{data?.mon_hoc.TenMH}</td>
-                                                                                    <td className="border border-black px-2 text-center">{diemRLH.find(item => item.MaMH = data.MaMH)?.Diem || "-"}</td>
+                                                            <div className="grid grid-cols-4 grid-flow-row space-x-1 space-y-1 mx-3">
+                                                                {renLuyenHeHT.map((hs) => (
+                                                                    <div key={hs.MSHS} style={{ margin: 0 }} className="space-x-1 space-y-1">
+                                                                        <h1 className="text-lg my-2">{hs.hoc_sinh.HoTen}</h1>
+                                                                        <table className="table-fixed" style={{ margin: 0 }}>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th className="border border-black px-2">Tên môn</th>
+                                                                                    <th className="border border-black px-2">Điểm rèn luyện lại</th>
                                                                                 </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            ))}
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data) => (
+                                                                                    <tr key={data.MaMH}>
+                                                                                        <td className="border border-black px-2">{data?.mon_hoc.TenMH}</td>
+                                                                                        <td className="border border-black px-2 text-center">{diemRLH.find(item => item.MaMH == data.MaMH)?.Diem || "-"}</td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                ))}
+
+
+                                                            </div>
                                                         </div>
                                                     }
                                                     <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện lại điểm rèn luyện trong hè</h1>
                                                     {renLuyenHeRL.length > 0 &&
-                                                        <table className="table-auto text-center w-full">
+                                                        <table className="table-auto text-center  w-[70%]">
                                                             <thead>
                                                                 <tr>
                                                                     <th className="border border-black">Mã số học sinh</th>
@@ -677,7 +684,7 @@ export default function Homeroom() {
                                                                         <tr key={hs.MSHS}>
                                                                             <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
                                                                             <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
-                                                                            <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
+                                                                            <td className="border border-black">{hs?.ren_luyen_lai.TenRL}</td>
                                                                         </tr>
                                                                     )
                                                                 })}
@@ -691,10 +698,33 @@ export default function Homeroom() {
                                         </div>
                                     }
                                     {subState == 7 &&
-                                        <div>
+                                        <div className="relative">
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
+                                            <h1 className="text-center font-bold text-2xl mt-3">Danh sách đề xuất khen thưởng</h1>
+                                            <div className="w-[70%] mx-auto">
+                                                <table className="table w-full text-xl">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="border border-black px-2">Mã số học sinh</th>
+                                                            <th className="border border-black px-2">Tên học sinh</th>
+                                                            <th className="border border-black px-2">Đề xuất khen thưởng</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {dsKhenThuong?.map((item) => (
+                                                            <tr key={item.MSHS}>
+                                                                <td className="border border-black px-2">{item.MSHS}</td>
+                                                                <td className="border border-black px-2">{item.HoTen}</td>
+                                                                <td className="border border-black px-2">{item.KhenThuong}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
+
                                     }
+
                                 </div>
                             }
                         </div>

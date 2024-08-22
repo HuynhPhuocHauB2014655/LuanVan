@@ -10,7 +10,7 @@ export default function Info() {
     const [info, setInfo] = useState({});
     const { userName } = useUserContext();
     const [show, setShow] = useState(false);
-    const {message,setMessage} = useStateContext();
+    const {message,setMessage,setError} = useStateContext();
     const fetchData = async () => {
         try {
             const response = await axiosClient.get(`/gv/show/${userName}`);
@@ -36,7 +36,7 @@ export default function Info() {
             setMessage(response.data);
             setShow(false);
         }catch(error){
-            setMessage(error.response.data);
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
             console.log(error);
         }
     }

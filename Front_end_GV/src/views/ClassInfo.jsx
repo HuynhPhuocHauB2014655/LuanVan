@@ -13,7 +13,7 @@ import Draggable from 'react-draggable';
 
 export default function ClassInfo() {
     const { userName } = useUserContext();
-    const { nienKhoa, setMessage } = useStateContext();
+    const { nienKhoa, setMessage, setError } = useStateContext();
     const [loading, setLoading] = useState(true);
     const [loaiDiem, setLoaiDiem] = useState([]);
     const [diemHK1, setDiemHK1] = useState([]);
@@ -94,7 +94,7 @@ export default function ClassInfo() {
             setMessage(response.data);
         } catch (error) {
             console.log(error);
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             fetchDiem();
             setShowButton(false);
@@ -110,7 +110,7 @@ export default function ClassInfo() {
             setMessage(response.data);
         } catch (error) {
             console.log(error);
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             if (disableHK1 == false) {
                 TongKetHK(maHK1);
@@ -127,7 +127,7 @@ export default function ClassInfo() {
     }
     const handleSubmit = async (value) => {
         const payload = {
-            MaHK: value.MaHK,
+            MaHK: value.MaLoai == "rlh" ? "2"+nienKhoa.NienKhoa :  value.MaHK,
             MaMH: classData.MaMH,
             MSHS: value.MSHS,
             Diem: value.Diem,
@@ -143,13 +143,13 @@ export default function ClassInfo() {
             setMessage(response.data);
         } catch (error) {
             console.error('Error submitting data:', error);
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             fetchDiem();
             setShowButton(false);
         }
     }
-    const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai));
+    const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck','rlh'].includes(item.MaLoai));
     const hocki = {
         "Học kì 1": 1 + nienKhoa.NienKhoa,
         "Học kì 2": 2 + nienKhoa.NienKhoa
@@ -254,7 +254,7 @@ export default function ClassInfo() {
             setMessage(response.data);
         } catch (error) {
             console.error('Error submitting data:', error);
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
             setShowButton(false);
@@ -271,13 +271,12 @@ export default function ClassInfo() {
             setMessage(response.data);
         } catch (error) {
             console.error('Error submitting data:', error);
-            setMessage(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
             setShowButton(false);
         }
     }
-    console.log(diemCN);
     return (
         <div className="main-content relative">
             {showConfirm &&

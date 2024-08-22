@@ -86,6 +86,7 @@ const RenLuyenForm = ({ initialValues, handler, showForm, disable }) => {
                                             <option value="">Chọn học kì</option>
                                             <option value="1">Học kì 1</option>
                                             <option value="2">Học kì 2</option>
+                                            <option value="3">Rèn luyện hè</option>
                                         </Field>
                                         <ErrorMessage className="text-red-700 block mb-2" name="LoaiRL" component="div" />
                                     </div>

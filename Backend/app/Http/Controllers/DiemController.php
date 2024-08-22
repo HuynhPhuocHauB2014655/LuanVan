@@ -92,7 +92,7 @@ class DiemController extends Controller
     }
     public function DiemTB(Request $rq)
     {
-        $diemTB = HocLop::with(['renLuyenLai','hocSinh.lop','hocSinh','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2','trangThai'])
+        $diemTB = HocLop::with(['renLuyenLai','hocLucLai','hocSinh.lop','hocSinh','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2','trangThai'])
         ->whereHas('hocSinh.lop', function($query) use ($rq) {
             $query->where('lop.MaLop', $rq->MaLop);
         })->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
@@ -108,6 +108,9 @@ class DiemController extends Controller
         if(!$exits){
             return response()->json('Học sinh không thuộc lớp này',401);
         }
+        if($request->MaLoai == "rlh" && $exits->MaTT != 2){
+            return response()->json('Học sinh này không rèn luyện hè',401);
+        }
         if($request->MaLoai == "tx")
         {
             $txCount = Diem::where('MSHS',$request->MSHS)
@@ -121,6 +124,14 @@ class DiemController extends Controller
             $diem = Diem::create($request->all());
             return response()->json("Đã thêm điểm thành công", 200);
         }else{
+            if($request->MaLoai == 'rlh'){
+                $exits = Diem::where('MSHS',$request->MSHS)
+                            ->where('MaMH',$request->MaMH)
+                            ->where('MaLoai',$request->MaLoai)->first();
+                if($exits){
+                    return response()->json('Đã nhập điểm rèn  luyện hè cho học sinh này', 409);
+                }
+            }
             $exits = Diem::where('MSHS',$request->MSHS)
                             ->where('MaHK',$request->MaHK)
                             ->where('MaMH',$request->MaMH)
@@ -303,23 +314,59 @@ class DiemController extends Controller
             $data = HocLop::where('MSHS', $hs->MSHS)->where('MaLop',$rq->MaLop)
                 ->where('MaNK', $rq->MaNK)
                 ->first();
-            $tbcn = Diem::where('MSHS', $hs->MSHS)->whereNotIn("MaMH",["CB4","CB5"])->where('MaHK', '2' . $rq->MaNK)->where('MaLoai', 'tbcn')->get();
-            $danhgia = Diem::where('MSHS', $hs->MSHS)->whereIn("MaMH",["CB4","CB5"])->where('MaHK','2' . $rq->MaNK)->where('MaLoai', 'tbcn')->get();
-            if ($tbcn->count() === 8) {
-                $cn = round($tbcn->avg('Diem'),1);
+            $tbcn = Diem::where('MSHS', $hs->MSHS)
+            ->whereNotIn('MaMH', ['CB4', 'CB5'])
+            ->where('MaHK', '2' . $rq->MaNK)
+            ->where('MaLoai', 'tbcn')
+            ->get();
+            $rlh = Diem::where('MSHS', $hs->MSHS)
+            ->whereNotIn('MaMH', ['CB4', 'CB5'])
+            ->where('MaHK', '2' . $rq->MaNK)
+            ->where('MaLoai', 'rlh')
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->MSHS . '-' . $item->MaMH;
+            });
+            $diemTK = $tbcn->map(function ($item) use ($rlh) {
+                $key = $item->MSHS . '-' . $item->MaMH;
+                return $rlh->has($key) ? $rlh->get($key) : $item;
+            });
+            $danhgia = Diem::where('MSHS', $hs->MSHS)
+            ->whereIn('MaMH', ['CB4', 'CB5'])
+            ->where('MaHK', '2' . $rq->MaNK)
+            ->where('MaLoai', 'tbcn')
+            ->get();
+            $danhgiarlh = Diem::where('MSHS', $hs->MSHS)
+            ->whereIn('MaMH', ['CB4', 'CB5'])
+            ->where('MaHK', '2' . $rq->MaNK)
+            ->where('MaLoai', 'rlh')
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->MSHS . '-' . $item->MaMH;
+            });
+            $danhgiaTK = $danhgia->map(function ($item) use ($danhgiarlh) {
+                $key = $item->MSHS . '-' . $item->MaMH;
+                return $danhgiarlh->has($key) ? $danhgiarlh->get($key) : $item;
+            });
+            if ($diemTK->count() === 8) {
+                $cn = round($diemTK->avg('Diem'),1);
                 $hocLuc = 0;
-                if($danhgia->sum("Diem") == 2 && $tbcn->where('Diem',"<",6.5)->isEmpty() && $tbcn->where('Diem',">=",8.0)->count() >= 6)
+                if($danhgiaTK->sum("Diem") == 2 && $diemTK->where('Diem',"<",6.5)->isEmpty() && $diemTK->where('Diem',">=",8.0)->count() >= 6)
                 {
                     $hocLuc = 4;
-                }elseif ($danhgia->sum("Diem") == 2 && $tbcn->where('Diem',"<",5.0)->isEmpty() && $tbcn->where('Diem',">=",6.5)->count() >= 6) {
+                }elseif ($danhgiaTK->sum("Diem") == 2 && $diemTK->where('Diem',"<",5.0)->isEmpty() && $diemTK->where('Diem',">=",6.5)->count() >= 6) {
                     $hocLuc = 3;
-                }elseif($danhgia->sum("Diem") == 1 && $tbcn->where('Diem',"<",3.5)->isEmpty() && $tbcn->where('Diem',">=",5.0)->count() >= 6){
+                }elseif($danhgiaTK->sum("Diem") == 1 && $diemTK->where('Diem',"<",3.5)->isEmpty() && $diemTK->where('Diem',">=",5.0)->count() >= 6){
                     $hocLuc = 2;
                 }else{
                     $hocLuc = 1;
                 }
                 $data->Diem_TB_CN = $cn;
-                $data->MaHL = $hocLuc;
+                if($rlh->isNotEmpty() || $danhgiarlh->isNotEmpty()){
+                    $data->MaHLL = $hocLuc;
+                }else{
+                    $data->MaHL = $hocLuc;
+                }
                 $data->save();
             }
             else{

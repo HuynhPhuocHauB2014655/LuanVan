@@ -26,11 +26,7 @@ export default function Class() {
         };
         fetchData();
     }, [userName]);
-    useEffect(() => {
-        if (datas) {
-            // console.log(datas);
-        };
-    }, [datas, nienKhoa]);
+
     const handleToClass = (data) => {
         navigate('/class-info', { state: { classData: data } });
     };

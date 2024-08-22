@@ -22,6 +22,9 @@ class Diem extends Model
     public function hocSinh(): BelongsTo{
         return $this->belongsTo(HocSinh::class, 'MSHS', 'MSHS');
     }
+    public function loaiDiem(): BelongsTo{
+        return $this->belongsTo(LoaiDiem::class, 'MaLoai', 'MaLoai');
+    }
     public function monHoc(): BelongsTo{
         return $this->belongsTo(MonHoc::class, 'MaMH', 'MaMH');
     }

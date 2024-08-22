@@ -10,7 +10,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
 }) => {
     const [showEditForm, setShowEditForm] = useState(false);
     const [initialValues, setInitialValues] = useState({});
-    const { nienKhoa, setMessage } = useStateContext();
+    const { nienKhoa } = useStateContext();
     const countTX1 = {};
     if (diemHK1.length > 0) {
         hocSinh.map((student) => {
@@ -46,7 +46,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
             return cells;
         } else {
             const cells = grades.map((data, index) => (
-                data.Diem >=0 ?
+                data.Diem >= 0 ?
                     show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
                             {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
@@ -75,7 +75,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
             return cells;
         } else {
             return grades.map((data, index) => (
-                data.Diem >=0?
+                data.Diem >= 0 ?
                     show == 2 ?
                         <td key={`other-grade-${student.MSHS}-${index}`} className="bd-td-edit" onClick={() => showEdit(data)}>
                             {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
@@ -116,29 +116,31 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         <th className="border border-black" colSpan={2}>Cả năm</th>
                     </tr>
                     <tr>
-                    <th className="border border-black">STT</th>
+                        <th className="border border-black">STT</th>
                         <th className="border border-black">Mã số học sinh</th>
                         <th className="border border-black">Tên học sinh</th>
                         {loaiDiem.map((data) => (
-                            data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black" colSpan={4}>
-                                    {data.TenLoai}
-                                </th>
-                                :
-                                <th key={data.MaLoai} className="border border-black">
-                                    {data.TenLoai}
-                                </th>
+                            data.MaLoai != "rlh" &&
+                                (data.MaLoai === 'tx' ?
+                                    <th key={data.MaLoai} className="border border-black" colSpan={4}>
+                                        {data.TenLoai}
+                                    </th>
+                                    :
+                                    <th key={data.MaLoai} className="border border-black">
+                                        {data.TenLoai}
+                                    </th>)
                         ))}
                         <th className="border border-black">Trung bình học kì 1</th>
                         {loaiDiem.map((data) => (
-                            data.MaLoai === 'tx' ?
+                            data.MaLoai != "rlh" &&
+                                (data.MaLoai === 'tx' ?
                                 <th key={data.MaLoai} className="border border-black" colSpan={4}>
                                     {data.TenLoai}
                                 </th>
                                 :
                                 <th key={data.MaLoai} className="border border-black">
                                     {data.TenLoai}
-                                </th>
+                                </th>)
                         ))}
                         <th className="border border-black">Trung bình học kì 2</th>
                         <th className="border border-black">Rèn luyện hè</th>
@@ -146,11 +148,11 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                     </tr>
                 </thead>
                 <tbody>
-                    {hocSinh.map((student,index) => {
+                    {hocSinh.map((student, index) => {
                         const txGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
                         const txGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && item.MaLoai === "tx");
-                        const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && (item.MaLoai === "ck" || item.MaLoai === "gk") );
-                        const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && (item.MaLoai === "ck" || item.MaLoai === "gk") );
+                        const otherGrades1 = diemHK1.filter((item) => item.MSHS === student.MSHS && (item.MaLoai === "ck" || item.MaLoai === "gk"));
+                        const otherGrades2 = diemHK2.filter((item) => item.MSHS === student.MSHS && (item.MaLoai === "ck" || item.MaLoai === "gk"));
                         const TBHK1 = diemHK1.find((item) => item.MSHS === student.MSHS && item.MaLoai === "tbhk1");
                         const TBHK2 = diemHK2.find((item) => item.MSHS === student.MSHS && item.MaLoai === "tbhk2");
                         const TBCN = diemCN.find((item) => item.MSHS === student.MSHS && item.MaLoai == 'tbcn');
@@ -159,25 +161,28 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
                         return (
                             <tr key={student.MSHS}>
-                                <td className="bd-td-normal">{index+1}</td>
+                                <td className="bd-td-normal">{index + 1}</td>
 
                                 <td className="bd-td-normal">{student.MSHS}</td>
 
                                 <td className="bd-td-normal text-start">{student.HoTen}</td>
 
-                                {generateTXCells(txGrades1, emptyTXCellsCount1, student,)}
+                                {generateTXCells(txGrades1, emptyTXCellsCount1, student)}
 
-                                {generateOtherCells(otherGrades1, student, !TBHK1)}
+                                {generateOtherCells(otherGrades1, student, )}
 
                                 <td className="bd-td-normal">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
 
                                 {generateTXCells(txGrades2, emptyTXCellsCount2, student)}
 
-                                {generateOtherCells(otherGrades2, student, )}
+                                {generateOtherCells(otherGrades2, student)}
 
                                 <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-
-                                <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                {show == 2 ? 
+                                    <td onClick={() => showEdit(RLH)} className="bd-td-edit">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                    :
+                                    <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                }
 
                                 <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>
