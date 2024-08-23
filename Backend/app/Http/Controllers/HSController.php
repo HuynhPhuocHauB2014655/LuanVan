@@ -10,7 +10,16 @@ class HSController extends Controller
 {
     public function allHS()
     {
-        $hocsinh = HocSinh::with(['ban', 'lop'])->paginate(10);
+        $hocsinh = HocSinh::with(['ban', 'lop' => function ($query) {
+            $query->latest();
+        }])->paginate(20);
+        return response()->json($hocsinh, Response::HTTP_OK);
+    }
+    public function indexAll()
+    {
+        $hocsinh = HocSinh::with(['ban', 'lop' => function ($query) {
+            $query->latest();
+        }])->paginate(20);
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function index()

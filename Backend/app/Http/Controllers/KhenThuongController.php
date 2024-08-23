@@ -17,7 +17,18 @@ class KhenThuongController extends Controller
 
     public function create(Request $rq)
     {
-        $kt = new KhenThuong();
-        
+        $kt = KhenThuong::create($rq->all());
+        return response()->json($kt,201);
+    }
+    public function getLop($MaLop)
+    {
+        $kt = KhenThuong::with(['hocSinh','lop','nienKhoa'])->where("MaLop",$MaLop)->get();
+        return response()->json($kt,200);
+    }
+    public function update(Request $rq)
+    {
+        $kt = KhenThuong::find($rq->id);
+        $kt->update($rq->all());
+        return response()->json("Đã cập nhật thành công!",200);
     }
 }

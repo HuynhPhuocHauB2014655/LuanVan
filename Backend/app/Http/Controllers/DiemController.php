@@ -53,7 +53,7 @@ class DiemController extends Controller
     }
     public function diemLH(Request $request)
     {
-        $diem = Diem::with(['hocSinh.lop'])
+        $diem = Diem::with(['hocSinh.lop','monHoc'])
         ->whereHas('hocSinh.lop', function($query) use ($request) {
             $query->where('lop.MaLop', $request->MaLop);
         })

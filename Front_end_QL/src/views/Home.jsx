@@ -8,6 +8,7 @@ export default function Home() {
         { id: 5, route: "/class", label: 'Lớp Học' },
         { id: 6, route: "/tkb", label: 'Thời Khóa Biểu' },
         { id: 7, route: "/account", label: 'Tài khoản' },
+        { id: 8, route: "/rs", label: 'Kết quả học tập' },
     ];
     return (
         <div className="main-content">

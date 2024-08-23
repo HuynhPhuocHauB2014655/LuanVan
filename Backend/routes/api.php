@@ -13,6 +13,7 @@ use App\Http\Controllers\TKBController;
 use App\Http\Controllers\TaiKhoanController;
 use App\Http\Controllers\DiemController;
 use App\Http\Controllers\RenLuyenController;
+use App\Http\Controllers\KhenThuongController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -86,6 +87,7 @@ Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
 Route::get('/lop/tn/{MaNK}',[LopController::class,'indexTN']);
 Route::get('/lop/xh/{MaNK}',[LopController::class,'indexXH']);
 Route::post('/lop/addHS',[LopController::class,'addToClass']);
+Route::get('/lop/duyetkq/{MaLop}',[LopController::class,'DuyetKQHT']);
 
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
@@ -139,3 +141,9 @@ Route::post('/rl/add',[RenLuyenController::class,'addRL']);
 Route::post('/rl/update',[RenLuyenController::class,'updateRL']);
 Route::get('/rl/{MaLop}',[RenLuyenController::class,'xetRLCaNam']);
 Route::get('/tk/{MaLop}',[RenLuyenController::class,'xetLenLop']);
+
+//Khen thuong route
+Route::get('/kt/index',[KhenThuongController::class,'index']);
+Route::post('/kt/add',[KhenThuongController::class,'create']);
+Route::put('/kt/update',[KhenThuongController::class,'update']);
+Route::get('/kt/get/{MaLop}',[KhenThuongController::class,'getLop']);

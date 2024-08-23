@@ -1,6 +1,7 @@
 import { useState } from "react";
 import classNames from 'classnames';
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 export default function Menu() {
     const [active, setActive] = useState(0);
     const menu_items = [
@@ -12,11 +13,21 @@ export default function Menu() {
         { id: 6, route: "/class", label: 'Lớp Học' },
         { id: 7, route: "/tkb", label: 'Thời Khóa Biểu' },
         { id: 8, route: "/account", label: 'Tài khoản' },
+        { id: 9, route: "/rs", label: 'Kết quả học tập' },
     ];
     const activeItem = (id) => {
         setActive(id);
     }
-
+    useEffect(()=> {
+        const url = window.location.pathname;
+        if(url == "/class-info"){
+            setActive(9);
+        }
+        else{
+            const id = menu_items.findIndex(item => item.route === url);
+            setActive(id+1);
+        }
+    },[]);
     return (
         <ul className="border-e-4 border-cyan-200 px-2 w-[15%]">
             {menu_items.map((item) => (

@@ -17,6 +17,7 @@ export default function Homeroom() {
     const { nienKhoa, setMessage, setError } = useStateContext();
     const [loading, setLoading] = useState(true);
     const [datas, setDatas] = useState([]);
+    const [classInfo, setClassInfo] = useState([]);
     const [state, setState] = useState(1);
     const [renLuyen, setRenLuyen] = useState([]);
     const [subState, setSubState] = useState(1);
@@ -32,17 +33,18 @@ export default function Homeroom() {
     const [disableCN, setDisableCN] = useState(false);
     const [disableRL, setDisableRL] = useState(false);
     const [disableTT, setDisableTT] = useState(false);
+    const [disableBC, setDisableBC] = useState(false);
     const [showButton, setShowButton] = useState(false);
     const [renLuyenHeHT, setRenLuyenHeHT] = useState([]);
     const [renLuyenHeRL, setRenLuyenHeRL] = useState([]);
-    const [dsKhenThuong, setDSKhenThuong] = useState([]);
+    const [dsKhenThuong, setDsKhenThuong] = useState([]);
+    const [dxKhenThuong, setDXKhenThuong] = useState([]);
     const [showConfirm, setShowConfirm] = useState(0);
     const [monRLH, setMonRLH] = useState([]);
     const [diemRLH, setDiemRLH] = useState([]);
     const [change, setChange] = useState(false);
     const [hanSuaDiem, setHanSuaDiem] = useState(true);
     const [initialValues, setInitialValues] = useState();
-    const [hoten, setHoten] = useState();
     const dragRef = useRef();
     const [count, setCount] = useState({
         Siso: 0,
@@ -59,6 +61,8 @@ export default function Homeroom() {
             setDatas(response.data);
             const renluyen = await axiosClient.get('/rl/index');
             setRenLuyen(renluyen.data);
+            const classdata = await axiosClient.get(`/lop/show/${response.data.lop[0].MaLop}`);
+            setClassInfo(classdata.data);
             var urlMH = '';
             if (response.data?.lop[0].MaLop.substring(0, 1) === "C") {
                 urlMH = '/mh/xh';
@@ -94,6 +98,9 @@ export default function Homeroom() {
                 }
                 if (item.MaRL == 0 || item.MaHL == 0) {
                     setDisableTT(true);
+                }
+                if (item.MaTT == 0 || item.MaTT == 2) {
+                    setDisableBC(true);
                 }
             })
             const rlhht = diemtb.data.filter(item => (item.MaTT == 2 && item.MaHL == 1) || item.MaHLL != 0);
@@ -133,6 +140,7 @@ export default function Homeroom() {
                                 HoTen: hs.hoc_sinh.HoTen,
                                 KhenThuong: "Học sinh Xuất sắc",
                                 MaLop: response.data.lop[0].MaLop,
+                                MaNK: nienKhoa.NienKhoa
                             })
                         } else {
                             array.push({
@@ -140,11 +148,12 @@ export default function Homeroom() {
                                 HoTen: hs.hoc_sinh.HoTen,
                                 KhenThuong: "Học sinh Giỏi",
                                 MaLop: response.data.lop[0].MaLop,
+                                MaNK: nienKhoa.NienKhoa
                             })
                         }
                     }
                 })
-                setDSKhenThuong(array);
+                setDXKhenThuong(array);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -153,7 +162,9 @@ export default function Homeroom() {
         }
     };
     useEffect(() => {
-        fetchData();
+        if (userName && nienKhoa) {
+            fetchData();
+        }
     }, [userName, nienKhoa]);
     const handleState = async (view) => {
         setState(view);
@@ -171,6 +182,17 @@ export default function Homeroom() {
             setCount(newCount);
         }
     }, [datas]);
+    useEffect(() => {
+        const fetchKhenThuong = async () => {
+            try {
+                const kt = await axiosClient.get(`/kt/get/${classInfo.MaLop}`);
+                setDsKhenThuong(kt.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        fetchKhenThuong();
+    }, [classInfo])
     if (loading) {
         return <Loading />
     }
@@ -298,20 +320,40 @@ export default function Homeroom() {
             fetchData();
         }
     }
-    const getName = (event) => {
-        const Mshs = event.target.value;
-        const hocsinh = diemTB.find(hs => hs.MSHS == Mshs);
-        if (hocsinh) {
-            setHoten(hocsinh.hoc_sinh.HoTen || '');
-        } else {
-            setHoten('');
+    const onConfirm = async () => {
+        const payload = classInfo;
+        payload.TrangThai = 1;
+        try {
+            const res = await axiosClient.put(`/lop/update/${payload.MaLop}`, payload);
+            setMessage(res.data);
+        } catch (error) {
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        } finally {
+            setShowConfirm(0);
+            fetchData();
         }
     }
-    // console.log(datas);
+    const onCancel = () => {
+        setShowConfirm(0);
+    }
+    const deXuatKT = async () => {
+        try {
+            dxKhenThuong.map(async (item) => {
+                const res = await axiosClient.post("/kt/add", item);
+            });
+            setMessage("Đã đề xuất thành công!");
+            fetchData();
+        } catch (error) {
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        }
+    }
     return (
         <div className="main-content">
             <Menu />
             <div className="right-part relative">
+                {showConfirm === 1 &&
+                    <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
+                }
                 <h1 className="page-name">Quản lí lớp chủ nhiệm</h1>
                 <div>
                     {Object.keys(datas).length > 0 ?
@@ -432,7 +474,7 @@ export default function Homeroom() {
                                         <div>
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình</h2>
                                             <div className="w-[90%] mx-auto">
-                                                <div className="flex justify-end w-full space-x-2 mb-1">
+                                                {classInfo?.TrangThai == 0 ? <div className="flex justify-end w-full space-x-2 mb-1">
                                                     {showButton &&
                                                         <div className="flex text-sm space-x-1">
                                                             <button
@@ -454,6 +496,9 @@ export default function Homeroom() {
                                                         onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
                                                     </button>
                                                 </div>
+                                                    :
+                                                    <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
+                                                }
                                                 <table className="table-auto text-center w-full">
                                                     <thead>
                                                         <tr>
@@ -495,7 +540,7 @@ export default function Homeroom() {
                                     {subState == 4 &&
                                         <div className="relative">
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Đánh giá rèn luyện</h2>
-                                            {hanSuaDiem ?
+                                            {hanSuaDiem && classInfo?.TrangThai == 0 ?
                                                 <div className="flex justify-between my-2">
                                                     <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" disabled={disableRL} onClick={danhGiaRLCN}>Xét rèn luyện cả năm</button>
                                                     <div className="flex">
@@ -505,7 +550,8 @@ export default function Homeroom() {
                                                     </div>
                                                 </div>
                                                 :
-                                                <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                                                !hanSuaDiem ? <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                                                    : <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
                                             }
                                             <table className="table-auto text-center w-full">
                                                 <thead>
@@ -567,9 +613,14 @@ export default function Homeroom() {
                                     {subState == 5 &&
                                         <div>
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Xét lên lớp</h2>
-                                            <div className="my-2">
-                                                <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
-                                            </div>
+                                            {classInfo.TrangThai == 1 ?
+                                                <div className="text-green-500 font-bold ">Đã nộp báo cáo</div>
+                                                :
+                                                <div className="my-2 flex justify-between">
+                                                    <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
+                                                    <button className="button border-blue-500 hover:bg-blue-400 hover:text-white" disabled={disableBC} onClick={() => setShowConfirm(1)}>Nộp báo cáo</button>
+                                                </div>
+                                            }
                                             <table className="table-auto text-center w-full">
                                                 <thead>
                                                     <tr>
@@ -702,6 +753,13 @@ export default function Homeroom() {
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
                                             <h1 className="text-center font-bold text-2xl mt-3">Danh sách đề xuất khen thưởng</h1>
                                             <div className="w-[70%] mx-auto">
+                                                {dsKhenThuong?.length > 0 ?
+                                                    <div className="text-xl font-bold text-green-500">Đã đề xuất khen thưởng</div>
+                                                    :
+                                                    <div>
+                                                        <button onClick={deXuatKT} className="button border-blue-400">Đề xuất</button>
+                                                    </div>
+                                                }
                                                 <table className="table w-full text-xl">
                                                     <thead>
                                                         <tr>
@@ -711,7 +769,7 @@ export default function Homeroom() {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {dsKhenThuong?.map((item) => (
+                                                        {dxKhenThuong?.map((item) => (
                                                             <tr key={item.MSHS}>
                                                                 <td className="border border-black px-2">{item.MSHS}</td>
                                                                 <td className="border border-black px-2">{item.HoTen}</td>

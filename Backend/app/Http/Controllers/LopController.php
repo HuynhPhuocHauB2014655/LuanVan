@@ -8,6 +8,7 @@ use App\Models\HocSinh;
 use App\Models\HocLop;
 use App\Models\GiaoVien;
 use App\Models\Diem;
+use App\Models\KhenThuong;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -199,7 +200,7 @@ class LopController extends Controller
             return response()->json(['error' => 'Data not found'], Response::HTTP_NOT_FOUND);
         }
         $lop->update($request->all());
-        return response()->json($lop, Response::HTTP_OK);
+        return response()->json("Đã cập nhật thành công!", Response::HTTP_OK);
     }
 
     public function destroy($MaLop)
@@ -211,6 +212,58 @@ class LopController extends Controller
         $data->delete();
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function DuyetKQHT($MaLop)
+    {
+        $lop = Lop::find($MaLop);
+        $hocsinh = $lop->hocSinh;
+        $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",3)->get();
+        $totnghiep = [];
+        $ban = substr($MaLop, 0, 1);
+        $MSGV = $lop->MSGV;
+        $NK = substr($MaLop, 3, 2);
+        $MaNK = $NK . "-" . $NK+1;
+        $NK = $NK.$NK+1;
+        $sttLop = substr($MaLop, 7, 1);
+        $MaKhoi = $lop->MaKhoi+1;
+        $MaLopMoi = 'A' . $NK . $MaKhoi . $sttLop;
+        $khenThuong = KhenThuong::where("MaLop",$MaLop)->get();
+        if($khenThuong){
+            foreach ($khenThuong as $kt) {
+                $kt->TrangThai = 1;
+                $kt->save();
+            }
+        }
+        if($lop->MaKhoi == 12){
+            $totnghiep = $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",4)->get();
+            foreach($totnghiep as $tn){
+                $hs = HocSinh::find($tn->MSHS);
+                $hs->TrangThai = 2;
+                $hs->save();
+            }
+        }else{
+            $lopmoi = Lop::create(
+                [
+                    'MaLop' => $MaLopMoi,
+                    'MaKhoi' => $MaKhoi,
+                    'TenLop' => $MaKhoi . $ban . $sttLop,
+                    'MaNK' => $MaNK,
+                    'MSGV' => $MSGV,
+                ]
+            );
+            
+            foreach ($lenlop as $hs) {
+                HocLop::create([
+                    'MaLop' => $MaLopMoi,
+                    'MSHS' => $hs->MSHS,
+                    'MaNK' => $MaNK,
+                ]);
+            }
+        }
+        $lop->TrangThai = 2;
+        $lop->save();
+        return response()->json("Đã duyệt thành công!",200);
     }
     // public function createDiem(){
     //     $diem = new Diem();

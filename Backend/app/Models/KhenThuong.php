@@ -16,7 +16,8 @@ class KhenThuong extends Model
         'MSHS',
         'MaNK',
         'MaLop',
-        'KhenThuong'
+        'KhenThuong',
+        'TrangThai'
     ];
     public function lop(): HasMany{
         return $this->hasMany(Lop::class,'MaLop','MaLop');

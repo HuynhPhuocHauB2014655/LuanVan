@@ -9,6 +9,8 @@ import Class from "./views/Class.jsx";
 import TKB from "./views/TKB.jsx";
 import GuestLayout from "./components/GuestLayout.jsx";
 import Account from "./views/Account.jsx";
+import Result from "./views/Result.jsx";
+import ClassInfo from "./views/ClassInfo.jsx";
 
 
 const router = createBrowserRouter([
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
             {
                 path: "/account",
                 element: <Account/>,
+            },
+            {
+                path: "/rs",
+                element: <Result/>,
+            },
+            {
+                path: "/class-info",
+                element: <ClassInfo/>,
             },
         ]
     },
