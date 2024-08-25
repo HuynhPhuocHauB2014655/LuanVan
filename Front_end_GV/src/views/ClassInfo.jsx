@@ -75,6 +75,7 @@ export default function ClassInfo() {
         if (view === 2) {
             setLoading(true);
             fetchDiem();
+            checkTongKet();
             const date = new Date();
             if (new Date(nienKhoa.HanSuaDiem) < date) {
                 setHanSuaDiem(false);
@@ -112,6 +113,7 @@ export default function ClassInfo() {
             console.log(error);
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
+            checkTongKet();
             if (disableHK1 == false) {
                 TongKetHK(maHK1);
             }
@@ -154,7 +156,7 @@ export default function ClassInfo() {
         "Học kì 1": 1 + nienKhoa.NienKhoa,
         "Học kì 2": 2 + nienKhoa.NienKhoa
     };
-    const CheckTongKet = () => {
+    const checkTongKet = () => {
         let checkHK1 = true;
         let checkHK2 = true;
         let checkCN = true;
@@ -195,6 +197,9 @@ export default function ClassInfo() {
         } else {
             setDisableNH(true);
         }
+    }
+    const ShowButton = () => {
+        checkTongKet();
         setShowButton(!showButton);
     }
     const changeConfirm = (type) => {
@@ -257,7 +262,7 @@ export default function ClassInfo() {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
-            setShowButton(false);
+            checkTongKet();
         }
     }
     const TongKetHK = async (maHK) => {
@@ -274,7 +279,7 @@ export default function ClassInfo() {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             handleShow(2);
-            setShowButton(false);
+            checkTongKet();
         }
     }
     return (
@@ -308,7 +313,7 @@ export default function ClassInfo() {
                         {hanSuaDiem ?
                             <div className="flex justify-between my-2 w-full">
                                 <div className="space-x-2 flex">
-                                    <button onClick={CheckTongKet} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
+                                    <button onClick={ShowButton} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
                                     {showButton &&
                                         <div className="space-x-2">
                                             <button

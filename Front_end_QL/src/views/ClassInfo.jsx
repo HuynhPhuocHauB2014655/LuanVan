@@ -97,11 +97,11 @@ export default function ClassInfo() {
     }
     const duyetKQ = async () => {
         setShowConfirm(0);
-        try{
+        try {
             const res = await axiosClient.get(`lop/duyetkq/${classData.MaLop}`);
             setMessage("Đã duyệt thành công");
             navigate(-1);
-        }catch(error){
+        } catch (error) {
             console.error('Error fetching data:', error);
         }
     }
@@ -119,15 +119,21 @@ export default function ClassInfo() {
                 <div className="border-b-2 border-cyan-400 py-3 flex justify-between">
                     <button onClick={() => navigate(-1)} className="button border-blue-500 hover:bg-blue-500 hover:text-white">Trở về</button>
                     <h1 className="text-2xl font-bold text-center">Kết quả học tập</h1>
-                    {classData.TrangThai == 2 ? <div className="text-xl text-green-400">Đã duyệt</div> : <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={()=>setShowConfirm(1)}>Duyệt kết quả</button>}
+                    {classData.TrangThai == 2 ?
+                        <div className="text-xl text-green-400">Đã duyệt</div>
+                        : classData.TrangThai == 1 ?
+                            <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={() => setShowConfirm(1)}>Duyệt kết quả</button>
+                            :
+                            <div className="text-xl text-red-400">Chưa báo cáo</div>
+                    }
                 </div>
                 <div className="mt-2 grid gird-rows-1 grid-flow-col">
-                    <button className="class-info-head border-x-2 rounded-s-md" onClick={firstView}>Danh sách lớp</button>
-                    <button className="class-info-head border-e-2" onClick={secondView}>Điểm chi tiết</button>
-                    <button className="class-info-head border-e-2" onClick={thirdView}>Kết quả học tập</button>
-                    <button className="class-info-head border-e-2" onClick={fourthView}>Kết quả rèn luyện</button>
-                    <button className="class-info-head border-e-2" onClick={fiftthView}>Xét lên lớp</button>
-                    <button className="class-info-head border-e-2 rounded-e-md" onClick={sixthView}>Khen Thưởng</button>
+                    <button className={view == 1 ? "class-info-head-active border-x-2 rounded-s-md" : "class-info-head border-x-2 rounded-s-md"} onClick={firstView}>Danh sách lớp</button>
+                    <button className={view == 2 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={secondView}>Điểm chi tiết</button>
+                    <button className={view == 3 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={thirdView}>Kết quả học tập</button>
+                    <button className={view == 4 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fourthView}>Kết quả rèn luyện</button>
+                    <button className={view == 5 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fiftthView}>Xét lên lớp</button>
+                    <button className={view == 6 ? "class-info-head-active border-x-2 rounded-e-md" : "class-info-head border-x-2 rounded-e-md"} onClick={sixthView}>Khen Thưởng</button>
                 </div>
                 {view == 1 &&
                     <div className="mt-3 max-w-[90%] mx-auto">

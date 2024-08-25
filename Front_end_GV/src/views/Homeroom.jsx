@@ -72,88 +72,9 @@ export default function Homeroom() {
             const sujs = await axiosClient.get(urlMH);
             setSubjects(sujs.data);
 
-            const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
-            const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
-            const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: response.data.lop[0].MaLop };
-            const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
-                axiosClient.post("/diem/cn", payloadHK1),
-                axiosClient.post("/diem/cn", payloadHK2),
-                axiosClient.post("/diem/cn/getCN", payloadCN),
-                axiosClient.get('/diem/loaidiem')
-            ]);
-            setDiemHK1(diemHk1.data);
-            setDiemHK2(diemHk2.data);
-            setDiemCN(diemCn.data);
-            setLoaiDiem(data.data);
-
-            const payload1 = {
-                MaNK: nienKhoa.NienKhoa,
-                MaLop: response.data?.lop[0].MaLop
-            }
-            const diemtb = await axiosClient.post(`/diem/tb`, payload1);
-            setDiemTB(diemtb.data);
-            diemtb.data.map((item) => {
-                if (item.MaRL_HK1 == 0 || item.MaRL_HK2 == 0) {
-                    setDisableRL(true);
-                }
-                if (item.MaRL == 0 || item.MaHL == 0) {
-                    setDisableTT(true);
-                }
-                if (item.MaTT == 0 || item.MaTT == 2) {
-                    setDisableBC(true);
-                }
-            })
-            const rlhht = diemtb.data.filter(item => (item.MaTT == 2 && item.MaHL == 1) || item.MaHLL != 0);
-            setRenLuyenHeHT(rlhht);
-            const rlhrl = diemtb.data.filter(item => (item.MaTT == 2 && item.MaRL == 1) || item.MaRLL != 0);
-            setRenLuyenHeRL(rlhrl);
-
-
             const date = new Date();
             if (date > new Date(nienKhoa.HanSuaDiem)) {
                 setHanSuaDiem(false);
-            }
-            const payload2 = {
-                MaLop: response.data.lop[0].MaLop,
-                MaHK: "2" + nienKhoa.NienKhoa,
-            }
-            const diemduoi5 = await axiosClient.post('/diem/mon/rlh', payload2);
-            setMonRLH(diemduoi5.data);
-            var monDuoi5 = [];
-            diemduoi5.data.map((item) => {
-                monDuoi5.push(item.MaMH);
-            })
-            const payload3 = {
-                monRLH: monDuoi5,
-                MaLop: response.data.lop[0].MaLop,
-                MaHK: "2" + nienKhoa.NienKhoa
-            }
-            const res = await axiosClient.post('/diem/rlh', payload3);
-            setDiemRLH(res.data);
-            if (!diemtb.data.find(item => item.MaHL == 0 || item.MaRL == 0)) {
-                var array = [];
-                diemtb.data.map((hs) => {
-                    if (hs.MaHL == 4 && hs.MaRL == 4) {
-                        if (diemTB.filter(item => item.MSHS == hs.MSHS && item.Diem_TB_CN >= 9).length >= 6) {
-                            array.push({
-                                MSHS: hs.MSHS,
-                                HoTen: hs.hoc_sinh.HoTen,
-                                KhenThuong: "Học sinh Xuất sắc",
-                                MaLop: response.data.lop[0].MaLop,
-                                MaNK: nienKhoa.NienKhoa
-                            })
-                        } else {
-                            array.push({
-                                MSHS: hs.MSHS,
-                                HoTen: hs.hoc_sinh.HoTen,
-                                KhenThuong: "Học sinh Giỏi",
-                                MaLop: response.data.lop[0].MaLop,
-                                MaNK: nienKhoa.NienKhoa
-                            })
-                        }
-                    }
-                })
-                setDXKhenThuong(array);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -166,10 +87,116 @@ export default function Homeroom() {
             fetchData();
         }
     }, [userName, nienKhoa]);
+    const fetchDiem = async () => {
+        const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+        const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+        const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+        const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
+            axiosClient.post("/diem/cn", payloadHK1),
+            axiosClient.post("/diem/cn", payloadHK2),
+            axiosClient.post("/diem/cn/getCN", payloadCN),
+            axiosClient.get('/diem/loaidiem')
+        ]);
+        setDiemHK1(diemHk1.data);
+        setDiemHK2(diemHk2.data);
+        setDiemCN(diemCn.data);
+        setLoaiDiem(data.data);
+    }
+    const fetchDiemTB = async () => {
+        const payload1 = {
+            MaNK: nienKhoa.NienKhoa,
+            MaLop: datas.lop[0].MaLop
+        }
+        const diemtb = await axiosClient.post(`/diem/tb`, payload1);
+        setDiemTB(diemtb.data);
+        fetchKhenThuong();
+        var checkRL = false;
+        var checkTT = false;
+        var checkBC = false;
+        diemtb.data.map((item) => {
+            if (item.MaRL_HK1 == 0 || item.MaRL_HK2 == 0) {
+                checkRL = true;
+            }
+            if (item.MaRL == 0 || item.MaHL == 0) {
+                checkTT = true;
+            }
+            if (item.MaTT == 0 || item.MaTT == 2 || dsKhenThuong.length > 0) {
+                checkBC = true;
+            }
+        })
+        setDisableRL(checkRL);
+        setDisableTT(checkTT);
+        setDisableBC(checkBC);
+        const rlhht = diemtb.data.filter(item => (item.MaTT == 2 && item.MaHL == 1) || item.MaHLL != 0);
+        setRenLuyenHeHT(rlhht);
+        const rlhrl = diemtb.data.filter(item => (item.MaTT == 2 && item.MaRL == 1) || item.MaRLL != 0);
+        setRenLuyenHeRL(rlhrl);
+
+        getDSKhenThuong(diemtb.data);
+    }
+    const fetchRLH = async () => {
+        const payload2 = {
+            MaLop: datas.lop[0].MaLop,
+            MaHK: "2" + nienKhoa.NienKhoa,
+        }
+        const diemduoi5 = await axiosClient.post('/diem/mon/rlh', payload2);
+        setMonRLH(diemduoi5.data);
+        var monDuoi5 = [];
+        diemduoi5.data.map((item) => {
+            monDuoi5.push(item.MaMH);
+        })
+        const payload3 = {
+            monRLH: monDuoi5,
+            MaLop: datas.lop[0].MaLop,
+            MaHK: "2" + nienKhoa.NienKhoa
+        }
+        const res = await axiosClient.post('/diem/rlh', payload3);
+        setDiemRLH(res.data);
+    }
+    const getDSKhenThuong = (data) => {
+        if (!data.find(item => item.MaHL == 0 || item.MaRL == 0)) {
+            var array = [];
+            data.map((hs) => {
+                if (hs.MaHL == 4 && hs.MaRL == 4) {
+                    if (data.filter(item => item.MSHS == hs.MSHS && item.Diem_TB_CN >= 9).length >= 6) {
+                        array.push({
+                            MSHS: hs.MSHS,
+                            HoTen: hs.hoc_sinh.HoTen,
+                            KhenThuong: "Học sinh Xuất sắc",
+                            MaLop: datas.lop[0].MaLop,
+                            MaNK: nienKhoa.NienKhoa
+                        })
+                    } else {
+                        array.push({
+                            MSHS: hs.MSHS,
+                            HoTen: hs.hoc_sinh.HoTen,
+                            KhenThuong: "Học sinh Giỏi",
+                            MaLop: datas.lop[0].MaLop,
+                            MaNK: nienKhoa.NienKhoa
+                        })
+                    }
+                }
+            })
+            setDXKhenThuong(array);
+        }
+    }
     const handleState = async (view) => {
+        if (view == 2 ) {
+            fetchDiem();
+        }
         setState(view);
     }
     const handleSubState = (view) => {
+        if(view >= 3 && diemTB.length == 0){
+            fetchDiemTB();
+        }
+        if(view == 6){
+            fetchRLH();
+        }
+        if(view == 7){
+            fetchKhenThuong();
+            getDSKhenThuong(diemTB);
+        }
         setSubState(view);
     }
     useEffect(() => {
@@ -182,17 +209,14 @@ export default function Homeroom() {
             setCount(newCount);
         }
     }, [datas]);
-    useEffect(() => {
-        const fetchKhenThuong = async () => {
-            try {
-                const kt = await axiosClient.get(`/kt/get/${classInfo.MaLop}`);
-                setDsKhenThuong(kt.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+    const fetchKhenThuong = async () => {
+        try {
+            const kt = await axiosClient.get(`/kt/get/${classInfo.MaLop}`);
+            setDsKhenThuong(kt.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
-        fetchKhenThuong();
-    }, [classInfo])
+    }
     if (loading) {
         return <Loading />
     }
@@ -208,7 +232,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
             changeShowButton();
         }
     }
@@ -224,7 +248,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
             changeShowButton();
         }
     }
@@ -259,7 +283,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
         }
     }
     const showUpdateRL = (data, HK) => {
@@ -284,7 +308,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
         }
     }
     const SetShowForm = (show) => {
@@ -307,7 +331,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
         }
     }
     const xetLenLop = async () => {
@@ -317,7 +341,7 @@ export default function Homeroom() {
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
-            fetchData();
+            fetchDiemTB();
         }
     }
     const onConfirm = async () => {
@@ -330,7 +354,7 @@ export default function Homeroom() {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             setShowConfirm(0);
-            fetchData();
+            fetchDiemTB();
         }
     }
     const onCancel = () => {
@@ -342,9 +366,10 @@ export default function Homeroom() {
                 const res = await axiosClient.post("/kt/add", item);
             });
             setMessage("Đã đề xuất thành công!");
-            fetchData();
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        }finally{
+            fetchKhenThuong();
         }
     }
     return (

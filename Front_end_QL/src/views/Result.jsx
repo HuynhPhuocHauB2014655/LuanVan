@@ -75,6 +75,29 @@ export default function Result() {
     const handleToClass = (data) => {
         navigate('/class-info', { state: { classData: data } });
     };
+    const handleToStudent = (data) => {
+        navigate('/student-info', { state: { studentData: data } });
+    };
+    const search = async () => {
+        const searchValue = document.getElementById('search').value;
+        try {
+            const searchId = await axiosClient.get('/hs/show/' + searchValue);
+            if (Object.keys(searchId.data).length === 0) {
+                const searchName = await axiosClient.get(`/hs/search/${searchValue}`);
+                if (Object.keys(searchName.data).length === 0) {
+                    setMessage('Không tìm thấy kết quả');
+                } else {
+                    setStudentList(searchName.data);
+                }
+            } else {
+                setStudentList([searchId.data]);
+            }
+        } catch (error) {
+            console.error('Error searching data:', error);
+            setMessage(error.response.data.message);
+        }
+
+    }
     console.log();
     return (
         <div className="main-content">
@@ -90,7 +113,7 @@ export default function Result() {
                         <h2 className="text-3xl font-semibold text-center my-3">Danh sách lớp</h2>
                         <div className="">
                             {classList?.map((item) => (
-                                <div key={item.MaLop} onClick={()=>handleToClass(item)}
+                                <div key={item.MaLop} onClick={() => handleToClass(item)}
                                     className="grid grid-cols-3 grid-flow-row text-2xl w-[90%] mx-auto
                                      bg-white shadow-md border-2 border-collapse p-2 transition duration-300 
                                      ease-in-out transform hover:scale-x-105 hover:shadow-lg hover:bg-slate-200 cursor-pointer"
@@ -113,8 +136,14 @@ export default function Result() {
                     </div>
                 }
                 {view == 2 &&
-                    <div>
+                    <div className="w-[80%] mx-auto">
                         <h2 className="text-3xl font-semibold text-center my-3">Danh sách học sinh</h2>
+                        <div className="flex justify-end">
+                            <div className="flex w-[30%]">
+                                <input type="text" id="search" className="form-input rounded h-9 w-full" placeholder="Tìm tên hoặc mã số học sinh" />
+                                <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                            </div>
+                        </div>
                         <div className="my-1 flex justify-center">
                             <button
                                 onClick={() => handlePageChange(1)}
@@ -155,7 +184,7 @@ export default function Result() {
                                 <FontAwesomeIcon icon={faAngleDoubleRight} />
                             </button>
                         </div>
-                        <table className="table table-auto w-[80%] text-xl bg-white">
+                        <table className="table table-auto w-full text-xl bg-white">
                             <thead>
                                 <tr>
                                     <th className="td py-1 px-2" >STT</th>
@@ -170,7 +199,7 @@ export default function Result() {
                             </thead>
                             <tbody>
                                 {studentList.map((data, index) => (
-                                    <tr key={index} className="cursor-pointer hover:bg-slate-100">
+                                    <tr key={index} onClick={() => handleToStudent(data)} className="cursor-pointer hover:bg-slate-100">
                                         <td className="td py-1 px-2" >{(currentPage - 1) * 10 + index + 1}</td>
                                         <td className="td py-1 px-2" >{data.MSHS}</td>
                                         <td className="td py-1 px-2" >{data.HoTen}</td>

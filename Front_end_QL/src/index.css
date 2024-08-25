@@ -38,12 +38,6 @@ input[type="number"] {
 .right-part{
   @apply w-[85%] mx-2
 }
-.home {
-  background-image: url('assets/home_background.jpg');
-  background-size: cover;          /* Scales the image to cover the entire element */
-  background-repeat: no-repeat;    /* Prevents the image from repeating */
-  background-position: center;     /* Centers the image */
-}
 .button-animation {
   @apply shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg
 }
@@ -109,4 +103,7 @@ input[type="number"] {
 
 .class-info-head{
   @apply hover:bg-white py-3 border-y-2 border-cyan-300 text-lg
+}
+.class-info-head-active{
+  @apply bg-white py-3 border-y-2 border-cyan-300 text-lg
 }

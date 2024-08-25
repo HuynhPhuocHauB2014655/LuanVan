@@ -26,7 +26,7 @@ class RenLuyenController extends Controller
         if(!$exits){
             return response()->json('Học sinh không thuộc lớp này',401);
         }
-        if($exits->MaTT != 2){
+        if($exits->MaTT != 2 && $rq->LoaiRL == 3){
             return response()->json('Học sinh không rèn luyện hè',401);
         }
         $rl = HocLop::where('MaLop',$rq->MaLop)->where('MaNK',$rq->MaNK)->where('MSHS',$rq->MSHS)->first();
@@ -104,7 +104,7 @@ class RenLuyenController extends Controller
         foreach ($kqht as $item){
             if($item->MaTT == 2){
                 if($item->MaHLL == 1 || $item->MaRLL ==  1){
-                    $item->MaRL = 1;
+                    $item->MaTT = 1;
                 }elseif(
                     (($item->MaHL == 1 && $item->MaHLL >= 2) && ($item->MaRL == 1 && $item->MaRLL >= 2)) ||
                     (($item->MaHL == 1 && $item->MaHLL >= 2) && ($item->MaRL >= 2)) ||
@@ -115,13 +115,11 @@ class RenLuyenController extends Controller
                     $break = true;
                     break;
                 }
-            }elseif($item->MaHL != 1 && $item->MaRL !=  1){
-                if($item->MaHL == 1 || $item->MaRL ==  1){
-                    $item->MaTT = 2;
-                }
-                else {
-                    $item->MaTT = (substr($MaLop, 5, 2) == 12) ? 4 : 3;
-                }
+            }elseif($item->MaHL == 1 || $item->MaRL ==  1){
+                $item->MaTT = 2;
+            }
+            else {
+                $item->MaTT = (substr($MaLop, 5, 2) == 12) ? 4 : 3;
             }
             $item->save();
         }

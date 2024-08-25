@@ -50,13 +50,13 @@ class LopController extends Controller
     }
     public function indexWithStudent()
     {
-        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->get();
+        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->orderBy('created_at','desc')->get();
         return response()->json($lops, Response::HTTP_OK);
     }
 
     public function indexWithStudentNow($MaNK)
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->orderBy('created_at','desc')->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     
@@ -95,7 +95,11 @@ class LopController extends Controller
         for ($i=1; $i <= $request->soLopTN ; $i++) { 
             $maLop = "A" . $nienkhoa . "10" . $i;
             $tenLop = "10A" . $i;
-            $gvcn = $gvTN->shift();
+            $check=null;
+            do{
+                $gvcn = $gvTN->random();
+                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
+            }while(!$check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
@@ -136,7 +140,11 @@ class LopController extends Controller
         for ($i=1; $i <= $request->soLopXH ; $i++) { 
             $maLop = "C" . $nienkhoa . "10" . $i;
             $tenLop = "10C" . $i;
-            $gvcn = $gvXH->shift();
+            $check=null;
+            do{
+                $gvcn = $gvXH->random();
+                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
+            }while(!$check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
@@ -227,7 +235,7 @@ class LopController extends Controller
         $NK = $NK.$NK+1;
         $sttLop = substr($MaLop, 7, 1);
         $MaKhoi = $lop->MaKhoi+1;
-        $MaLopMoi = 'A' . $NK . $MaKhoi . $sttLop;
+        $MaLopMoi = $ban . $NK . $MaKhoi . $sttLop;
         $khenThuong = KhenThuong::where("MaLop",$MaLop)->get();
         if($khenThuong){
             foreach ($khenThuong as $kt) {

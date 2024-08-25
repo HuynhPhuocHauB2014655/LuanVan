@@ -11,6 +11,7 @@ import GuestLayout from "./components/GuestLayout.jsx";
 import Account from "./views/Account.jsx";
 import Result from "./views/Result.jsx";
 import ClassInfo from "./views/ClassInfo.jsx";
+import StudentInfo from "./views/StudentInfo.jsx";
 
 
 const router = createBrowserRouter([
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
             {
                 path: "/class-info",
                 element: <ClassInfo/>,
+            },
+            {
+                path: "/student-info",
+                element: <StudentInfo/>,
             },
         ]
     },

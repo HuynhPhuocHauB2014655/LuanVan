@@ -61,6 +61,13 @@ class DiemController extends Controller
         ->get();
         return response()->json($diem, Response::HTTP_OK);
     }
+    public function diemHS(Request $request)
+    {
+        $diem = Diem::with(['hocSinh','monHoc','hocKi.nienKhoa'])
+        ->where('MaHK', $request->MaHK)->where('MSHS',$request->MSHS)
+        ->get();
+        return response()->json($diem, Response::HTTP_OK);
+    }
     public function MonRLH(Request $request)
     {
         $diem1 = Diem::with(['hocSinh.lop','monHoc'])
@@ -96,6 +103,12 @@ class DiemController extends Controller
         ->whereHas('hocSinh.lop', function($query) use ($rq) {
             $query->where('lop.MaLop', $rq->MaLop);
         })->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
+        return response()->json($diemTB, Response::HTTP_OK);
+    }
+    public function DiemTB_HS(Request $rq)
+    {
+        $diemTB = HocLop::with(['renLuyenLai','hocLucLai','hocSinh','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2','trangThai'])
+        ->where("MSHS",$rq->MSHS)->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
         return response()->json($diemTB, Response::HTTP_OK);
     }
     public function AddDiem(Request $request)
@@ -348,8 +361,9 @@ class DiemController extends Controller
                 $key = $item->MSHS . '-' . $item->MaMH;
                 return $danhgiarlh->has($key) ? $danhgiarlh->get($key) : $item;
             });
+            $tbhk = HocLop::where("MSHS",$hs->MSHS)->where("MaNK",$rq->MaNK)->where("MaLop",$rq->MaLop)->first();
             if ($diemTK->count() === 8) {
-                $cn = round($diemTK->avg('Diem'),1);
+                $cn = round(($tbhk->Diem_TB_HKI + ($tbhk->Diem_TB_HKII * 2))/3,1);
                 $hocLuc = 0;
                 if($danhgiaTK->sum("Diem") == 2 && $diemTK->where('Diem',"<",6.5)->isEmpty() && $diemTK->where('Diem',">=",8.0)->count() >= 6)
                 {
