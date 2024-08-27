@@ -146,7 +146,7 @@ export default function TKB() {
                         {tkb.map((data) => (
                             <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '95%' }}>
                                 <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
-                                <table className="border-2 border-black border-collapse text-center w-full">
+                                <table className="border-2 border-black border-collapse text-center w-full table-fixed">
                                     <thead>
                                         <tr>
                                             <th className="td"></th>

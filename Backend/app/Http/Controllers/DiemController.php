@@ -108,7 +108,10 @@ class DiemController extends Controller
     public function DiemTB_HS(Request $rq)
     {
         $diemTB = HocLop::with(['renLuyenLai','hocLucLai','hocSinh','hocLuc','hocLucHK1','hocLucHK2','renLuyen','renLuyenHK1','renLuyenHK2','trangThai'])
-        ->where("MSHS",$rq->MSHS)->where('MaLop',$rq->MaLop)->where("MaNK",$rq->MaNK)->get();
+        ->where('MSHS', $rq->MSHS)
+        ->where('MaLop', $rq->MaLop)
+        ->where('MaNK', $rq->MaNK)
+        ->first();
         return response()->json($diemTB, Response::HTTP_OK);
     }
     public function AddDiem(Request $request)

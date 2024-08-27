@@ -19,6 +19,16 @@ export default function Result() {
     const [endPage, setEndPage] = useState(0);
     const [view, setView] = useState(1);
     const navigate = useNavigate();
+    const [Nk, setNk] = useState([]);
+    const NKRef = useRef();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const nk = await axiosClient.get("/nk/index");
+            setNk(nk.data);
+        }
+        fetchData();
+    },[])
     const fetchByClass = async (NK) => {
         try {
             const response = await axiosClient.get(`/lop/list/${NK}`);
@@ -26,6 +36,18 @@ export default function Result() {
         } catch (error) {
             console.log(error);
         }
+    }
+    const fetchAllClass = async () => {
+        try {
+            const response = await axiosClient.get(`/lop/list`);
+            setClassLiss(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const fetchByNK = () => {
+        const NK = NKRef.current.value;
+        fetchByClass(NK);
     }
     const fetchByStudent = async (page) => {
         try {
@@ -111,10 +133,20 @@ export default function Result() {
                 {view == 1 &&
                     <div>
                         <h2 className="text-3xl font-semibold text-center my-3">Danh sách lớp</h2>
-                        <div className="">
+                        <div className="w-[90%] mx-auto">
+                            <div className="my-2 grid grid-rows-1 grid-flow-col w-[30%] space-x-2">
+                                <button className="button border border-blue-400 hover:bg-blue-300" onClick={fetchAllClass}>Tất cả</button>
+                                <button className="button border border-blue-400 hover:bg-blue-300" onClick={()=>fetchByClass(nienKhoa.NienKhoa)}>Hiện tại</button>
+                                <select ref={NKRef} className="rounded-md" onChange={fetchByNK}>
+                                    <option value="">Chọn niên khóa</option>
+                                    {Nk.map((item) => (
+                                        <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
+                                    ))}
+                                </select>
+                            </div>
                             {classList?.map((item) => (
                                 <div key={item.MaLop} onClick={() => handleToClass(item)}
-                                    className="grid grid-cols-3 grid-flow-row text-2xl w-[90%] mx-auto
+                                    className="grid grid-cols-3 grid-flow-row text-2xl
                                      bg-white shadow-md border-2 border-collapse p-2 transition duration-300 
                                      ease-in-out transform hover:scale-x-105 hover:shadow-lg hover:bg-slate-200 cursor-pointer"
                                 >

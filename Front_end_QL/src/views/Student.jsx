@@ -77,11 +77,11 @@ export default function Student() {
                 setMessage('Có lỗi trong quá trình sửa học sinh');
             }
         } else {
+            var soHocSinh = 0;
             try {
-                var soHocSinh = 0;
                 if (datas.length > 0) {
-                    const lastStudent = await axiosClient.get('/hs/last');
-                    soHocSinh = parseInt(lastStudent.data.substring(6, 9), 10) + 1;
+                    const lastStudent = await axiosClient.get(`/hs/last/${values.MaNK.replace(/-/g, '')}`);
+                    soHocSinh = parseInt(lastStudent.data.substring(6, 9), 10) + 1 || 0;
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
@@ -193,7 +193,7 @@ export default function Student() {
                                 DiaChi: '',
                                 SDT: '',
                                 MaBan: 'TN',
-                                TrangThai: ''
+                                TrangThai: 0
                             }}
                             validationSchema={validationSchema}
                             onSubmit={handleSubmit}
@@ -246,9 +246,9 @@ export default function Student() {
                                             <ErrorMessage className="text-red-700" name="ban" component="div" />
 
                                             <Field as="select" name="TrangThai" className="form-select w-full">
-                                                <option value="0">Đang học</option>
-                                                <option value="1">Đã thôi học</option>
-                                                <option value="2">Đã tốt nghiệp</option>
+                                                <option value={0}>Đang học</option>
+                                                <option value={1}>Đã thôi học</option>
+                                                <option value={2}>Đã tốt nghiệp</option>
                                             </Field>
                                             <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
                                         </div>

@@ -42,9 +42,8 @@ export default function ClassInfo() {
         fetchDiem();
     }, []);
     const fetchDiem = async () => {
-        const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: classData.MaLop };
-        const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classData.MaLop };
-        const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classData.MaLop };
+        const payloadHK1 = { MaHK: 1 + classData.MaNK, MaLop: classData.MaLop };
+        const payloadHK2 = { MaHK: 2 + classData.MaNK, MaLop: classData.MaLop };
         const [diemHk1, diemHk2] = await Promise.all([
             axiosClient.post("/diem/cn", payloadHK1),
             axiosClient.post("/diem/cn", payloadHK2),
@@ -61,27 +60,28 @@ export default function ClassInfo() {
     }
     const getKQHT = async () => {
         const payload1 = {
-            MaNK: nienKhoa.NienKhoa,
+            MaNK: classData.MaNK,
             MaLop: classData.MaLop
         }
+        console.log(payload1);
         const diemtb = await axiosClient.post(`/diem/tb`, payload1);
         setKqht(diemtb.data);
     }
     const thirdView = () => {
-        setView(3);
         getKQHT();
+        setView(3);
     }
     const fourthView = () => {
-        setView(4);
         if (kqht.length == 0) {
             getKQHT();
         }
+        setView(4);
     }
     const fiftthView = () => {
-        setView(5);
         if (kqht.length == 0) {
             getKQHT();
         }
+        setView(5);
     }
     const fetchKhenThuong = async () => {
         try {
@@ -108,6 +108,7 @@ export default function ClassInfo() {
     const onCancel = () => {
         setShowConfirm(0);
     }
+    console.log(kqht)
     return (
         <div className="main-content relative">
             {showConfirm === 1 &&
@@ -173,22 +174,20 @@ export default function ClassInfo() {
                             </thead>
                             <tbody>
                                 {classData.hoc_sinh.map((hs) => {
-                                    const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
-                                    if (data) {
-                                        return (
-                                            <tr key={hs.MSHS}>
-                                                <td className="border border-black">{hs.MSHS}</td>
-                                                <td className="border border-black text-left">{hs.HoTen}</td>
-                                                <td className="border border-black">{data.Diem_TB_HKI || "-"}</td>
-                                                <td className="border border-black">{data.hoc_luc_h_k1.TenHL}</td>
-                                                <td className="border border-black">{data.Diem_TB_HKII || "-"}</td>
-                                                <td className="border border-black">{data.hoc_luc_h_k2.TenHL}</td>
-                                                <td className="border border-black">{data.Diem_TB_CN || "-"}</td>
-                                                <td className="border border-black">{data.hoc_luc.TenHL}</td>
-                                                <td className="border border-black">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
-                                            </tr>
-                                        )
-                                    }
+                                    const data = kqht.find((diem) => diem.MSHS == hs.MSHS);
+                                    return (
+                                        <tr key={hs.MSHS}>
+                                            <td className="border border-black">{hs.MSHS}</td>
+                                            <td className="border border-black text-left">{hs.HoTen}</td>
+                                            <td className="border border-black">{data?.Diem_TB_HKI || "-"}</td>
+                                            <td className="border border-black">{data?.hoc_luc_h_k1.TenHL}</td>
+                                            <td className="border border-black">{data?.Diem_TB_HKII || "-"}</td>
+                                            <td className="border border-black">{data?.hoc_luc_h_k2.TenHL}</td>
+                                            <td className="border border-black">{data?.Diem_TB_CN || "-"}</td>
+                                            <td className="border border-black">{data?.hoc_luc.TenHL}</td>
+                                            <td className="border border-black">{data?.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
+                                        </tr>
+                                    )
                                 })}
                             </tbody>
                         </table>
@@ -264,24 +263,34 @@ export default function ClassInfo() {
                 }
                 {view == 6 &&
                     <div className=" w-[90%] mx-auto mt-10">
-                        <table className="table w-full text-xl">
-                            <thead>
-                                <tr>
-                                    <th className="border border-black px-2">Mã số học sinh</th>
-                                    <th className="border border-black px-2">Tên học sinh</th>
-                                    <th className="border border-black px-2">Đề xuất khen thưởng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {dsKhenThuong?.map((item) => (
-                                    <tr key={item.MSHS}>
-                                        <td className="border border-black px-2">{item.MSHS}</td>
-                                        <td className="border border-black px-2">{item.hoc_sinh[0].HoTen}</td>
-                                        <td className="border border-black px-2">{item.KhenThuong}</td>
+                        {dsKhenThuong.length > 0 ?
+                            <table className="table w-full text-xl">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-black px-2">Mã số học sinh</th>
+                                        <th className="border border-black px-2">Tên học sinh</th>
+                                        <th className="border border-black px-2">Đề xuất khen thưởng</th>
+                                        <th className="border border-black px-2">Trạng thái</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {dsKhenThuong?.map((item) => (
+                                        <tr key={item.MSHS}>
+                                            <td className="border border-black px-2">{item.MSHS}</td>
+                                            <td className="border border-black px-2">{item.hoc_sinh[0].HoTen}</td>
+                                            <td className="border border-black px-2">{item.KhenThuong}</td>
+                                            {item.TrangThai == 0 ?
+                                                <td className="border border-black px-2 py-1 text-center text-red-500">Chưa duyệt</td>
+                                                :
+                                                <td className="border border-black px-2 py-1 text-center text-green-500">Đã duyệt</td>
+                                            }
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            :
+                            <div className="text-center text-2xl text-red-500 mt-10">Không có đề xuất khen thưởng</div>
+                        }
                     </div>
                 }
             </div>

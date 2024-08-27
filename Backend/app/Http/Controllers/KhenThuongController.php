@@ -25,6 +25,11 @@ class KhenThuongController extends Controller
         $kt = KhenThuong::with(['hocSinh','lop','nienKhoa'])->where("MaLop",$MaLop)->get();
         return response()->json($kt,200);
     }
+    public function getHS(Request $rq)
+    {
+        $kt = KhenThuong::with(['hocSinh','lop','nienKhoa'])->where("MaLop",$rq->MaLop)->where("MSHS",$rq->MSHS)->where("MaNK",$rq->MaNK)->get();
+        return response()->json($kt,200);
+    }
     public function update(Request $rq)
     {
         $kt = KhenThuong::find($rq->id);

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\GiaoVien;
 use App\Models\PhanCong;
 use App\Models\TKB;
+use App\Models\TKGiaoVien;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class GiaoVienController extends Controller
@@ -33,7 +34,11 @@ class GiaoVienController extends Controller
     public function store(Request $request)
     {
         $giaovien = GiaoVien::create($request->all());
+        TKGiaoVien::create([
 
+            'MSGV' => $giaovien->MSGV,
+            'MatKhau' => $giaovien->MSGV . "123",
+        ]);
         return response()->json($giaovien, Response::HTTP_CREATED);
     }
 

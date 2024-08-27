@@ -99,7 +99,7 @@ class LopController extends Controller
             do{
                 $gvcn = $gvTN->random();
                 $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
-            }while(!$check);
+            }while($check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
@@ -113,8 +113,6 @@ class LopController extends Controller
                     'MaLop' => $maLop,
                     'MSHS' => $mshs,
                     'MaNK' => $request->MaNK,
-                    'MaHL' => "0",
-                    'MaHK' => "0",
                 ])->toArray()
             );
         }
@@ -129,8 +127,6 @@ class LopController extends Controller
                         'MaLop' => $randomClass,
                         'MSHS' => $hocsinhTN[$i],
                         'MaNK' => $request->MaNK,
-                        'MaHL' => "0",
-                        'MaHK' => "0",
                     ]
                 );
             }
@@ -144,7 +140,7 @@ class LopController extends Controller
             do{
                 $gvcn = $gvXH->random();
                 $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
-            }while(!$check);
+            }while($check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
             $lop->TenLop = $tenLop;
@@ -158,8 +154,6 @@ class LopController extends Controller
                     'MaLop' => $maLop,
                     'MSHS' => $mshs,
                     'MaNK' => $request->MaNK,
-                    'MaHL' => "0",
-                    'MaHK' => "0",
                 ])->toArray()
             );
         }
@@ -174,8 +168,6 @@ class LopController extends Controller
                         'MaLop' => $randomClass,
                         'MSHS' => $hocsinhXH[$i],
                         'MaNK' => $request->MaNK,
-                        'MaHL' => "0",
-                        'MaHK' => "0",
                     ]
                 );
             }
@@ -196,8 +188,6 @@ class LopController extends Controller
         $hoclop->MaLop = $request->MaLop;
         $hoclop->MSHS = $request->MSHS;
         $hoclop->MaNK = $request->MaNK;
-        $hoclop->MaHL = 0;
-        $hoclop->MaHK = 0;
         $hoclop->save();
         return response()->json("Đã thêm thành công", Response::HTTP_OK);
     }

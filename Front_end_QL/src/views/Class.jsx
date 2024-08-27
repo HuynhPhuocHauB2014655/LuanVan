@@ -19,6 +19,8 @@ export default function Class() {
     const [classTN, setClassTN] = useState([]);
     const [classXH, setClassXH] = useState([]);
     const [selected, setSelected] = useState({});
+    const [oLaiLop, setOLaiLop] = useState([]);
+    const [checkAdd, setCheckAdd] = useState();
     const selectedClass = useRef();
     const fetchNewStudent = async () => {
         try {
@@ -34,6 +36,8 @@ export default function Class() {
             const fetchXH = await axiosClient.get(`/lop/xh/${nienKhoa.NienKhoa}`);
             setClassXH(fetchXH.data);
             console.log(classTN);
+            const oll = await axiosClient.get(`/hs/${nienKhoa.NienKhoa}`);
+            setOLaiLop(oll.data);
         } catch (error) {
             console.log(error);
         }
@@ -64,9 +68,8 @@ export default function Class() {
         }
     }
     const _showForm = (show, data) => {
-        if (show == 2) {
+        if (show >= 2) {
             setSelected(data);
-            setShowForm(show);
         }
         setShowForm(show);
     }
@@ -101,21 +104,34 @@ export default function Class() {
     };
     const SelectClass = async (MSHS) => {
         const classed = selectedClass.current.value;
-        const payload = {
-            MSHS: MSHS,
-            MaNK: nienKhoa.NienKhoa,
-            MaLop: classed
-        };
-        try {
-            const response = await axiosClient.post(`/lop/addHS`, payload);
-            fetchNewStudent();
-            setMessage(response.data);
-            setShowForm(0);
-        } catch (error) {
-            console.log(error);
-            setMessage(error.response.data);
+        if (classed) {
+            const payload = {
+                MSHS: MSHS,
+                MaNK: nienKhoa.NienKhoa,
+                MaLop: classed
+            };
+            try {
+                const response = await axiosClient.post(`/lop/addHS`, payload);
+                fetchNewStudent();
+                setMessage(response.data);
+                setShowForm(0);
+            } catch (error) {
+                console.log(error);
+                setMessage(error.response.data);
+            } finally {
+                fetchNewStudent();
+            }
         }
     }
+    const checkHS = async (data) => {
+        try {
+            const response = await axiosClient.post("/hs/check", { hs: data });
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    console.log(checkAdd)
     return (
         <div className="main-content">
             <Menu />
@@ -130,7 +146,7 @@ export default function Class() {
                 {show == 1 &&
                     <div>
                         <h2 className="text-center font-bold text-2xl">Danh sách học sinh mới chưa xếp lớp</h2>
-                        {newStudents.length > 0 ? <div className="mx-auto w-full" style={{ maxWidth: '95%' }}>
+                        {newStudents.length > 0 || oLaiLop.length > 0 ? <div className="mx-auto w-full" style={{ maxWidth: '95%' }}>
                             <div className="flex justify-between">
                                 <p className="mb-2 font-semibold">Tổng số: {studentCount} Ban Tự nhiên: {TNCount} Ban Xã hội: {XHCount} </p>
                                 <div className="space-x-2">
@@ -180,6 +196,38 @@ export default function Class() {
                                             </td>
                                         </tr>
                                     ))}
+                                    <tr>
+                                        <td className="border border-gray-400 p-2 text-2xl text-center" colSpan={12}>Học sinh ở lại lớp</td>
+                                    </tr>
+                                    {oLaiLop.map((data, index) => (
+                                        <tr key={index}>
+                                            <td className="border border-gray-400 p-2">{index + 1}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.MSHS}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.HoTen}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.NgaySinh}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.GioiTinh}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.QueQuan}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.DanToc}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.TonGiao}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.DiaChi}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.SDT}</td>
+                                            <td className="border border-gray-400 p-2">{data.hoc_sinh.ban.TenBan}</td>
+                                            <td className="border border-gray-400 p-2">
+                                                {checkHS(data) ?
+                                                    <div className="flex justify-center">Đã xếp lớp</div>
+                                                    :
+                                                    <div className="flex justify-center">
+                                                        <button
+                                                            className="border-2 p-1 rounded-md border-blue-400 hover:bg-blue-200"
+                                                            onClick={() => _showForm(3, data)}
+                                                        >
+                                                            Chọn lớp
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div> :
@@ -212,6 +260,42 @@ export default function Class() {
                                                 ))
                                                     :
                                                     classXH.map((lop) => (
+                                                        <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
+                                                    ))}
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                {showForm == 3 &&
+                    <div className="w-[50%] p-3 border-2 border-slate-400 rounded bg-slate-100 absolute top-64 left-[25%]">
+                        <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => _showForm(0)}>X</button>
+                        <button className="button border-blue-500 hover:bg-blue-300" onClick={() => SelectClass(selected.MSHS)}>Lưu</button>
+                        <table className="table-auto border-collapse mt-2 mb-2 w-full">
+                            <thead>
+                                <tr>
+                                    <th className="border border-gray-400 p-2">MSHS</th>
+                                    <th className="border border-gray-400 p-2">Tên học sinh</th>
+                                    <th className="border border-gray-400 p-2">Ban</th>
+                                    <th className="border border-gray-400 p-2">Lớp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="border border-gray-400 p-2">{selected.hoc_sinh.MSHS}</td>
+                                    <td className="border border-gray-400 p-2">{selected.hoc_sinh.HoTen}</td>
+                                    <td className="border border-gray-400 p-2">{selected.hoc_sinh.ban.TenBan}</td>
+                                    <td className="border border-gray-400 p-2">
+                                        <div className="flex justify-center">
+                                            <select name="lop" className="rounded-md bg-amber-50 shadow-md" required ref={selectedClass}>
+                                                {selected.hoc_sinh.ban.MaBan == "TN" ? classTN.filter(item => item.MaKhoi == selected.lop.MaKhoi).map((lop) => (
+                                                    <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
+                                                ))
+                                                    :
+                                                    classXH.filter(item => item.MaKhoi == selected.lop.MaKhoi).map((lop) => (
                                                         <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
                                                     ))}
                                             </select>

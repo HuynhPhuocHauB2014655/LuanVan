@@ -41,8 +41,8 @@ class HocLop extends Model
 
         return $query->update($this->getDirty());
     }
-    public function hoclop(): HasMany{
-        return $this->hasMany(Lop::class,'MaLop','MaLop');
+    public function lop(): BelongsTo{
+        return $this->belongsTo(Lop::class,'MaLop','MaLop');
     }
     public function hocSinh():BelongsTo{
         return $this->belongsTo(HocSinh::class,'MSHS','MSHS');

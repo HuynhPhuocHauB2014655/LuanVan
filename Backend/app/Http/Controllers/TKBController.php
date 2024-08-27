@@ -141,15 +141,23 @@ class TKBController extends Controller
                                 $tkb->save();
                                 if(($monHoc['MaMH'] == "CB1" || $monHoc['MaMH'] == "CB2") && ($soTietTuan[$monHoc['MaMH']] > 1) && ($j < 4))
                                 {
-                                    $tkb = new TKB();
-                                    $tkb->MaNK = $nk;
-                                    $tkb->MaMH = $monHoc['MaMH'];
-                                    $tkb->MSGV = $phanCong->MSGV;
-                                    $tkb->MaLop = $lop->MaLop;
-                                    $tkb->MaNgay = $i;
-                                    $tkb->TietDay = $j+1;
-                                    $tkb->save();
-                                    $soTietTuan[$monHoc['MaMH']] -= 1;
+                                    $checkTKB = TKB::where('MaMH', $monHoc['MaMH'])
+                                        ->where('MSGV', $phanCong->MSGV)
+                                        ->where('MaNgay', $i)
+                                        ->where('TietDay', $j+1)
+                                        ->where('MaNK', $nk)
+                                        ->first();
+                                    if (is_null($checkTKB)) {
+                                        $tkb = new TKB();
+                                        $tkb->MaNK = $nk;
+                                        $tkb->MaMH = $monHoc['MaMH'];
+                                        $tkb->MSGV = $phanCong->MSGV;
+                                        $tkb->MaLop = $lop->MaLop;
+                                        $tkb->MaNgay = $i;
+                                        $tkb->TietDay = $j+1;
+                                        $tkb->save();
+                                        $soTietTuan[$monHoc['MaMH']] -= 1;
+                                    }
                                 }
                                 $soTietTuan[$monHoc['MaMH']] -= 1;
                                 $flat = 1;

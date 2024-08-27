@@ -32,8 +32,12 @@ Route::get('/hs/show/{mshs}',[HSController::class,'show']);
 Route::put('/hs/update/{mshs}',[HSController::class,'update']);
 Route::delete('/hs/delete/{mshs}',[HSController::class,'destroy']);
 Route::get('/hs/search/{name}',[HSController::class,'findByName']);
-Route::get('/hs/last',[HSController::class,'lastStudent']);
+Route::get('/hs/last/{MaNK}',[HSController::class,'lastStudent']);
 Route::get('/hs/new',[HSController::class,'newStudents']);
+Route::get('/hs/{MaNK}',[HSController::class,'oLaiLop']);
+Route::post('/hs/check',[HSController::class,'checkAdd']);
+Route::post('/hs/tkb',[HSController::class,'getTKB']);
+
 
 //nien khoa route
 Route::post('/nk/create',[NienKhoaController::class,'store']);
@@ -149,3 +153,4 @@ Route::get('/kt/index',[KhenThuongController::class,'index']);
 Route::post('/kt/add',[KhenThuongController::class,'create']);
 Route::put('/kt/update',[KhenThuongController::class,'update']);
 Route::get('/kt/get/{MaLop}',[KhenThuongController::class,'getLop']);
+Route::post('/kt/get',[KhenThuongController::class,'getHS']);
