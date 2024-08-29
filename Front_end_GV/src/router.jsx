@@ -7,7 +7,7 @@ import Homeroom from "./views/Homeroom.jsx";
 import Class from "./views/Class.jsx";
 import ClassInfo from "./views/ClassInfo.jsx";
 import TKB from "./views/TKB.jsx";
-import DiemDanh from "./views/DiemDanh.jsx";
+import Notification from "./views/Notification.jsx";
 
 
 const router = createBrowserRouter([
@@ -40,8 +40,8 @@ const router = createBrowserRouter([
                 element: <TKB />,
             },
             {
-                path: "/diemdanh",
-                element: <DiemDanh/>,
+                path: "/tb",
+                element: <Notification/>,
             },
         ]
     },

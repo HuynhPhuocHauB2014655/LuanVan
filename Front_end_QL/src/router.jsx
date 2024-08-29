@@ -12,6 +12,7 @@ import Account from "./views/Account.jsx";
 import Result from "./views/Result.jsx";
 import ClassInfo from "./views/ClassInfo.jsx";
 import StudentInfo from "./views/StudentInfo.jsx";
+import Notification from "./views/Notification.jsx";
 
 
 const router = createBrowserRouter([
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
             {
                 path: "/student-info",
                 element: <StudentInfo/>,
+            },
+            {
+                path: "/notify",
+                element: <Notification/>,
             },
         ]
     },

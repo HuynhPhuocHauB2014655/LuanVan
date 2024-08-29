@@ -183,4 +183,14 @@ Class TaiKhoanController extends Controller
         }
         return response()->json($giaovien->MSGV, 200);
     }
+    public function test(){
+        $hs = HocSinh::where('MSHS','like','%2324%')->doesntHave('taiKhoan')->get();
+        foreach ($hs as $hs){
+            TKHocSinh::create([
+                'MSHS' => $hs->MSHS,
+                'MatKhau' => $hs->MSHS . "123",
+            ]);
+        }
+        return response()->json("OK",200);
+    }
 }

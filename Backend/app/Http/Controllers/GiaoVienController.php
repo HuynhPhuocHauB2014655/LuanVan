@@ -58,8 +58,10 @@ class GiaoVienController extends Controller
 
     return response()->json($giaovien, Response::HTTP_OK);
 }
-    public function showTeaching($MSGV){
-        $class = PhanCong::with(['lop.hocSinh','monHoc'])->where('MSGV',$MSGV)->get();
+    public function showTeaching(Request $rq){
+        // "23-24" -> "2324"
+        $nienKhoa = str_replace("-","",$rq->MaNK);
+        $class = PhanCong::with(['lop.hocSinh','monHoc'])->where('MSGV',$rq->MSGV)->where('MaLop','like',"%{$nienKhoa}%")->get();
         return response()->json($class, Response::HTTP_OK);
     }
     public function findByName($name)

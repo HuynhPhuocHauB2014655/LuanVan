@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Diem;
 use App\Models\LoaiDiem;
 use App\Models\HocSinh;
+use App\Models\ThongBao;
 use App\Models\Lop;
 use App\Models\HocLop;
 use App\Models\MonHoc;
@@ -116,6 +117,7 @@ class DiemController extends Controller
     }
     public function AddDiem(Request $request)
     {
+        $tenMH = MonHoc::find($request->MaMH)->TenMH;
         $hocsinh = HocSinh::find($request->MSHS);
         if(!$hocsinh){
             return response()->json('Học sinh không tồn tại',404);
@@ -138,6 +140,12 @@ class DiemController extends Controller
                 return response()->json("Đã đạt số cột điểm tối đa", 409);
             }
             $diem = Diem::create($request->all());
+            ThongBao::create([
+                'NguoiNhan' => $request->MSHS,
+                'NoiDung' => 'Bạn có cập nhật điểm mới của môn học: '. $tenMH,
+                'NguoiGui' => 'Hệ thống',
+                'TieuDe'=> 'Cập nhật điểm'
+            ]);
             return response()->json("Đã thêm điểm thành công", 200);
         }else{
             if($request->MaLoai == 'rlh'){
@@ -145,7 +153,7 @@ class DiemController extends Controller
                             ->where('MaMH',$request->MaMH)
                             ->where('MaLoai',$request->MaLoai)->first();
                 if($exits){
-                    return response()->json('Đã nhập điểm rèn  luyện hè cho học sinh này', 409);
+                    return response()->json('Đã nhập điểm rèn luyện hè cho học sinh này', 409);
                 }
             }
             $exits = Diem::where('MSHS',$request->MSHS)
@@ -154,6 +162,12 @@ class DiemController extends Controller
                             ->where('MaLoai',$request->MaLoai)->first();
             if($exits == null){
                 $diem = Diem::create($request->all());
+                ThongBao::create([
+                    'NguoiNhan' => $request->MSHS,
+                    'NoiDung' => 'Bạn có cập nhật điểm mới của môn học: '. $tenMH,
+                    'NguoiGui' => 'Hệ thống',
+                    'TieuDe'=> 'Cập nhật điểm'
+                ]);
                 return response()->json("Đã thêm điểm thành công", 200);
             }else{
                 return response()->json("Đã đạt số cột điểm tối đa", 409);
@@ -162,9 +176,16 @@ class DiemController extends Controller
     }
     public function updateDiem(Request $request)
     {
+        $tenMH = MonHoc::find($request->MaMH)->TenMH;
         $diem = Diem::find($request->id);
         if($diem){
             $diem->update($request->all());
+            ThongBao::create([
+                'NguoiNhan' => $request->MSHS,
+                'NoiDung' => 'Bạn có cập nhật điểm mới của môn học: '. $tenMH,
+                'NguoiGui' => 'Hệ thống',
+                'TieuDe'=> 'Cập nhật điểm'
+            ]);
             return response()->json("Đã cập nhật điểm thành công", 200);
         }
         else{
@@ -175,8 +196,16 @@ class DiemController extends Controller
     {
         $diem = Diem::find($id);
         if($diem){
+            $tenMH = MonHoc::find($diem->MaMH)->TenMH;
+            $MSHS = $diem->MSHS;
             $diem->delete();
-            return response()->json("Đã cập nhật điểm thành công", 200);
+            ThongBao::create([
+                'NguoiNhan' => $MSHS,
+                'NoiDung' => 'Bạn có cập nhật điểm mới của môn học: '. $tenMH,
+                'NguoiGui' => 'Hệ thống',
+                'TieuDe'=> 'Cập nhật điểm'
+            ]);
+            return response()->json("Đã xóa điểm thành công!", 200);
         }
         else{
             return response()->json("Điểm không tồn tại", 404);

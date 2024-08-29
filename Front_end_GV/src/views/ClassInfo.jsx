@@ -10,6 +10,9 @@ import { useLocation } from "react-router-dom";
 import HocSinhTable from "../components/HocSinhTable";
 import BangDiem from "../components/BangDiem";
 import Draggable from 'react-draggable';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell, faBellSlash } from "@fortawesome/free-solid-svg-icons";
+import NotifyForm from "../components/NoitifyForm";
 
 export default function ClassInfo() {
     const { userName } = useUserContext();
@@ -19,6 +22,7 @@ export default function ClassInfo() {
     const [diemHK1, setDiemHK1] = useState([]);
     const [diemHK2, setDiemHK2] = useState([]);
     const [diemCN, setDiemCN] = useState([]);
+    const [info, setInfo] = useState();
     const [show, setShow] = useState(1);
     const [showButton, setShowButton] = useState(false);
     const [showForm, setShowForm] = useState(0);
@@ -41,6 +45,8 @@ export default function ClassInfo() {
             try {
                 const { data } = await axiosClient.get('/diem/loaidiem');
                 setLoaiDiem(data);
+                const Info = await axiosClient.get(`/gv/show/${userName}`);
+                setInfo(Info.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -129,7 +135,7 @@ export default function ClassInfo() {
     }
     const handleSubmit = async (value) => {
         const payload = {
-            MaHK: value.MaLoai == "rlh" ? "2"+nienKhoa.NienKhoa :  value.MaHK,
+            MaHK: value.MaLoai == "rlh" ? "2" + nienKhoa.NienKhoa : value.MaHK,
             MaMH: classData.MaMH,
             MSHS: value.MSHS,
             Diem: value.Diem,
@@ -151,7 +157,7 @@ export default function ClassInfo() {
             setShowButton(false);
         }
     }
-    const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck','rlh'].includes(item.MaLoai));
+    const loaiDiemHK = loaiDiem.filter(item => ['tx', 'gk', 'ck', 'rlh'].includes(item.MaLoai));
     const hocki = {
         "Học kì 1": 1 + nienKhoa.NienKhoa,
         "Học kì 2": 2 + nienKhoa.NienKhoa
@@ -282,6 +288,26 @@ export default function ClassInfo() {
             checkTongKet();
         }
     }
+    const sendTB = async (value) => {
+        const nguoiNhan = value.NguoiNhan.split(';').filter(id => id !== '');
+        nguoiNhan.map( async (item)=>{
+            const payload = {
+                NguoiGui: info.TenGV + " - " + userName,
+                NguoiNhan: item,
+                NoiDung: value.NoiDung,
+                TrangThai: 0,
+                TieuDe: value.TieuDe
+            };
+            try{
+                await axiosClient.post("/tb/add",payload);
+                setMessage("Đã gửi thành công!");
+            }catch(error){
+                setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            }finally{
+                setShowForm(0);
+            }
+        })
+    }
     return (
         <div className="main-content relative">
             {showConfirm &&
@@ -297,12 +323,19 @@ export default function ClassInfo() {
             }
             <Menu />
             <div className="right-part mb-2 relative">
-                <h1 className="page-name">Thông tin lớp</h1>
+                {showForm == 3 &&
+                    <NotifyForm MaLop={classData.MaLop} handleSubmit={sendTB} close={()=>setShowForm(0)}/>
+                }
+                <div className="page-name relative">
+                    Thông tin lớp
+                    <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
+                </div>
                 <div className="my-2 flex">
                     <button className="teacher-head" onClick={() => handleShow(1)}>Danh sách lớp</button>
                     <button className="teacher-head" onClick={() => handleShow(2)}>Quản lí điểm</button>
                 </div>
                 <div className="flex justify-between px-2 text-xl">
+                    <p><strong>Mã lớp:</strong> {classData.lop.MaLop}</p>
                     <p><strong>Tên lớp:</strong> {classData.lop.TenLop}</p>
                     <p><strong>Môn dạy:</strong> {classData.mon_hoc.TenMH}</p>
                     <p><strong>Sỉ số:</strong> {classData.lop.hoc_sinh.length}</p>

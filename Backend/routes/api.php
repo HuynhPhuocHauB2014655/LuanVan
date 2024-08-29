@@ -14,6 +14,7 @@ use App\Http\Controllers\TaiKhoanController;
 use App\Http\Controllers\DiemController;
 use App\Http\Controllers\RenLuyenController;
 use App\Http\Controllers\KhenThuongController;
+use App\Http\Controllers\TBController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -75,8 +76,10 @@ Route::get('/gv/search/{name}',[GiaoVienController::class,'findByName']);
 Route::put('/gv/update/{MSGV}',[GiaoVienController::class,'update']);
 Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
 Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
-Route::get('/gv/teaching/{MSGV}',[GiaoVienController::class,'showTeaching']);
+Route::post('/gv/teaching',[GiaoVienController::class,'showTeaching']);
 Route::post('/gv/tkb',[GiaoVienController::class,'getTKB']);
+
+
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
 Route::get('/lop/index',[LopController::class,'index']);
@@ -119,6 +122,7 @@ Route::put('/tk/update/gv',[TaiKhoanController::class,'changePassGV']);
 Route::put('/tk/update/hs',[TaiKhoanController::class,'changePassHS']);
 Route::post('/tk/hs/login',[TaiKhoanController::class,'HSLogin']);
 Route::post('/tk/gv/login',[TaiKhoanController::class,'GVLogin']);
+Route::get('/test',[TaiKhoanController::class,'test']);
 
 //Diem route
 Route::get('/diem/loaidiem',[DiemController::class,'loaiDiem']);
@@ -154,3 +158,13 @@ Route::post('/kt/add',[KhenThuongController::class,'create']);
 Route::put('/kt/update',[KhenThuongController::class,'update']);
 Route::get('/kt/get/{MaLop}',[KhenThuongController::class,'getLop']);
 Route::post('/kt/get',[KhenThuongController::class,'getHS']);
+
+
+// Thong bao route
+Route::get('/tb/index',[TBController::class,'index']);
+Route::get('/tb/gv/{MSGV}',[TBController::class,'getGV']);
+Route::get('/tb/gv/send/{MSGV}',[TBController::class,'getSendedGV']);
+Route::get('/tb/hs/{MSHS}',[TBController::class,'getHS']);
+Route::post('/tb/add',[TBController::class,'create']);
+Route::put('/tb/update',[TBController::class,'update']);
+Route::delete('/tb/delete',[TBController::class,'delete']);

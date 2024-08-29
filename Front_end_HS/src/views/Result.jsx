@@ -7,8 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AlterConfirm from "../components/Confirm";
 export default function Result() {
     const { userName } = useUserContext();
-    const [info, setInfo] = useState();
     const { nienKhoa } = useStateContext();
+    const [info, setInfo] = useState();
     const [view, setView] = useState(1);
     const [subView, setSubView] = useState(1);
     const [loaiDiem, setLoaiDiem] = useState([]);
@@ -85,7 +85,6 @@ export default function Result() {
     }
     useEffect(() => {
         if (info && nienKhoa.NienKhoa) {
-            setDefaultNK(nienKhoa.NienKhoa);
             fetchDiem(nienKhoa.NienKhoa);
             getKQHT(nienKhoa.NienKhoa);
             getKT(nienKhoa.NienKhoa);
@@ -143,15 +142,14 @@ export default function Result() {
     useEffect(() => {
         const selectedMaNK = NKRef.current?.value;
         if (selectedMaNK) {
-            const selectedLop = info.lop.find(item => item.MaNK === selectedMaNK);
+            const selectedLop = info?.lop.find(item => item.MaNK === selectedMaNK);
             if (selectedLop) {
                 setSelectedClass(selectedLop.TenLop);
             } else {
                 setSelectedClass('');
             }
         }
-    }, [nienKhoa,info, NK, NKRef.current?.value]);
-    // console.log(diemHK1);
+    }, [info, NK, NKRef.current?.value]);
     return (
         <div className="main-content">
             <Menu />
@@ -195,8 +193,9 @@ export default function Result() {
                         </div>
                         <div className="flex items-center space-x-2">
                             <div className="text-xl">Niên khóa:</div>
-                            <select name="nienkhoa" ref={NKRef} defaultValue={nienKhoa.NienKhoa} onChange={selectedNK} className="p-2 border-2 border-black rounded-md">
-                                {NK.map((nk) => (
+                            <select name="nienkhoa" ref={NKRef} onChange={selectedNK} className="rounded-md border-2 border-black px-3 py-2">
+                                <option value={nienKhoa.NienKhoa}>{NK.find(item => item.MaNK == nienKhoa.NienKhoa)?.TenNK}</option>
+                                {NK.filter(item => item.MaNK !== nienKhoa.NienKhoa).map((nk) => (
                                     <option key={nk.MaNK} value={nk.MaNK}>{nk.TenNK}</option>
                                 ))}
                             </select>

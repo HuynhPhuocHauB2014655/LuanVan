@@ -2,13 +2,29 @@ import { useState } from "react";
 import classNames from 'classnames';
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-export default function Menu() {
+import { useUserContext } from "../context/userContext";
+import axiosClient from "../axios-client";
+export default function Menu({update}) {
     const [active, setActive] = useState(0);
+    const {userName} = useUserContext();
+    const [tbCount,setTbCount] = useState(0);
+    const fetchTB = async () => {
+        const TB = await axiosClient.get(`/tb/hs/${userName}`);
+        const count = TB.data.filter(item => item.TrangThai == 0).length;
+        setTbCount(count);
+    }
+    useEffect(()=>{
+        fetchTB();
+    },[userName])
+    if(update == 1){
+        fetchTB();
+    }
     const menu_items = [
         { id: 1, route: "/", label: 'Trang chủ' },
         { id: 2, route: "/info", label: 'Thông tin cá nhân' },
         { id: 3, route: "/result", label: 'Kết quả học tập' },
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
+        { id: 5, route: "/notify", label: 'Thông báo' },
     ];
     const activeItem = (id) => {
         setActive(id);
@@ -19,17 +35,17 @@ export default function Menu() {
         setActive(id+1);
     },[]);
     return (
-        <ul className="border-e-4 border-cyan-200 px-2 w-[10%]">
+        <ul className="border-e-4 border-cyan-200 px-2 w-[15%]">
             {menu_items.map((item) => (
                 <li
                     key={item.id}
                     className={classNames('menu-item', { 'bg-slate-100 border-b-2 border-cyan-200': active === item.id })}
                 >
                     <Link
-                        className="py-2 ps-2 block border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100"
+                        className="py-2 ps-2 block border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100 relative"
                         to={item.route} onClick={() => activeItem(item.id)}
                     >
-                        {item.label}
+                        {item.label} {item.id == 5 && tbCount > 0 && <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>}
                     </Link>
                 </li>
             ))}

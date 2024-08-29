@@ -16,7 +16,11 @@ export default function Class() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axiosClient.get(`/gv/teaching/${userName}`);
+                const payload = {
+                    MaNK: nienKhoa.NienKhoa,
+                    MSGV: userName,
+                }
+                const response = await axiosClient.post(`/gv/teaching`,payload);
                 setDatas(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -25,7 +29,7 @@ export default function Class() {
             }
         };
         fetchData();
-    }, [userName]);
+    }, [userName,nienKhoa]);
 
     const handleToClass = (data) => {
         navigate('/class-info', { state: { classData: data } });
@@ -54,6 +58,7 @@ export default function Class() {
                                     className="hover:cursor-pointer text-2xl p-3 border-t"
                                     onClick={()=>{handleToClass(data)}}
                                 >
+                                    <span className="font-semibold">Mã lớp:</span> {data.lop.MaLop} -
                                     <span className="font-semibold">Tên lớp:</span> {data.lop.TenLop} -
                                     <span className="font-semibold"> Môn dạy:</span> {data.mon_hoc.TenMH} -
                                     <span className="font-semibold"> Sỉ số:</span> {data.lop.hoc_sinh.length}

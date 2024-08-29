@@ -61,10 +61,10 @@ export default function Homeroom() {
             setDatas(response.data);
             const renluyen = await axiosClient.get('/rl/index');
             setRenLuyen(renluyen.data);
-            const classdata = await axiosClient.get(`/lop/show/${response.data.lop[0].MaLop}`);
-            setClassInfo(classdata.data);
+            const classdata = response.data.lop.find(item => item.MaNK == nienKhoa.NienKhoa);
+            setClassInfo(classdata);
             var urlMH = '';
-            if (response.data?.lop[0].MaLop.substring(0, 1) === "C") {
+            if (classdata.MaLop.substring(0, 1) === "C") {
                 urlMH = '/mh/xh';
             } else {
                 urlMH = '/mh/tn';
@@ -83,14 +83,14 @@ export default function Homeroom() {
         }
     };
     useEffect(() => {
-        if (userName && nienKhoa) {
+        if (userName && nienKhoa.NienKhoa) {
             fetchData();
         }
     }, [userName, nienKhoa]);
     const fetchDiem = async () => {
-        const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
-        const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
-        const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: datas.lop[0].MaLop };
+        const payloadHK1 = { MaHK: 1 + nienKhoa.NienKhoa, MaLop: classInfo.MaLop };
+        const payloadHK2 = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classInfo.MaLop };
+        const payloadCN = { MaHK: 2 + nienKhoa.NienKhoa, MaLop: classInfo.MaLop };
         const [diemHk1, diemHk2, diemCn, data] = await Promise.all([
             axiosClient.post("/diem/cn", payloadHK1),
             axiosClient.post("/diem/cn", payloadHK2),
@@ -105,7 +105,7 @@ export default function Homeroom() {
     const fetchDiemTB = async () => {
         const payload1 = {
             MaNK: nienKhoa.NienKhoa,
-            MaLop: datas.lop[0].MaLop
+            MaLop: classInfo.MaLop
         }
         const diemtb = await axiosClient.post(`/diem/tb`, payload1);
         setDiemTB(diemtb.data);
@@ -136,7 +136,7 @@ export default function Homeroom() {
     }
     const fetchRLH = async () => {
         const payload2 = {
-            MaLop: datas.lop[0].MaLop,
+            MaLop: classInfo.MaLop,
             MaHK: "2" + nienKhoa.NienKhoa,
         }
         const diemduoi5 = await axiosClient.post('/diem/mon/rlh', payload2);
@@ -147,7 +147,7 @@ export default function Homeroom() {
         })
         const payload3 = {
             monRLH: monDuoi5,
-            MaLop: datas.lop[0].MaLop,
+            MaLop: classInfo.MaLop,
             MaHK: "2" + nienKhoa.NienKhoa
         }
         const res = await axiosClient.post('/diem/rlh', payload3);
@@ -163,7 +163,7 @@ export default function Homeroom() {
                             MSHS: hs.MSHS,
                             HoTen: hs.hoc_sinh.HoTen,
                             KhenThuong: "Học sinh Xuất sắc",
-                            MaLop: datas.lop[0].MaLop,
+                            MaLop: classInfo.MaLop,
                             MaNK: nienKhoa.NienKhoa
                         })
                     } else {
@@ -171,7 +171,7 @@ export default function Homeroom() {
                             MSHS: hs.MSHS,
                             HoTen: hs.hoc_sinh.HoTen,
                             KhenThuong: "Học sinh Giỏi",
-                            MaLop: datas.lop[0].MaLop,
+                            MaLop: classInfo.MaLop,
                             MaNK: nienKhoa.NienKhoa
                         })
                     }
@@ -181,19 +181,19 @@ export default function Homeroom() {
         }
     }
     const handleState = async (view) => {
-        if (view == 2 ) {
+        if (view == 2) {
             fetchDiem();
         }
         setState(view);
     }
     const handleSubState = (view) => {
-        if(view >= 3 && diemTB.length == 0){
+        if (view >= 3 && diemTB.length == 0) {
             fetchDiemTB();
         }
-        if(view == 6){
+        if (view == 6) {
             fetchRLH();
         }
-        if(view == 7){
+        if (view == 7) {
             fetchKhenThuong();
             getDSKhenThuong(diemTB);
         }
@@ -202,9 +202,9 @@ export default function Homeroom() {
     useEffect(() => {
         if (datas && Object.keys(datas).length > 0) {
             const newCount = {
-                Siso: datas.lop[0].hoc_sinh.length,
-                Nam: datas.lop[0].hoc_sinh.filter(item => item.GioiTinh === 'Nam').length,
-                Nu: datas.lop[0].hoc_sinh.filter(item => item.GioiTinh === 'Nữ').length,
+                Siso: datas.lop?.find(item => item.MaNK == nienKhoa.NienKhoa).hoc_sinh.length,
+                Nam: datas.lop?.find(item => item.MaNK == nienKhoa.NienKhoa).hoc_sinh.filter(item => item.GioiTinh === 'Nam').length,
+                Nu: datas.lop?.find(item => item.MaNK == nienKhoa.NienKhoa).hoc_sinh.filter(item => item.GioiTinh === 'Nữ').length,
             };
             setCount(newCount);
         }
@@ -224,7 +224,7 @@ export default function Homeroom() {
     const TinhDiemTBHK = async (hk) => {
         const payload = {
             MaHK: hk + nienKhoa.NienKhoa,
-            MaLop: datas.lop[0].MaLop
+            MaLop: classInfo.MaLop
         }
         try {
             const res = await axiosClient.post('/diem/tk/hocki', payload);
@@ -239,7 +239,7 @@ export default function Homeroom() {
     const TinhDiemTBCN = async () => {
         const payload = {
             MaNK: nienKhoa.NienKhoa,
-            MaLop: datas.lop[0].MaLop
+            MaLop: classInfo.MaLop
         }
         try {
             const res = await axiosClient.post('/diem/tk/namhoc', payload);
@@ -256,7 +256,7 @@ export default function Homeroom() {
         var checkHK1 = false;
         var checkHK2 = false;
         var checkCN = false;
-        datas.lop[0].hoc_sinh.map((item) => {
+        classInfo.hoc_sinh.map((item) => {
             const tbhk1 = diemHK1.filter(data => data.MaLoai == 'tbhk1' && data.MSHS == item.MSHS);
             const tbhk2 = diemHK2.filter(data => data.MaLoai == 'tbhk2' && data.MSHS == item.MSHS);
             const tbcn = diemCN.filter(data => data.MaLoai == 'tbcn' && data.MSHS == item.MSHS);
@@ -273,7 +273,7 @@ export default function Homeroom() {
         const payload = {
             MaNK: nienKhoa.NienKhoa,
             MSHS: value.MSHS,
-            MaLop: datas.lop[0].MaLop,
+            MaLop: classInfo.MaLop,
             RenLuyen: value.RenLuyen,
             LoaiRL: value.LoaiRL,
         }
@@ -298,7 +298,7 @@ export default function Homeroom() {
         const payload = {
             MaNK: nienKhoa.NienKhoa,
             MSHS: value.MSHS,
-            MaLop: datas.lop[0].MaLop,
+            MaLop: classInfo.MaLop,
             RenLuyen: value.RenLuyen,
             LoaiRL: value.LoaiRL,
         }
@@ -326,7 +326,7 @@ export default function Homeroom() {
     }
     const danhGiaRLCN = async () => {
         try {
-            const res = await axiosClient.get(`/rl/${datas.lop[0].MaLop}`);
+            const res = await axiosClient.get(`/rl/${classInfo.MaLop}`);
             setMessage(res.data);
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
@@ -336,7 +336,7 @@ export default function Homeroom() {
     }
     const xetLenLop = async () => {
         try {
-            const res = await axiosClient.get(`/tk/${datas.lop[0].MaLop}`);
+            const res = await axiosClient.get(`/tk/${classInfo.MaLop}`);
             setMessage(res.data);
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
@@ -368,10 +368,11 @@ export default function Homeroom() {
             setMessage("Đã đề xuất thành công!");
         } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
-        }finally{
+        } finally {
             fetchKhenThuong();
         }
     }
+    // console.log(datas)
     return (
         <div className="main-content">
             <Menu />
@@ -388,12 +389,12 @@ export default function Homeroom() {
                                 <button className="teacher-head" onClick={() => handleState(2)}>Xem điểm</button>
                             </div>
                             <div className="flex justify-between w-[90%] mx-auto">
-                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {datas.lop[0].TenLop}</p>
+                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {classInfo.MaLop} - {classInfo.TenLop}</p>
                                 <p className="text-2xl font-bold">Sỉ số: {count.Siso}</p>
                                 <p className="text-2xl font-bold">Nam: {count.Nam}</p>
                                 <p className="text-2xl font-bold">Nữ: {count.Nu}</p>
                             </div>
-                            {state == 1 ? <HocSinhTable datas={datas.lop[0]?.hoc_sinh} />
+                            {state == 1 ? <HocSinhTable datas={classInfo?.hoc_sinh} />
                                 :
                                 <div className="">
                                     <div className="w-full mx-auto grid grid-rows-1 grid-flow-col mt-2">
@@ -433,7 +434,7 @@ export default function Homeroom() {
                                                 <div key={mh.MaMH} className="my-2">
                                                     <h3 className="text-2xl font-bold">Tên môn: {mh.TenMH}</h3>
                                                     <BangDiem
-                                                        hocSinh={datas.lop[0]?.hoc_sinh}
+                                                        hocSinh={classInfo?.hoc_sinh}
                                                         loaiDiem={loaiDiemHK}
                                                         diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
                                                         diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}
@@ -462,7 +463,7 @@ export default function Homeroom() {
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {datas.lop[0]?.hoc_sinh.map((hs) => {
+                                                                {classInfo?.hoc_sinh.map((hs) => {
                                                                     const tbhk1 = diemHK1?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk1" && diem.MSHS === hs.MSHS);
                                                                     const tbhk2 = diemHK2?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk2" && diem.MSHS === hs.MSHS);
                                                                     const tbcn = diemCN?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbcn" && diem.MSHS === hs.MSHS);
@@ -539,7 +540,7 @@ export default function Homeroom() {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {datas.lop[0]?.hoc_sinh.map((hs) => {
+                                                        {classInfo?.hoc_sinh.map((hs) => {
                                                             const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                             if (data) {
                                                                 return (
@@ -590,7 +591,7 @@ export default function Homeroom() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {datas.lop[0]?.hoc_sinh.map((hs) => {
+                                                    {classInfo?.hoc_sinh.map((hs) => {
                                                         const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                         if (data) {
                                                             return (
@@ -657,7 +658,7 @@ export default function Homeroom() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {datas.lop[0]?.hoc_sinh.map((hs) => {
+                                                    {classInfo?.hoc_sinh.map((hs) => {
                                                         const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                         if (data) {
                                                             return (
@@ -778,31 +779,37 @@ export default function Homeroom() {
                                             <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
                                             <h1 className="text-center font-bold text-2xl mt-3">Danh sách đề xuất khen thưởng</h1>
                                             <div className="w-[70%] mx-auto">
-                                                {dsKhenThuong?.length > 0 ?
-                                                    <div className="text-xl font-bold text-green-500">Đã đề xuất khen thưởng</div>
-                                                    :
+                                                {dxKhenThuong.length > 0 ?
                                                     <div>
-                                                        <button onClick={deXuatKT} className="button border-blue-400">Đề xuất</button>
+                                                        {dsKhenThuong?.length > 0 ?
+                                                            <div className="text-xl font-bold text-green-500">Đã đề xuất khen thưởng</div>
+                                                            :
+                                                            <div>
+                                                                <button onClick={deXuatKT} className="button border-blue-400">Đề xuất</button>
+                                                            </div>
+                                                        }
+                                                        <table className="table w-full text-xl">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="border border-black px-2">Mã số học sinh</th>
+                                                                    <th className="border border-black px-2">Tên học sinh</th>
+                                                                    <th className="border border-black px-2">Đề xuất khen thưởng</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {dxKhenThuong?.map((item) => (
+                                                                    <tr key={item.MSHS}>
+                                                                        <td className="border border-black px-2">{item.MSHS}</td>
+                                                                        <td className="border border-black px-2">{item.HoTen}</td>
+                                                                        <td className="border border-black px-2">{item.KhenThuong}</td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
                                                     </div>
+                                                    :
+                                                    <div className="text-red-500 text-xl text-center">Không có đề xuất khen thưởng</div>
                                                 }
-                                                <table className="table w-full text-xl">
-                                                    <thead>
-                                                        <tr>
-                                                            <th className="border border-black px-2">Mã số học sinh</th>
-                                                            <th className="border border-black px-2">Tên học sinh</th>
-                                                            <th className="border border-black px-2">Đề xuất khen thưởng</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {dxKhenThuong?.map((item) => (
-                                                            <tr key={item.MSHS}>
-                                                                <td className="border border-black px-2">{item.MSHS}</td>
-                                                                <td className="border border-black px-2">{item.HoTen}</td>
-                                                                <td className="border border-black px-2">{item.KhenThuong}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
                                             </div>
                                         </div>
 

@@ -68,7 +68,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
     const generateOtherCells = (grades, student) => {
         if (grades.length == 0) {
             const cells = loaiDiem.map((data) => (
-                data.MaLoai != 'tx' &&
+                data.MaLoai != 'tx' && data.MaLoai != 'rlh' &&
                 <td key={data.MaLoai} className="bd-td-normal">-
                 </td>
             ))
@@ -183,7 +183,6 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                     :
                                     <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
                                 }
-
                                 <td className="bd-td-normal">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>
                         );

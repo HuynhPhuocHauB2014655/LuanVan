@@ -1,11 +1,24 @@
 import { Link } from "react-router-dom";
+import { useUserContext } from "../context/userContext";
+import { useEffect, useState } from "react";
+import axiosClient from "../axios-client";
 export default function Home() {
+    const {userName} = useUserContext();
+    const [tbCount,setTbCount] = useState(0);
+    useEffect(()=>{
+        const fetchTB = async () => {
+            const TB = await axiosClient.get(`/tb/gv/${userName}`);
+            const count = TB.data.filter(item => item.TrangThai == 0).length;
+            setTbCount(count);
+        }
+        fetchTB();
+    },[userName])
     const menu_items = [
         { id: 1, route: "/info", label: 'Thông tin cá nhân' },
         { id: 2, route: "/cn", label: 'Chủ nhiệm' },
         { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
-        { id: 5, route: "/diemdanh", label: 'Điểm danh' },
+        { id: 5, route: "/tb", label: 'Thông báo' },
     ];
     return (
         <div className="main-content">
@@ -20,7 +33,7 @@ export default function Home() {
                             className="border-2 border-slate-500 rounded-lg mx-1 py-2 hover:bg-cyan-400 button-animation text-center block mb-2"
                             to={item.route}
                         >
-                            {item.label}
+                            {item.label} {item.id == 5 && tbCount > 0 && <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>}
                         </Link>
                     ))}
                 </div>

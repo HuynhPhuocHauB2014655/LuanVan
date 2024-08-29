@@ -5,6 +5,7 @@ import GuestLayout from "./components/GuestLayout.jsx";
 import Info from "./views/Info.jsx";
 import TKB from "./views/TKB.jsx";
 import Result from "./views/Result.jsx";
+import Notification from "./views/Notification.jsx";
 
 
 const router = createBrowserRouter([
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
             {
                 path: "/result",
                 element: <Result/>
+            },
+            {
+                path: "/notify",
+                element: <Notification/>
             }
         ]
     },
