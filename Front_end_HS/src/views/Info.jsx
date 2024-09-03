@@ -40,6 +40,7 @@ export default function Info() {
             console.log(error);
         }
     }
+    console.log(info);
     return (
         <div className="main-content">
             <Menu />
@@ -48,7 +49,7 @@ export default function Info() {
                 <h1 className="page-name">Thông tin cá nhân</h1>
                 <button className="button mt-2 border-2 border-blue-400 hover:bg-blue-300" onClick={() => Show(!show)}>Đổi mật khẩu</button>
                 <div className="text-xl flex justify-center mt-5">
-                    <table className="w-[70%] text-center border-collapse">
+                    <table className="w-[70%] border-collapse">
                         <tbody>
                             <tr className="border-b border-slate-400">
                                 <td className="py-2 font-semibold text-gray-700">Mã số học sinh</td>
@@ -77,6 +78,18 @@ export default function Info() {
                             <tr className="border-b border-slate-400">
                                 <td className="py-2 font-semibold text-gray-700">Địa chỉ</td>
                                 <td className="py-2 text-gray-900">{info.DiaChi}</td>
+                            </tr>
+                            <tr className="border-b border-slate-400">
+                                <td className="py-2 font-semibold text-gray-700">Lịch sử học tập</td>
+                                <td className="py-2 text-gray-900">
+                                        <div>
+                                            {info.lop?.map((lop) => (
+                                                <div key={lop.MaLop}>
+                                                    {lop.MaNK} - {lop.TenLop}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </td>
                             </tr>
                         </tbody>
                     </table>

@@ -137,7 +137,7 @@ export default function Result() {
                             <div className="my-2 grid grid-rows-1 grid-flow-col w-[30%] space-x-2">
                                 <button className="button border border-blue-400 hover:bg-blue-300" onClick={fetchAllClass}>Tất cả</button>
                                 <button className="button border border-blue-400 hover:bg-blue-300" onClick={()=>fetchByClass(nienKhoa.NienKhoa)}>Hiện tại</button>
-                                <select ref={NKRef} className="rounded-md" onChange={fetchByNK}>
+                                <select ref={NKRef} className="rounded-md border-2 px-2" onChange={fetchByNK}>
                                     <option value="">Chọn niên khóa</option>
                                     {Nk.map((item) => (
                                         <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>

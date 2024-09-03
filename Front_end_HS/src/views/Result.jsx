@@ -282,7 +282,7 @@ export default function Result() {
                                         <tr>
                                             <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK1</th>
                                             <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
-                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={6}></td>
+                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={7}></td>
                                             <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK1</th>
                                             <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k1.TenRL}</td>
                                         </tr>
@@ -309,6 +309,12 @@ export default function Result() {
                                         <tr>
                                             <th className="border-2 border-black px-2 py-1 text-start">Xếp loại Cả năm</th>
                                             <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
+                                        </tr>
+                                        <tr>
+                                            <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
+                                            <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaRLL > 0 ? kqht.ren_luyen_lai.TenRL : "-"}</td>
                                         </tr>
                                         <tr>
                                             <td className="border-2 border-black px-2 py-1 text-start font-bold text-red-500" colSpan={2}>Tổng kết:</td>

@@ -151,7 +151,7 @@ export default function StudentInfo() {
             }
         }
     }, [studentData, NK, NKRef.current?.value]);
-    console.log(kt);
+    console.log();
     return (
         <div className="main-content">
             <Menu />
@@ -252,7 +252,7 @@ export default function StudentInfo() {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="text-xl">Niên khóa:</div>
-                                <select name="nienkhoa" ref={NKRef} defaultValue={defaultNK} onChange={selectedNK} className="rounded-md">
+                                <select name="nienkhoa" ref={NKRef} defaultValue={defaultNK} onChange={selectedNK} className="rounded-md border-2 p-2">
                                     {NK.map((nk) => (
                                         <option key={nk.MaNK} value={nk.MaNK}>{nk.TenNK}</option>
                                     ))}
@@ -340,7 +340,7 @@ export default function StudentInfo() {
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK1</th>
                                                 <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
-                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={6}></td>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={7}></td>
                                                 <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK1</th>
                                                 <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k1.TenRL}</td>
                                             </tr>
@@ -369,6 +369,12 @@ export default function StudentInfo() {
                                                 <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
                                             </tr>
                                             <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaRLL > 0 ? kqht.ren_luyen_lai.TenRL : "-"}</td>
+                                            </tr>
+                                            <tr>
                                                 <td className="border-2 border-black px-2 py-1 text-start font-bold text-red-500" colSpan={2}>Tổng kết:</td>
                                                 <td className="border-2 border-black px-2 py-1 text-center"></td>
                                                 <td className="border-2 border-black px-2 py-1 font-bold text-center" colSpan={3}>
@@ -390,11 +396,11 @@ export default function StudentInfo() {
                                     {kt.length > 0 ?
                                         <table className="w-[80%] mx-auto text-2xl">
                                             <tbody>
-                                                {kt.map((item,index) => (
+                                                {kt.map((item, index) => (
                                                     <tr>
-                                                        <td className="border-2 border-black px-2 py-1 text-center">{index+1}</td>
+                                                        <td className="border-2 border-black px-2 py-1 text-center">{index + 1}</td>
                                                         <td key={item.id} className="border-2 border-black px-2 py-1 font-bold text-center">{item.KhenThuong}</td>
-                                                        {item.TrangThai == 0 ? 
+                                                        {item.TrangThai == 0 ?
                                                             <td className="border-2 border-black px-2 py-1 text-center text-red-500">Chưa duyệt</td>
                                                             :
                                                             <td className="border-2 border-black px-2 py-1 text-center text-green-500">Đã duyệt</td>
