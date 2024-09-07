@@ -7,8 +7,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
+import { useNavigate } from "react-router-dom";
 export default function Student() {
     const [datas, setDatas] = useState([]);
+    const navigate = useNavigate();
     const { setMessage } = useStateContext();
     const [showForm, setShowForm] = useState(0);
     const [studentForm, setStudentForm] = useState({});
@@ -173,6 +175,9 @@ export default function Student() {
     const handlePageChange = (page) => {
         fetchData(page);
     }
+    const toStudentInfo = (mshs) => {
+        navigate('/student-info', { state: { Mshs: mshs } });
+    }
     return (
         <div className="main-content ">
             <Menu />
@@ -180,7 +185,7 @@ export default function Student() {
                 {showForm != 0 &&
                     <div className="absolute z-10 w-[70%] left-[15%] top-40 bg-sky-300 p-5">
                         <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
-                        <h1 className="text-center mb-3 text-2xl font-semibold">Thêm học sinh</h1>
+                        <h1 className="text-center mb-3 text-2xl font-semibold">{showForm == 1 ? "Thêm học sinh" : "Sửa học sinh"}</h1>
                         <Formik
                             initialValues={{
                                 MaNK: '',
@@ -208,44 +213,44 @@ export default function Student() {
                                 }, [studentForm, setValues]);
                                 return (
                                     <Form className="relative" ref={formRef}>
-                                        <div className="columns-3 gap-3">
-                                            <Field type="text" name="MaNK" className="w-full mb-1 rounded form-input" placeholder="Mã niên khóa" />
+                                        <div className="grid grid-cols-2 grid-flow-row gap-2">
+                                            <Field type="text" name="MaNK" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Mã niên khóa" />
                                             <ErrorMessage className="text-red-700" name="MaNK" component="div" />
 
-                                            <Field type="text" name="HoTen" className="w-full mb-1 rounded form-input" placeholder="Họ và tên" />
+                                            <Field type="text" name="HoTen" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Họ và tên" />
                                             <ErrorMessage className="text-red-700" name="HoTen" component="div" />
 
-                                            <Field type="text" name="NgaySinh" className="w-full mb-1 rounded form-input" placeholder="Ngày sinh" />
+                                            <Field type="text" name="NgaySinh" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Ngày sinh" />
                                             <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
 
-                                            <Field as="select" name="GioiTinh" className="form-select w-full mb-1">
+                                            <Field as="select" name="GioiTinh" className="border-2 border-black p-2 w-full mb-1 rounded">
                                                 <option value="Nam" defaultChecked>Nam</option>
                                                 <option value="Nữ">Nữ</option>
                                             </Field>
                                             <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
 
-                                            <Field type="text" name="QueQuan" className="w-full mb-1 rounded form-input" placeholder="Quê quán" />
+                                            <Field type="text" name="QueQuan" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Quê quán" />
                                             <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
 
-                                            <Field type="text" name="DanToc" className="w-full mb-1 rounded form-input" placeholder="Dân Tộc" />
+                                            <Field type="text" name="DanToc" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Dân Tộc" />
                                             <ErrorMessage className="text-red-700" name="DanToc" component="div" />
 
-                                            <Field type="text" name="TonGiao" className="w-full mb-1 rounded form-input" placeholder="Tôn Giáo" />
+                                            <Field type="text" name="TonGiao" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Tôn Giáo" />
                                             <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
 
-                                            <Field type="text" name="DiaChi" className="w-full mb-1 rounded form-input" placeholder="Địa chỉ" />
+                                            <Field type="text" name="DiaChi" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Địa chỉ" />
                                             <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
 
-                                            <Field type="text" name="SDT" className="w-full mb-1 rounded form-input" placeholder="Số điện thoại" />
+                                            <Field type="text" name="SDT" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Số điện thoại" />
                                             <ErrorMessage className="text-red-700" name="SDT" component="div" />
 
-                                            <Field as="select" name="MaBan" className="form-select w-full mb-1">
+                                            <Field as="select" name="MaBan" className="border-2 border-black p-2 w-full mb-1 rounded">
                                                 <option value="TN">Tự nhiên</option>
                                                 <option value="XH">Xã hội</option>
                                             </Field>
                                             <ErrorMessage className="text-red-700" name="ban" component="div" />
 
-                                            <Field as="select" name="TrangThai" className="form-select w-full">
+                                            <Field as="select" name="TrangThai" className="border-2 border-black p-2 w-full rounded">
                                                 <option value={0}>Đang học</option>
                                                 <option value={1}>Đã thôi học</option>
                                                 <option value={2}>Đã tốt nghiệp</option>
@@ -281,14 +286,14 @@ export default function Student() {
                         <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400 button-animation" onClick={() => showFormStudent(1)}>Thêm học sinh</button>
                     </div>
                     <div className="me-3 flex w-[25%]">
-                        <input type="text" id="search" className="form-input rounded h-9 w-full" placeholder="Tìm tên hoặc mã số học sinh" />
-                        <button onClick={search} className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                        <input type="text" id="search" className="rounded w-full border-2 border-black px-2" placeholder="Tìm tên hoặc mã số học sinh" />
+                        <button onClick={search} className="p-2 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                     </div>
                 </div>
                 <div className="my-1 flex justify-center">
                     <button
                         onClick={() => handlePageChange(1)}
-                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                        className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
                     >
                         <FontAwesomeIcon icon={faAngleDoubleLeft} />
                     </button>
@@ -320,25 +325,17 @@ export default function Student() {
                     </button>
                     <button
                         onClick={() => handlePageChange(totalPages)}
-                        className="me-1 px-2 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                        className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
                     >
                         <FontAwesomeIcon icon={faAngleDoubleRight} />
                     </button>
                 </div>
-                <table className="table">
+                <table className="table-auto w-[80%] mx-auto text-xl">
                     <thead>
                         <tr>
                             <th className="td py-1 px-2" >STT</th>
                             <th className="td py-1 px-2" >MSHS</th>
                             <th className="td py-1 px-2" >Tên học sinh</th>
-                            <th className="td py-1 px-2" >Ngày Sinh</th>
-                            <th className="td py-1 px-2" >Giới tính</th>
-                            <th className="td py-1 px-2" >Quê quán</th>
-                            <th className="td py-1 px-2" >Dân tộc</th>
-                            <th className="td py-1 px-2" >Tôn Giáo</th>
-                            <th className="td py-1 px-2" >Địa chỉ</th>
-                            <th className="td py-1 px-2" >Số điện thoại</th>
-                            <th className="td py-1 px-2" >Ban</th>
                             <th className="td py-1 px-2" >Lớp</th>
                             <th className="td py-1 px-2" >Trạng thái</th>
                             <th className="td py-1 px-2" >Hành động</th>
@@ -346,18 +343,10 @@ export default function Student() {
                     </thead>
                     <tbody>
                         {datas.map((data, index) => (
-                            <tr key={index}>
+                            <tr key={index} className="cursor-pointer hover:bg-slate-100" onClick={()=>toStudentInfo(data.MSHS)}>
                                 <td className="td py-1 px-2" >{(currentPage - 1) * 10 + index + 1}</td>
                                 <td className="td py-1 px-2" >{data.MSHS}</td>
                                 <td className="td py-1 px-2" >{data.HoTen}</td>
-                                <td className="td py-1 px-2" >{data.NgaySinh}</td>
-                                <td className="td py-1 px-2" >{data.GioiTinh}</td>
-                                <td className="td py-1 px-2" >{data.QueQuan}</td>
-                                <td className="td py-1 px-2" >{data.DanToc}</td>
-                                <td className="td py-1 px-2" >{data.TonGiao}</td>
-                                <td className="td py-1 px-2" >{data.DiaChi}</td>
-                                <td className="td py-1 px-2" >{data.SDT}</td>
-                                <td className="td py-1 px-2" >{data.ban.TenBan}</td>
                                 {data.lop[0]?.TenLop ?
                                     <td className="td">{data.lop[0].TenLop}</td> :
                                     <td className="td">Chưa xếp</td>}

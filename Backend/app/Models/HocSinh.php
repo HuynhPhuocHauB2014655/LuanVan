@@ -35,4 +35,7 @@ class HocSinh extends Model
     public function taiKhoan():HasOne{
         return $this->hasOne(TKHocSinh::class,'MSHS','MSHS');
     }
+    public function phuHuynh():HasOne{
+        return $this->hasOne(PhuHuynh::class,'MSHS','MSHS');
+    }
 }

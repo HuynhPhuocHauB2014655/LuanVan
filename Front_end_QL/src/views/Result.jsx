@@ -98,7 +98,7 @@ export default function Result() {
         navigate('/class-info', { state: { classData: data } });
     };
     const handleToStudent = (data) => {
-        navigate('/student-info', { state: { studentData: data } });
+        navigate('/student-result', { state: { studentData: data } });
     };
     const search = async () => {
         const searchValue = document.getElementById('search').value;

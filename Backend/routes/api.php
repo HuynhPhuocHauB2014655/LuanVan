@@ -38,6 +38,8 @@ Route::get('/hs/new',[HSController::class,'newStudents']);
 Route::get('/hs/{MaNK}',[HSController::class,'oLaiLop']);
 Route::post('/hs/check',[HSController::class,'checkAdd']);
 Route::post('/hs/tkb',[HSController::class,'getTKB']);
+Route::post('/hs/ph',[HSController::class,'addPH']);
+Route::put('/hs/ph',[HSController::class,'updatePH']);
 
 
 //nien khoa route

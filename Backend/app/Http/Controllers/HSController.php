@@ -5,6 +5,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\HocSinh;
 use App\Models\HocLop;
 use App\Models\TKHocSinh;
+use App\Models\PhuHuynh;
 use App\Models\TKB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -52,7 +53,7 @@ class HSController extends Controller
     }
     public function show($mshs)
     {
-        $hocsinh = HocSinh::with(['ban','taiKhoan','lop' => function ($query) {
+        $hocsinh = HocSinh::with(['ban','phuHuynh','taiKhoan','lop' => function ($query) {
             $query->latest();
         }])->find($mshs);
         return response()->json($hocsinh, Response::HTTP_OK);
@@ -108,4 +109,18 @@ class HSController extends Controller
         return response()->json($tkb, Response::HTTP_OK);
     }
 
+    public function addPH(Request $rq)
+    {
+        PhuHuynh::create($rq->all());
+        return response()->json("Đã thêm thành công", Response::HTTP_OK);
+    }
+    public function updatePH(Request $rq)
+    {
+        $ph = PhuHuynh::where("MSHS",$rq->MSHS);
+        if (!$ph) {
+            return response()->json('Không tìm thấy dữ liệu', Response::HTTP_NOT_FOUND);
+        }
+        $ph->update($rq->all());
+        return response()->json("Đã cập nhật thành công", Response::HTTP_OK);
+    }
 }
