@@ -11,6 +11,9 @@ import { Formik, Form, Field, ErrorMessage, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import AlterConfirm from "../components/Confirm";
 import RenLuyenForm from "../components/RenLuyenForm";
+import NotifyForm from "../components/NoitifyForm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
 
 export default function Homeroom() {
     const { userName } = useUserContext();
@@ -372,6 +375,26 @@ export default function Homeroom() {
             fetchKhenThuong();
         }
     }
+    const sendTB = async (value) => {
+        const nguoiNhan = value.NguoiNhan.split(';').filter(id => id !== '');
+        nguoiNhan.map( async (item)=>{
+            const payload = {
+                NguoiGui: info.TenGV + " - " + userName,
+                NguoiNhan: item,
+                NoiDung: value.NoiDung,
+                TrangThai: 0,
+                TieuDe: value.TieuDe
+            };
+            try{
+                await axiosClient.post("/tb/add",payload);
+                setMessage("Đã gửi thành công!");
+            }catch(error){
+                setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+            }finally{
+                setShowForm(0);
+            }
+        })
+    }
     // console.log(datas)
     return (
         <div className="main-content">
@@ -380,7 +403,13 @@ export default function Homeroom() {
                 {showConfirm === 1 &&
                     <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
                 }
-                <h1 className="page-name">Quản lí lớp chủ nhiệm</h1>
+                {showForm == 3 &&
+                    <NotifyForm MaLop={classInfo.MaLop} handleSubmit={sendTB} close={()=>setShowForm(0)}/>
+                }
+                <div className="page-name relative">
+                    Quản lí lớp chủ nhiệm
+                    <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
+                </div>
                 <div>
                     {Object.keys(datas).length > 0 ?
                         <div className="mt-2">

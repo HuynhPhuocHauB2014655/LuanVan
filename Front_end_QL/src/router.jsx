@@ -14,6 +14,7 @@ import ClassInfo from "./views/ClassInfo.jsx";
 import StudentResult from "./views/StudentResult.jsx";
 import Notification from "./views/Notification.jsx";
 import StudentInfo from "./views/StudentInfo.jsx";
+import TestFileUpload from "./views/TestFileUpload.jsx";
 
 
 const router = createBrowserRouter([
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
     {
         path: "/login",
         element: <GuestLayout />,
+    },
+    {
+        path: "/file",
+        element: <TestFileUpload />,
     },
     {
         path: "*",

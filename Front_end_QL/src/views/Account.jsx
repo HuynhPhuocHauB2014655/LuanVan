@@ -207,7 +207,7 @@ export default function Account() {
                                     <input type="text" ref={searchString} className="rounded h-9" placeholder="Nhập vào mã giáo viên" />
                                     <button
                                         onClick={searchGV}
-                                        className="h-9 px-2 py-1 border rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                                        className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                                 </div>
                             </div>
                             {searchresult == 1 &&
@@ -264,10 +264,10 @@ export default function Account() {
                             <div className="flex justify-between mb-2 pb-2">
                                 <div className="mt-2 text-xl">Quản lí tài khoản học sinh</div>
                                 <div className="">
-                                    <input type="text" ref={searchString} className="rounded h-9" placeholder="Nhập vào mã giáo viên" />
+                                    <input type="text" ref={searchString} className="rounded h-9" placeholder="Nhập vào mã số học sinh" />
                                     <button
                                         onClick={searchHS}
-                                        className="h-9 px-2 py-1 border rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                                        className="px-2 py-1 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
                                 </div>
                             </div>
                             {searchresult == 1 &&
@@ -278,8 +278,8 @@ export default function Account() {
                             {searchresult == 2 &&
                                 <div className="flex justify-center mt-10 mb-2 pb-2 ">
                                     <div className="text-xl leading-10">
-                                        <div>Mã số giáo viên: {searchResponse.MSHS}</div>
-                                        <div>Tên giáo viên: {searchResponse.hoc_sinh.HoTen}</div>
+                                        <div>Mã số học sinh : {searchResponse.MSHS}</div>
+                                        <div>Tên học sinh: {searchResponse.hoc_sinh.HoTen}</div>
                                         <div>Sửa đổi mật khẩu lần cuối: {formatDay(searchResponse.updated_at)}</div>
                                         <Formik
                                             initialValues={{

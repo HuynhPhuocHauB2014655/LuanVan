@@ -15,10 +15,14 @@ use App\Http\Controllers\DiemController;
 use App\Http\Controllers\RenLuyenController;
 use App\Http\Controllers\KhenThuongController;
 use App\Http\Controllers\TBController;
+use App\Http\Controllers\FileController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::post('/file',[FileController::class,'store']);
+Route::get('/file/{filename}',[FileController::class,'getAvatar']);
+Route::get('/file',[FileController::class,'getFileName']);
 // ban route
 Route::post('/ban/create',[BanController::class,'store']);
 Route::put('/ban/update/{MaBan}',[BanController::class,'update']);

@@ -23,6 +23,9 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+input {
+  @apply border-2 border-black rounded-md px-2
+}
 .button {
   @apply px-2 py-1 border-2 ms-1 rounded
 }
