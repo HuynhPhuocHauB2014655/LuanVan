@@ -338,7 +338,6 @@ export default function Student() {
                             <th className="td py-1 px-2" >Tên học sinh</th>
                             <th className="td py-1 px-2" >Lớp</th>
                             <th className="td py-1 px-2" >Trạng thái</th>
-                            <th className="td py-1 px-2" >Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -348,14 +347,9 @@ export default function Student() {
                                 <td className="td py-1 px-2" >{data.MSHS}</td>
                                 <td className="td py-1 px-2" >{data.HoTen}</td>
                                 {data.lop[0]?.TenLop ?
-                                    <td className="td">{data.lop[0].TenLop}</td> :
-                                    <td className="td">Chưa xếp</td>}
-                                <td className="td">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
-                                <td className="td">
-                                    <div className="flex justify-center">
-                                        <button className="px-2 border rounded bg-white border-black hover:border-sky-500" onClick={() => showFormStudent(2, data)}>Sửa</button>
-                                    </div>
-                                </td>
+                                    <td className="td py-1 px-2">{data.lop[0].TenLop}</td> :
+                                    <td className="td py-1 px-2">Chưa xếp</td>}
+                                <td className="td py-1 px-2">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
                             </tr>
                         ))}
                     </tbody>
