@@ -172,4 +172,18 @@ class TKBController extends Controller
             }
         }
     }
+    public function update(Request $rq)
+    {
+        $c1 = TKB::find($rq->change1);
+        $c2 = TKB::find($rq->change2);
+        $tmpMH = $c1->MaMH;
+        $tmpGV = $c1->MSGV;
+        $c1->MaMH = $c2->MaMH;
+        $c1->MSGV = $c2->MSGV;
+        $c2->MaMH = $tmpMH;
+        $c2->MSGV = $tmpGV;
+        $c1->save();
+        $c2->save();
+        return response()->json("Đã cập nhật thời khóa biểu thành công",200);
+    }
 }

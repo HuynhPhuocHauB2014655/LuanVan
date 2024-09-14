@@ -4,6 +4,7 @@ import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Menu from "../components/Menu";
+import AlterConfirm from "../components/Confirm";
 export default function TKB() {
     const [classes, setClasses] = useState([]);
     const [subjectTN, setSubjectTN] = useState([]);
@@ -11,11 +12,15 @@ export default function TKB() {
     const [tkb, settkb] = useState([]);
     const [date, setdate] = useState([]);
     const [show, setShow] = useState('');
-    const { setMessage } = useStateContext();
+    const { setMessage, setError } = useStateContext();
     const { nienKhoa } = useStateContext(false);
     const [disable, setDisable] = useState(true);
     const [state, setState] = useState(0);
     const [TKB, setTKB] = useState([]);
+    const [changeTKB, setChangeTKB] = useState();
+    const [change1, setChange1] = useState();
+    const [change2, setChange2] = useState();
+    const [showConfirm, setShowConfirm] = useState(false);
     const [schedule, setSchedule] = useState(
         Array.from({ length: 6 }, () => Array(4).fill(null))
     );
@@ -47,15 +52,21 @@ export default function TKB() {
                 const periodIndex = schedule.TietDay - 1;
 
                 tkbMatrix[dayIndex][periodIndex] = {
+                    id: schedule.id,
+                    MaMH: schedule.MaMH,
                     TenMon: schedule.mon_hoc.TenMH,
                     TenGV: schedule.giao_vien.TenGV
                 };
             });
             tkbMatrix[0][0] = {
+                id: -1,
+                MaMH: '',
                 TenMon: 'Chào cờ',
                 TenGV: ''
             }
             tkbMatrix[5][3] = {
+                id: -2,
+                MaMH: '',
                 TenMon: 'Sinh hoạt lớp',
                 TenGV: ''
             }
@@ -132,10 +143,78 @@ export default function TKB() {
         }
         setState(state);
     }
+    const activeChangeTKB = (id) => {
+        if (id) {
+            setChangeTKB(id);
+        } else {
+            setChangeTKB(null);
+        }
+        setChange1(null);
+        setChange2(null);
+    }
+    const chooseTKB = (data) => {
+        if (!data) {
+            setChange1(null);
+            setChange2(null);
+        }
+        else if (!change1) {
+            setChange1(data);
+        } else {
+            if (data.id != change1.id) {
+                var check = false;
+                for (let i = 0; i < tkb.length; i++) {
+                    if (tkb[i].MaLop != data.MaLop) {
+                        const check1 = tkb[i].tkb.find(item => data.TietDay == item.TietDay && data.MaNgay == item.MaNgay && item.MSGV == change1.MSGV);
+                        if (check1) {
+                            check = true;
+                        }
+                        const check2 = tkb[i].tkb.find(item => change1.TietDay == item.TietDay && change1.MaNgay == item.MaNgay && item.MSGV == data.MSGV);
+                        if (check2) {
+                            check = true;
+                        }
+                    }
+                    if (check) {
+                        break;
+                    }
+                }
+                if (check) {
+                    setError("Tiết dạy bạn chon bị trùng lặp");
+                } else {
+                    setChange2(data);
+                }
+            }
+        }
+    }
+    const saveChange = async () => {
+        if (change1 && change2) {
+            const payload = {
+                change1 : change1.id,
+                change2 : change2.id,
+            }
+            try{
+                const response = await axiosClient.put("/tkb/update",payload);
+                setMessage(response.data);
+                fetchTKB();
+                activeChangeTKB(null);
+            }catch(error){
+                console.log(error);
+            }
+        }
+    }
+    const onConfirm = () => {
+        setShowConfirm(0);
+        saveChange();
+    }
+    const onCancel = () => {
+        setShowConfirm(0);
+    }
     return (
         <div className="main-content">
             <Menu />
-            <div className="right-part">
+            <div className="right-part relative">
+                {showConfirm && 
+                    <AlterConfirm message={`Bạn có chắc chắn với thao tác này không?`}  onCancel={onCancel} onConfirm={onConfirm}/>
+                }
                 <h1 className="page-name">Quản lí thời khóa biểu</h1>
                 <div className="flex my-2">
                     <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(2)}>Xếp TKB</button>
@@ -145,8 +224,30 @@ export default function TKB() {
                     <div className="mb-2">
                         {tkb.map((data) => (
                             <div key={data.MaLop} className="mx-auto mb-10" style={{ maxWidth: '95%' }}>
-                                <h1 className="w-full text-2xl mb-2 font-bold" >Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}</h1>
-                                <table className="border-2 border-black border-collapse text-center w-full table-fixed">
+                                <div className="flex justify-between mb-2 items-center" >
+                                    <div className="text-2xl font-bold">
+                                        Lớp: {data.TenLop} - Niên khóa: {data.nien_khoa.TenNK}
+                                    </div>
+                                    <div>
+                                        {changeTKB == data.MaLop &&
+                                            <div className="text-red-400 text-xl font-bold">Click chọn 2 tiết cần đổi</div>
+                                        }
+                                    </div>
+                                    {changeTKB == data.MaLop ?
+                                        <div className="space-x-1 flex">
+                                            {change2 && 
+                                                <button className="border-2 rounded-lg px-2 py-1 text-sm border-green-500 hover:text-green-500 hover:bg-white hover:shadow-m" onClick={()=>setShowConfirm(true)}>Lưu</button>
+                                            }
+                                            {(change1 || change2) &&
+                                                <button className="border-2 rounded-lg px-2 py-1 text-sm border-red-500 hover:text-red-500 hover:bg-white hover:shadow-md" onClick={() => chooseTKB(null)}>Chọn lại</button>
+                                            }
+                                            <button className="border-2 rounded-lg px-2 py-1 text-sm border-red-500 hover:text-red-500 hover:bg-white hover:shadow-md" onClick={() => activeChangeTKB(null)}>Hủy</button>
+                                        </div>
+                                        :
+                                        <button className="border-2 rounded-lg px-2 py-1 text-sm border-blue-500 hover:text-blue-500 hover:bg-white hover:shadow-md" onClick={() => activeChangeTKB(data.MaLop)}>Sửa</button>
+                                    }
+                                </div>
+                                <table className={changeTKB === data.MaLop ? "border-2 border-red-400 border-collapse text-center w-full table-fixed bg-white" : "border-2 border-black border-collapse text-center w-full table-fixed"}>
                                     <thead>
                                         <tr>
                                             <th className="td"></th>
@@ -161,9 +262,14 @@ export default function TKB() {
                                                 <td className="td px-3">{i + 1}</td>
                                                 {[...Array(6)].map((_, j) => (
                                                     data.tkbMatrix[j][i] ?
-                                                        <td className="td" key={j + 1}>
-                                                            {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
-                                                        </td>
+                                                        changeTKB == data.MaLop && data.tkbMatrix[j][i].id != -1 && data.tkbMatrix[j][i].id != -2 && data.tkbMatrix[j][i].MaMH != change1?.MaMH ?
+                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td cursor-pointer text-red-500" : "td cursor-pointer"} onClick={() => chooseTKB(data.tkb.find(item => item.id == data.tkbMatrix[j][i].id))} key={j + 1}>
+                                                                {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
+                                                            </td>
+                                                            :
+                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td text-red-500" : "td "} key={j + 1}>
+                                                                {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
+                                                            </td>
                                                         :
                                                         <td className="td invisible" key={j + 1}>
                                                             N/A <br /> N/A
@@ -175,17 +281,21 @@ export default function TKB() {
                                             <td colSpan="6" className="h-10"></td>
                                         </tr>
                                         {[...Array(4)].map((_, i) => {
-                                            const startIndex = 4; // Start value for i
-                                            const currentIndex = i + startIndex;
+                                            const currentIndex = i + 4;
 
                                             return (
                                                 <tr key={currentIndex}>
                                                     <td className="td">{currentIndex + 1}</td>
                                                     {[...Array(6)].map((_, j) => (
                                                         data.tkbMatrix[j][currentIndex] ?
-                                                            <td className="td" key={j + 1}>
-                                                                {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
-                                                            </td>
+                                                            changeTKB == data.MaLop ?
+                                                                <td className={change1?.id == data.tkbMatrix[j][currentIndex].id || change2?.id == data.tkbMatrix[j][currentIndex].id ? "td cursor-pointer text-red-500" : "td cursor-pointer"} onClick={() => chooseTKB(data.tkb.find(item => item.id == data.tkbMatrix[j][i].id))} key={j + 1}>
+                                                                    {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
+                                                                </td>
+                                                                :
+                                                                <td className="td" key={j + 1}>
+                                                                    {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
+                                                                </td>
                                                             :
                                                             <td className="td invisible" key={j + 1}>
                                                                 N/A <br /> N/A

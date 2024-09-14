@@ -104,6 +104,7 @@ Route::get('/lop/duyetkq/{MaLop}',[LopController::class,'DuyetKQHT']);
 
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
+Route::put('/tkb/update',[TKBController::class,'update']);
 Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);
 Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
 Route::get('/tkb/date',[TKBController::class,'indexDate']);
