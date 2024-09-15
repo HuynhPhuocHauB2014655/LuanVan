@@ -15,14 +15,11 @@ use App\Http\Controllers\DiemController;
 use App\Http\Controllers\RenLuyenController;
 use App\Http\Controllers\KhenThuongController;
 use App\Http\Controllers\TBController;
-use App\Http\Controllers\FileController;
+use App\Http\Controllers\TinNhanController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/file',[FileController::class,'store']);
-Route::get('/file/{filename}',[FileController::class,'getAvatar']);
-Route::get('/file',[FileController::class,'getFileName']);
 // ban route
 Route::post('/ban/create',[BanController::class,'store']);
 Route::put('/ban/update/{MaBan}',[BanController::class,'update']);
@@ -175,3 +172,8 @@ Route::get('/tb/hs/{MSHS}',[TBController::class,'getHS']);
 Route::post('/tb/add',[TBController::class,'create']);
 Route::put('/tb/update',[TBController::class,'update']);
 Route::delete('/tb/delete',[TBController::class,'delete']);
+
+//Tin nhan route
+Route::get('/tn/index/{NguoiNhan}',[TinNhanController::class,'index']);
+Route::post('/tn/add',[TinNhanController::class,'store']);
+Route::get('/tn/test',[TinNhanController::class,'makeGroup']);

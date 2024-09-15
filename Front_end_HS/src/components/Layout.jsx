@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
+import pusher from "../pusher";
 export default function Layout() {
     const { message, error, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
     const { userName, setUserName } = useUserContext();
     const [showConfirm, setShowConfirm] = useState(false);
+    const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
     const fetchData = async () => {
         try {
@@ -22,6 +24,20 @@ export default function Layout() {
     if (!userName) {
         return <Navigate to="/login" replace/>
     }
+    useEffect(() => {
+        const channel = pusher.subscribe(`chat.${userName}`);
+
+        channel.bind('App\\Events\\sendMessage', (data) => {
+            console.log(data);
+            setMessages(prevMessages => [...prevMessages, data.message]);
+        });
+
+        // Clean up on component unmount
+        return () => {
+            channel.unbind_all();
+            channel.unsubscribe();
+        };
+    }, []);
     const logOut = () => {
         setShowConfirm(true);
     }

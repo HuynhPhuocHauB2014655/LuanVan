@@ -194,7 +194,7 @@ export default function StudentInfo() {
                         }
                     </div>
                 }
-                {show == 1 || show == 2 &&
+                {(show == 1 || show == 2) &&
                     <div>
                         <Formik
                             initialValues={initialValues}

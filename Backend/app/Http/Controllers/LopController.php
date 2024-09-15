@@ -9,6 +9,8 @@ use App\Models\HocLop;
 use App\Models\GiaoVien;
 use App\Models\Diem;
 use App\Models\KhenThuong;
+use App\Models\NhomTinNhan;
+use App\Models\ThanhVienNhom;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -107,12 +109,22 @@ class LopController extends Controller
             $lop->MaNK = $request->MaNK;
             $lop->MSGV = $gvcn->MSGV;
             $lop->save();
+            $newN = NhomTinNhan::create([
+                'MaLop' => $maLop,
+                'TenNhom' => $tenLop . "_" . $request->MaNK
+            ]);
             $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->limit($soHSTN)->pluck('MSHS');
             HocLop::insert(
                 $hocsinhTN->map(fn($mshs) => [
                     'MaLop' => $maLop,
                     'MSHS' => $mshs,
                     'MaNK' => $request->MaNK,
+                ])->toArray()
+            );
+            ThanhVienNhom::insert(
+                $hocsinhTN->map(fn($mshs) => [
+                    'Nhom_id' =>  $newN->id,
+                    'MaTV' => $mshs,
                 ])->toArray()
             );
         }
@@ -127,6 +139,12 @@ class LopController extends Controller
                         'MaLop' => $randomClass,
                         'MSHS' => $hocsinhTN[$i],
                         'MaNK' => $request->MaNK,
+                    ]
+                );
+                $newN = NhomTinNhan::where("MaLop",$randomClass)->first();
+                ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newN->id,
+                        'MaTV' => $mshs,
                     ]
                 );
             }
@@ -148,12 +166,22 @@ class LopController extends Controller
             $lop->MaNK = $request->MaNK;
             $lop->MSGV = $gvcn->MSGV;
             $lop->save();
+            $newN = NhomTinNhan::create([
+                'MaLop' => $maLop,
+                'TenNhom' => $tenLop . "_" . $request->MaNK
+            ]);
             $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->limit($soHSXH)->pluck('MSHS');
             HocLop::insert(
                 $hocsinhTXH->map(fn($mshs) => [
                     'MaLop' => $maLop,
                     'MSHS' => $mshs,
                     'MaNK' => $request->MaNK,
+                ])->toArray()
+            );
+            ThanhVienNhom::insert(
+                $hocsinhTXH->map(fn($mshs) => [
+                    'Nhom_id' =>  $newN->id,
+                    'MaTV' => $mshs,
                 ])->toArray()
             );
         }
@@ -168,6 +196,12 @@ class LopController extends Controller
                         'MaLop' => $randomClass,
                         'MSHS' => $hocsinhXH[$i],
                         'MaNK' => $request->MaNK,
+                    ]
+                );
+                $newN = NhomTinNhan::where("MaLop",$randomClass)->first();
+                ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newN->id,
+                        'MaTV' => $mshs,
                     ]
                 );
             }

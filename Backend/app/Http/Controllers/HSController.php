@@ -111,7 +111,15 @@ class HSController extends Controller
 
     public function addPH(Request $rq)
     {
-        PhuHuynh::create($rq->all());
+        PhuHuynh::create([
+            'MSHS' => $rq->MSHS,
+            'TenCha' => $rq->TenCha,
+            'SDTCha' => $rq->SDTCha,
+            'TenMe' =>$rq->TenMe,
+            'SDTMe' => $rq->SDTMe,
+            'TaiKhoan' => "PH_".$rq->MSHS,
+            'MatKhau' => "123456789"
+        ]);
         return response()->json("Đã thêm thành công", Response::HTTP_OK);
     }
     public function updatePH(Request $rq)
