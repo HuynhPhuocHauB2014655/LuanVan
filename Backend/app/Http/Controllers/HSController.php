@@ -7,6 +7,8 @@ use App\Models\HocLop;
 use App\Models\TKHocSinh;
 use App\Models\PhuHuynh;
 use App\Models\TKB;
+use App\Models\NhomTinNhan;
+use App\Models\ThanhVienNhom;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -111,7 +113,7 @@ class HSController extends Controller
 
     public function addPH(Request $rq)
     {
-        PhuHuynh::create([
+        $ph = PhuHuynh::create([
             'MSHS' => $rq->MSHS,
             'TenCha' => $rq->TenCha,
             'SDTCha' => $rq->SDTCha,
@@ -120,6 +122,17 @@ class HSController extends Controller
             'TaiKhoan' => "PH_".$rq->MSHS,
             'MatKhau' => "123456789"
         ]);
+        $lop = HocLop::where("MSHS",$rq->MSHS)->latest()->first();
+        if($lop){
+            $nhomPH = NhomTinNhan::where("MaLop",$lop->MaLop)->where("TenNhom","like","PH_%")->get();
+            foreach($nhomPH as $n)
+            {
+                ThanhVienNhom::create([
+                    'Nhom_id' => $n->id,
+                    'MaTV' => $ph->TaiKhoan
+                ]);
+            }
+        }
         return response()->json("Đã thêm thành công", Response::HTTP_OK);
     }
     public function updatePH(Request $rq)

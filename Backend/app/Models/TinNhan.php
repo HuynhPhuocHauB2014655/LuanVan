@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 class TinNhan extends Model
@@ -18,5 +18,7 @@ class TinNhan extends Model
         'NguoiNhan',
         'TrangThai'
     ];
-
+    public function nhom():BelongsTo{
+        return $this->belongsTo(Nhom::class,'Nhom_id','id');
+    }
 }

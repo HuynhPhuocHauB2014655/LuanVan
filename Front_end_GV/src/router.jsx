@@ -8,6 +8,7 @@ import Class from "./views/Class.jsx";
 import ClassInfo from "./views/ClassInfo.jsx";
 import TKB from "./views/TKB.jsx";
 import Notification from "./views/Notification.jsx";
+import Message from "./views/Message.jsx";
 
 
 const router = createBrowserRouter([
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
                 path: "/tb",
                 element: <Notification/>,
             },
+            {
+                path: "/ms",
+                element: <Message />,
+            }
         ]
     },
     {

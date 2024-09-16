@@ -19,6 +19,7 @@ export default function Home() {
         { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
         { id: 5, route: "/tb", label: 'Thông báo' },
+        { id: 6, route: "/ms", label: 'Tin nhắn' },
     ];
     return (
         <div className="main-content">

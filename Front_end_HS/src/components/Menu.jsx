@@ -25,6 +25,7 @@ export default function Menu({update}) {
         { id: 3, route: "/result", label: 'Kết quả học tập' },
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
         { id: 5, route: "/notify", label: 'Thông báo' },
+        { id: 6, route: "/tn", label: 'Tin nhắn' },
     ];
     const activeItem = (id) => {
         setActive(id);

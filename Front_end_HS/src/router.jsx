@@ -6,6 +6,7 @@ import Info from "./views/Info.jsx";
 import TKB from "./views/TKB.jsx";
 import Result from "./views/Result.jsx";
 import Notification from "./views/Notification.jsx";
+import Message from "./views/Message.jsx";
 
 
 const router = createBrowserRouter([
@@ -32,7 +33,11 @@ const router = createBrowserRouter([
             {
                 path: "/notify",
                 element: <Notification/>
-            }
+            },
+            {
+                path: "/tn",
+                element: <Message/>
+            },
         ]
     },
     {

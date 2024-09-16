@@ -382,7 +382,7 @@ export default function Class() {
                             <Form className="">
                                 <div className="columns-3">
                                     <div>
-                                        <Field as="select" name="MaNK" className="w-full" placeholder="Mã niên khóa">
+                                        <Field as="select" name="MaNK" className="w-full border-2 rounded-md px-2 py-1" placeholder="Mã niên khóa">
                                             <option value='' defaultChecked disabled>Chọn niên khóa</option>
                                             {nienKhoaList.map((data) => (
                                                 <option key={data.MaNK} value={data.MaNK}>{data.TenNK}</option>
@@ -391,11 +391,11 @@ export default function Class() {
                                         <ErrorMessage className="text-red-600" name="MaNK" component="p" />
                                     </div>
                                     <div>
-                                        <Field type="number" name="soLopTN" className="form-input w-full" placeholder="Số lớp ban Tự Nhiên" />
+                                        <Field type="number" name="soLopTN" className="form-input w-full border-2 rounded-md px-2 py-1" placeholder="Số lớp ban Tự Nhiên" />
                                         <ErrorMessage className="text-red-600" name="soLopTN" component="div" />
                                     </div>
                                     <div>
-                                        <Field type="number" inputMode="numberic" name="soLopXH" className="form-input w-full" placeholder="Số lớp ban Xã Hội" />
+                                        <Field type="number" inputMode="numberic" name="soLopXH" className="form-input w-full border-2 rounded-md px-2 py-1" placeholder="Số lớp ban Xã Hội" />
                                         <ErrorMessage className="text-red-600" name="soLopXH" component="div" />
                                     </div>
                                 </div>

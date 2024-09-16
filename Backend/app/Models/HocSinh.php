@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use \Illuminate\Database\Eloquent\Relations\BelongsTo;
 use \Illuminate\Database\Eloquent\Relations\HasOne;
+use \Illuminate\Database\Eloquent\Relations\HasMany;
 class HocSinh extends Model
 {
     use HasFactory;
@@ -37,5 +38,9 @@ class HocSinh extends Model
     }
     public function phuHuynh():HasOne{
         return $this->hasOne(PhuHuynh::class,'MSHS','MSHS');
+    }
+    public function thanhVien():HasMany
+    {
+        return $this->hasMany(ThanhVien::class, 'MaTV', 'MSHS');
     }
 }

@@ -17,6 +17,6 @@ class ThanhVienNhom extends Model
         'MaTV'
     ];
     public function nhom(): BelongsTo{
-        return $this->belongsTo(nhom::class,'Nhom_id','id');
+        return $this->belongsTo(NhomTinNhan::class,'Nhom_id','id');
     }
 }

@@ -113,6 +113,18 @@ class LopController extends Controller
                 'MaLop' => $maLop,
                 'TenNhom' => $tenLop . "_" . $request->MaNK
             ]);
+            $newNPH = NhomTinNhan::create([
+                'MaLop' => $maLop,
+                'TenNhom' => "PH_".$tenLop . "_" . $request->MaNK
+            ]);
+            ThanhVienNhom::create([
+                'Nhom_id' => $newN->id,
+                'MaTV' => $gvcn->MSGV
+            ]);
+            ThanhVienNhom::create([
+                'Nhom_id' => $newNPH->id,
+                'MaTV' => $gvcn->MSGV
+            ]);
             $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->limit($soHSTN)->pluck('MSHS');
             HocLop::insert(
                 $hocsinhTN->map(fn($mshs) => [
@@ -144,7 +156,7 @@ class LopController extends Controller
                 $newN = NhomTinNhan::where("MaLop",$randomClass)->first();
                 ThanhVienNhom::insert([
                         'Nhom_id' =>  $newN->id,
-                        'MaTV' => $mshs,
+                        'MaTV' =>$hocsinhTN[$i],
                     ]
                 );
             }
@@ -169,6 +181,18 @@ class LopController extends Controller
             $newN = NhomTinNhan::create([
                 'MaLop' => $maLop,
                 'TenNhom' => $tenLop . "_" . $request->MaNK
+            ]);
+            $newNPH = NhomTinNhan::create([
+                'MaLop' => $maLop,
+                'TenNhom' => "PH_".$tenLop . "_" . $request->MaNK
+            ]);
+            ThanhVienNhom::create([
+                'Nhom_id' => $newN->id,
+                'MaTV' => $gvcn->MSGV
+            ]);
+            ThanhVienNhom::create([
+                'Nhom_id' => $newNPH->id,
+                'MaTV' => $gvcn->MSGV
             ]);
             $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->limit($soHSXH)->pluck('MSHS');
             HocLop::insert(
@@ -201,7 +225,7 @@ class LopController extends Controller
                 $newN = NhomTinNhan::where("MaLop",$randomClass)->first();
                 ThanhVienNhom::insert([
                         'Nhom_id' =>  $newN->id,
-                        'MaTV' => $mshs,
+                        'MaTV' => $hocsinhXH[$i],
                     ]
                 );
             }

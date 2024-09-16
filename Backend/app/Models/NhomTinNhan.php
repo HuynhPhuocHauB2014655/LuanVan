@@ -17,7 +17,10 @@ class NhomTinNhan extends Model
         'MaLop'
     ];
     public function thanhVien(): HasMany{
-        return $this->hasMany(ThanhVienNhom::class,'nhom_id','id');
+        return $this->hasMany(ThanhVienNhom::class,'Nhom_id','id');
+    }
+    public function tinNhan():hasMany{
+        return $this->hasMany(TinNhan::class,'Nhom_id','id');
     }
     public function lop(): BelongsTo{
         return $this->belongsTo(Lop::class,'MaLop','MaLop');

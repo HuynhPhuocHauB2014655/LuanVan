@@ -248,7 +248,7 @@ export default function StudentResult() {
                                 </button>
                             </div>
                             <div className="flex items-center text-3xl font-bold text-blue-500 text-center">
-                                Lớp: {selectedClass || ''}
+                                Lớp: {selectedClass || 'Chưa xếp lớp'}
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="text-xl">Niên khóa:</div>
@@ -339,46 +339,46 @@ export default function StudentResult() {
                                         <tbody>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK1</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.Diem_TB_HKI || "-"}</td>
                                                 <td className="border-2 border-black px-2 py-1 text-center" rowSpan={7}></td>
                                                 <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK1</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k1.TenRL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht?.ren_luyen_h_k1?.TenRL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK1</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k1.TenHL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.hoc_luc_h_k1?.TenHL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK2</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKII || "-"}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.Diem_TB_HKII || "-"}</td>
                                                 <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK2</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k2.TenRL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht?.ren_luyen_h_k2?.TenRL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK2</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k2.TenHL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.hoc_luc_h_k2?.TenHL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Trung bình Cả năm</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_CN || "-"}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.Diem_TB_CN || "-"}</td>
                                                 <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện Cả năm</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen.TenRL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht?.ren_luyen?.TenRL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Xếp loại Cả năm</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.hoc_luc?.TenHL}</td>
                                             </tr>
                                             <tr>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.MaHLL > 0 ? kqht?.hoc_luc_lai?.TenHL : "-"}</td>
                                                 <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
-                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaRLL > 0 ? kqht.ren_luyen_lai.TenRL : "-"}</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht?.MaRLL > 0 ? kqht?.ren_luyen_lai?.TenRL : "-"}</td>
                                             </tr>
                                             <tr>
                                                 <td className="border-2 border-black px-2 py-1 text-start font-bold text-red-500" colSpan={2}>Tổng kết:</td>
                                                 <td className="border-2 border-black px-2 py-1 text-center"></td>
                                                 <td className="border-2 border-black px-2 py-1 font-bold text-center" colSpan={3}>
-                                                    {kqht.trang_thai.TenTT}
+                                                    {kqht?.trang_thai?.TenTT}
                                                 </td>
                                             </tr>
                                         </tbody>

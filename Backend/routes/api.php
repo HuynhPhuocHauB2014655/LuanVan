@@ -175,5 +175,8 @@ Route::delete('/tb/delete',[TBController::class,'delete']);
 
 //Tin nhan route
 Route::get('/tn/index/{NguoiNhan}',[TinNhanController::class,'index']);
+Route::get('/tn/name/{id}',[TinNhanController::class,'getName']);
+Route::get('/tn/group/{id}',[TinNhanController::class,'getTN']);
+Route::get('/tn/{id}',[TinNhanController::class,'getGroup']);
 Route::post('/tn/add',[TinNhanController::class,'store']);
 Route::get('/tn/test',[TinNhanController::class,'makeGroup']);
