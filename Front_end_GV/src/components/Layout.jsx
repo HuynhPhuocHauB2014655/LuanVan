@@ -5,10 +5,11 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
+import pusher from "../pusher";
 export default function Layout() {
     const { message, error, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
-    const { userName, setUserName } = useUserContext();
+    const { userName, setUserName, info, setInfo} = useUserContext();
     const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
     const fetchData = async () => {
@@ -35,6 +36,9 @@ export default function Layout() {
     useEffect(() => {
         fetchData();
     }, []);
+    useEffect(() => {
+        setInfo(userName);
+    }, [userName]);
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
@@ -75,7 +79,7 @@ export default function Layout() {
                 <button className="absolute right-2 h-[30%] top-[35%]" onClick={logOut}><FontAwesomeIcon icon={faRightFromBracket} color="white" className="h-full" /></button>
                 <p className="text-center text-2xl">Hệ thống quản lí <br /> Trường THPT Cần Thơ</p>
             </header>
-            <div>
+            <div className="relative">
                 <Outlet />
             </div>
             <footer className="footer bg-cyan-200 rounded flex items-center justify-center">

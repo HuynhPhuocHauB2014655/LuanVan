@@ -3,7 +3,7 @@ import Menu from "../components/Menu";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -11,24 +11,29 @@ import { useStateContext } from "../context/Context";
 import { useRef } from "react";
 import pusher from "../pusher";
 export default function Message() {
-    const { userName } = useUserContext();
+    const { userName, info } = useUserContext();
     const [messages, setMessages] = useState([]);
     const [groups, setGroups] = useState([]);
     const [groupsMember, setGroupsMember] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState();
+    const [showSearch, setShowSearch] = useState(false);
     const [show, setShow] = useState(false);
     const [showMem, setShowMem] = useState(false);
     const [value, setValue] = useState("");
-    const [info, setInfo] = useState({});
+    const [count, setCount] = useState(0);
+    const [update, setUpdate] = useState(0);
+    const [resultSearch, setResultSearch] = useState();
+    const [showResult, setShowResult] = useState(false);
     const { setMessage, setError } = useStateContext();
     const messageEndRef = useRef(null);
+
 
     const fetchGroup = async () => {
         try {
             const group = await axiosClient.get(`tn/${userName}`);
             setGroups(group.data);
-            const response = await axiosClient.get(`/hs/show/${userName}`);
-            setInfo(response.data);
+            const c = await axiosClient.get(`tn/count/${userName}`);
+            setCount(c.data);
         } catch (error) {
             console.log(error);
         }
@@ -42,12 +47,15 @@ export default function Message() {
         }
     }
     useEffect(() => {
-        fetchGroup();
-    }, [userName]);
+        if (info?.HoTen) {
+            fetchGroup();
+        }
+    }, [info]);
     const select = (data) => {
         setShow(false);
         setShowMem(false);
         fetchMessages(data.id);
+        setSeen(data);
         setSelectedGroup(data);
     }
     const countMem = (data) => {
@@ -81,22 +89,20 @@ export default function Message() {
             const payload = {
                 "Nhom_id": selectedGroup.id,
                 NguoiGui: `${userName}-${info.HoTen}`,
-                NguoiNhan:selectedGroup.id,
                 TinNhan: value
             };
             setMessages(prevMessages => [...prevMessages, payload]);
             setValue("");
             try {
                 await axiosClient.post("tn/add", payload);
+                fetchMessages(selectedGroup.id);
             } catch (error) {
                 console.log(error);
-            } finally {
-                fetchMessages(selectedGroup.id);
             }
         }
     }
     const scrollToBottom = () => {
-        messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messageEndRef.current?.scrollIntoView();
     };
 
     useEffect(() => {
@@ -106,46 +112,112 @@ export default function Message() {
         const channel = pusher.subscribe(`chat.${userName}`);
 
         channel.bind('App\\Events\\sendMessage', (data) => {
-            fetchMessages(selectedGroup.id);
-            setMessages(prevMessages => [...prevMessages, data.message]);
+            fetchGroup();
+            if (selectedGroup && selectedGroup.id == data.message.Nhom_id) {
+                setSeen(selectedGroup);
+                setMessages(prevMessages => [...prevMessages, data.message]);
+            }
         });
 
-        // Clean up on component unmount
         return () => {
             channel.unbind_all();
             channel.unsubscribe();
         };
-    }, []);
-    console.log(selectedGroup);
+    }, [userName, selectedGroup]);
+    const setSeen = async (data) => {
+        try {
+            const payload = {
+                'Nhom_id': data.id,
+                'NguoiNhan': `${userName}-${info.HoTen}`
+            }
+            await axiosClient.put('tn', payload);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            fetchGroup();
+            setUpdate(2);
+        }
+    }
+    const personalMessage = () => {
+        return messages.filter(item => (item.NguoiGui == `${userName}-${info.HoTen}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userName}-${info.HoTen}`)
+    }
+    const ShowSearch = (state) => {
+        setResultSearch(null);
+        setShowSearch(state);
+        setShowResult(false);
+    }
+    const search = (e) => {
+        const searchValue = e.target.value.toLowerCase();
+        const filteredMessages = personalMessage().filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
+        setResultSearch(filteredMessages);
+        if(searchValue){
+            setShowResult(true);
+        }else{
+            setShowResult(false);
+        }
+    }
+    const scrollTo = (id) => {
+        const element = document.getElementById(id);
+        element.scrollIntoView();
+    }
+    // console.log(groups);
     return (
         <div className="main-content">
-            <Menu />
+            <Menu update={update} />
             <div className="right-part">
                 <div className="page-name">Tin nhắn</div>
                 <div className="flex h-[80vh] bg-white shadow-lg mt-2">
-                    <div className="w-[20%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain">
+                    <div className="w-[30%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative">
+                        {showResult && 
+                            <div className="w-full h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden">
+                                <div className="text-center font-bold my-3">Kết quả tìm kiếm</div>
+                                {resultSearch?.length == 0 ? 
+                                    <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
+                                    :
+                                    resultSearch?.map((item)=>(
+                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={()=>scrollTo(item.id)}>
+                                             <div className="">{item.NguoiGui}</div>
+                                            <div className="">{item.TinNhan}</div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        }
                         {groups?.map((gr) => (
-                            <div key={gr.id} className={selectedGroup?.id == gr.id ? "px-2 py-5 hover:cursor-pointer bg-slate-400" : "px-2 py-5 hover:cursor-pointer hover:bg-slate-200"} onClick={() => select(gr)}>
-                                <div>{gr.TenNhom}</div>
+                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
+                                <div>
+                                    <div className="text-lg">{gr.TenNhom}</div>
+                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" :`${gr.tin_nhan[0].NguoiGui}: ${gr.tin_nhan[0].TinNhan.length > 10 ? `${gr.tin_nhan[0].TinNhan.substring(0, 10)}...` : gr.tin_nhan[0].TinNhan}`}</div>
+                                </div>
+                                {gr.tin_nhan_count > 0 &&
+                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{gr.tin_nhan_count}</div>
+                                }
                             </div>
                         ))}
                     </div>
-                    <div className="w-[80%] ">
+                    <div className="w-[70%]">
                         {selectedGroup &&
-                            <div className="grid grid-rows-1 grid-flow-col h-full">
+                            <div className="h-full relative">
                                 <div className="relative h-full w-full">
                                     <div className="border-b-2 border-slate-300 px-2 py-3 flex justify-between items-center h-[14%]">
                                         <div >
                                             <div className="text-xl font-bold">{selectedGroup.TenNhom}</div>
                                             <div>{countMem(selectedGroup?.thanh_vien)} thành viên</div>
                                         </div>
-                                        <div>
-                                            <button className="text-2xl"><FontAwesomeIcon icon={show ? faCaretRight : faCaretLeft} onClick={() => setShow(!show)} /></button>
+                                        <div className="space-x-2 w-1/2 flex justify-end">
+                                            {showSearch &&
+                                                <input type="text" className="w-full border-2 border-slate-400 rounded-full px-5 py-2" placeholder="Nhập từ khóa tìm kiếm..." onChange={search}/>
+                                            }
+                                            <button className="text-xl hover:text-blue-500"><FontAwesomeIcon icon={showSearch ? faXmark : faMagnifyingGlass} onClick={() => ShowSearch(!showSearch)} /></button>
+                                            <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className="h-[76%] overflow-y-auto flex-col-reverse w-full space-y-7">
-                                        {messages?.filter(item => (item.NguoiGui == `${userName}-${info.HoTen}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userName}-${info.HoTen}`).map((tn) => (
-                                            <div key={tn.id} className={` whitespace-pre-wrap rounded-md shadow-md w-[40%] border-2 px-2 py-3 mx-2 flex ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto justify-end'}`}>{tn.TinNhan}</div>
+                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2">
+                                        {personalMessage().map((tn) => (
+                                           <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
+                                                <div className="mx-2">{tn.NguoiGui}</div>
+                                                <div className={`w-full whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>{tn.TinNhan}</div>
+                                           </div>
                                         ))}
                                         <div ref={messageEndRef} />
                                     </div>
@@ -159,8 +231,11 @@ export default function Message() {
                                     </div>
                                 </div>
                                 {show &&
-                                    <div className="relative h-full w-full border-s-2 border-slate-300">
-                                        <div className="justify-center text-xl font-bold border-b-2 border-slate-300 flex items-center h-[14%]">Thông tin nhóm</div>
+                                    <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">
+                                        <div className="relative justify-center text-xl font-bold border-b-2 border-slate-300 flex items-center h-[14%]">
+                                            <div>Thông tin nhóm</div>
+                                            <button className="text-2xl absolute left-2 h-full flex justify-center items-center"><FontAwesomeIcon icon={faCaretRight} onClick={() => setShow(!show)} /></button>
+                                        </div>
                                         <div className="text-center text-xl font-bold border-b-2 border-slate-300 py-5">{selectedGroup.TenNhom}</div>
                                         <div className="border-b-2 border-slate-300 px-2 py-5 min-h-[80%]">
                                             <div className="flex justify-between items-center hover:bg-slate-200 hover:cursor-pointer px-2 py-3" onClick={() => setShowMem(!showMem)}>

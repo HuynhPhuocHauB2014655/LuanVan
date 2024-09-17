@@ -9,6 +9,8 @@ import ClassInfo from "./views/ClassInfo.jsx";
 import TKB from "./views/TKB.jsx";
 import Notification from "./views/Notification.jsx";
 import Message from "./views/Message.jsx";
+import StudentResult from "./views/StudentResult.jsx";
+import StudentInfo from "./views/StudentInfo.jsx";
 
 
 const router = createBrowserRouter([
@@ -47,7 +49,15 @@ const router = createBrowserRouter([
             {
                 path: "/ms",
                 element: <Message />,
-            }
+            },
+            {
+                path: "/student-result",
+                element: <StudentResult/>,
+            },
+            {
+                path: "/student-info",
+                element: <StudentInfo/>,
+            },
         ]
     },
     {

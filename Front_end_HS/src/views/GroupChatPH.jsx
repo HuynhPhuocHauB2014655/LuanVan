@@ -10,8 +10,11 @@ import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { useStateContext } from "../context/Context";
 import { useRef } from "react";
 import pusher from "../pusher";
-export default function Message() {
-    const { userName, info } = useUserContext();
+import { Navigate } from "react-router-dom";
+export default function GroupChatPH() {
+    const { userNamePH } = useUserContext();
+    const [info,setInfo] = useState();
+    const [std, setStd] = useState();
     const [messages, setMessages] = useState([]);
     const [groups, setGroups] = useState([]);
     const [groupsMember, setGroupsMember] = useState([]);
@@ -27,12 +30,19 @@ export default function Message() {
     const { setMessage, setError } = useStateContext();
     const messageEndRef = useRef(null);
 
-
+    if (!userNamePH) {
+        return <Navigate to="/loginPH" replace/>
+    }
     const fetchGroup = async () => {
         try {
-            const group = await axiosClient.get(`tn/${userName}`);
+            const res = await axiosClient.get(`hs/ph/${userNamePH}`);
+            setInfo(res.data);
+            const hs = await axiosClient.get(`hs/show/${res.data.MSHS}`);
+            setStd(hs.data);
+            console.log(hs.data);
+            const group = await axiosClient.get(`tn/${userNamePH}`);
             setGroups(group.data);
-            const c = await axiosClient.get(`tn/count/${userName}`);
+            const c = await axiosClient.get(`tn/count/${userNamePH}`);
             setCount(c.data);
         } catch (error) {
             console.log(error);
@@ -47,10 +57,9 @@ export default function Message() {
         }
     }
     useEffect(() => {
-        if (info?.TenGV) {
+        console.log(userNamePH);
             fetchGroup();
-        }
-    }, [info]);
+    }, [userNamePH]);
     const select = (data) => {
         setShow(false);
         setShowMem(false);
@@ -88,7 +97,7 @@ export default function Message() {
             e.preventDefault();
             const payload = {
                 "Nhom_id": selectedGroup.id,
-                NguoiGui: `${userName}-${info.TenGV}`,
+                NguoiGui: `${userNamePH}-Phụ huynh ${std.HoTen}`,
                 TinNhan: value
             };
             setMessages(prevMessages => [...prevMessages, payload]);
@@ -109,7 +118,7 @@ export default function Message() {
         scrollToBottom();
     }, [messages]);
     useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
+        const channel = pusher.subscribe(`chat.${userNamePH}`);
 
         channel.bind('App\\Events\\sendMessage', (data) => {
             fetchGroup();
@@ -123,12 +132,12 @@ export default function Message() {
             channel.unbind_all();
             channel.unsubscribe();
         };
-    }, [userName, selectedGroup]);
+    }, [userNamePH, selectedGroup]);
     const setSeen = async (data) => {
         try {
             const payload = {
                 'Nhom_id': data.id,
-                'NguoiNhan': `${userName}-${info.TenGV}`
+                'NguoiNhan': `${userNamePH}-Phụ huynh ${std.HoTen}`
             }
             await axiosClient.put('tn', payload);
         } catch (error) {
@@ -139,12 +148,12 @@ export default function Message() {
         }
     }
     const personalMessage = () => {
-        return messages.filter(item => (item.NguoiGui == `${userName}-${info.TenGV}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userName}-${info.TenGV}`)
+        return messages.filter(item => (item.NguoiGui == `${userNamePH}-Phụ huynh ${std.HoTen}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userNamePH}-Phụ huynh ${std.HoTen}`)
     }
     const ShowSearch = (state) => {
         setResultSearch(null);
-        setShowResult(false);
         setShowSearch(state);
+        setShowResult(false);
     }
     const search = (e) => {
         const searchValue = e.target.value.toLowerCase();
@@ -163,10 +172,9 @@ export default function Message() {
     // console.log(groups);
     return (
         <div className="main-content">
-            <Menu update={update} />
-            <div className="right-part">
+            <div className="w-full mx-auto my-2">
                 <div className="page-name">Tin nhắn</div>
-                <div className="flex h-[80vh] bg-white shadow-lg mt-2">
+                <div className="flex h-[80vh] bg-white shadow-lg mt-2 w-[80%] mx-auto border-2 border-black">
                     <div className="w-[30%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative">
                         {showResult && 
                             <div className="w-full h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden">
@@ -187,7 +195,7 @@ export default function Message() {
                             <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
-                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
+                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" :`${gr.tin_nhan[0].NguoiGui}: ${gr.tin_nhan[0].TinNhan.length > 10 ? `${gr.tin_nhan[0].TinNhan.substring(0, 10)}...` : gr.tin_nhan[0].TinNhan}`}</div>
                                 </div>
                                 {gr.tin_nhan_count > 0 &&
                                     <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{gr.tin_nhan_count}</div>
@@ -214,7 +222,7 @@ export default function Message() {
                                     </div>
                                     <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2">
                                         {personalMessage().map((tn) => (
-                                           <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.TenGV}` ? '' : 'ml-auto text-end'}`}>
+                                           <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
                                                 <div className={`w-full whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>{tn.TinNhan}</div>
                                            </div>

@@ -11,6 +11,7 @@ use App\Models\NhomTinNhan;
 use App\Models\ThanhVienNhom;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 class HSController extends Controller
 {
@@ -56,9 +57,25 @@ class HSController extends Controller
     public function show($mshs)
     {
         $hocsinh = HocSinh::with(['ban','phuHuynh','taiKhoan','lop' => function ($query) {
-            $query->latest();
+            $query->latest()->first();
         }])->find($mshs);
         return response()->json($hocsinh, Response::HTTP_OK);
+    }
+    public function showPH($mshs)
+    {
+        $ph = PhuHuynh::where("TaiKhoan",$mshs)->first();
+        return response()->json($ph, Response::HTTP_OK);
+    }
+    public function loginPH(Request $rq){
+        $ph = PhuHuynh::where("TaiKhoan",$rq->TaiKhoan)->first();
+        if(!$ph){
+            return response()->json("Tên tài khoản không đúng",401);
+        }
+        if(!Hash::check($rq->password, $ph->MatKhau))
+        {
+            return response()->json("Sai mật khẩu", 401);
+        }
+        return response()->json($ph->TaiKhoan, Response::HTTP_OK);
     }
     public function lastStudent($MaNK){
         $hocsinh = HocSinh::where("MSHS", 'like', "%$MaNK%")

@@ -9,7 +9,7 @@ import pusher from "../pusher";
 export default function Layout() {
     const { message, error, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
-    const { userName, setUserName } = useUserContext();
+    const { userName, setUserName , info, setInfo} = useUserContext();
     const [showConfirm, setShowConfirm] = useState(false);
     const [messages, setMessages] = useState([]);
     const navigate = useNavigate();
@@ -25,19 +25,8 @@ export default function Layout() {
         return <Navigate to="/login" replace/>
     }
     useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
-
-        channel.bind('App\\Events\\sendMessage', (data) => {
-            console.log(data);
-            setMessages(prevMessages => [...prevMessages, data.message]);
-        });
-
-        // Clean up on component unmount
-        return () => {
-            channel.unbind_all();
-            channel.unsubscribe();
-        };
-    }, []);
+        setInfo(userName);
+    }, [userName]);
     const logOut = () => {
         setShowConfirm(true);
     }
@@ -91,7 +80,7 @@ export default function Layout() {
                 <button className="absolute right-2 h-[30%] top-[35%]" onClick={logOut}><FontAwesomeIcon icon={faRightFromBracket} color="white" className="h-full" /></button>
                 <p className="text-center text-2xl">Hệ thống quản lí <br /> Trường THPT Cần Thơ</p>
             </header>
-            <div>
+            <div className="relative">
                 <Outlet />
             </div>
             <footer className="footer bg-cyan-200 rounded flex items-center justify-center">

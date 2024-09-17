@@ -21,15 +21,35 @@ class TinNhanController extends Controller
         return response()->json($tinNhan,200);
     }
     public function getGroup($id){
-        $nhom = NhomTinNhan::with(['thanhVien'])->whereHas('thanhVien', function ($query) use ($id) {
+        $nhom = NhomTinNhan::with(['thanhVien', 'tinNhan' => function ($query) {
+            $query->latest('created_at')
+                  ->limit(1);
+        }])
+        ->whereHas('thanhVien', function ($query) use ($id) {
             $query->where('MaTV', $id);
         })
+        ->withCount(['tinNhan' => function ($query) use ($id) {
+            $query->where('TrangThai', 0)  
+                  ->where('NguoiNhan',"like", $id."%");
+        }])
         ->get();
         return response()->json($nhom,200);
     }
     public function getTN($id){
         $tinNhan = TinNhan::where('Nhom_id',$id)->get();
         return response()->json($tinNhan,200);
+    }
+    public function countNotSeen($id){
+        $count = TinNhan::where('NguoiNhan',$id)->where('TrangThai',0)->count();
+        return response()->json($count,200);
+    }
+    public function setSeen(Request $rq){
+        $tn = TinNhan::where('NguoiNhan',$rq->NguoiNhan)->where("Nhom_id",$rq->Nhom_id)->where('TrangThai',0)->get();
+        foreach($tn as $tn){
+            $tn->TrangThai = 1;
+            $tn->save();
+        }
+        return response()->json("OK",200);
     }
     public function store(Request $rq)
     {
@@ -52,12 +72,12 @@ class TinNhanController extends Controller
                 $tinNhan->NguoiNhan = $gv->MSGV."-".$gv->TenGV;
             }else{
                 $hocsinh = HocSinh::find($ph->MSHS);
-                $tinNhan->NguoiNhan = $ph->TaiKhoan."- Phụ huynh ".$hocsinh->HoTen;
+                $tinNhan->NguoiNhan = $ph->TaiKhoan."-Phụ huynh ".$hocsinh->HoTen;
             }
             $tinNhan->TinNhan = $rq->TinNhan;
             $tinNhan->Nhom_id = $rq->Nhom_id;
             $tinNhan->save();
-            event(new sendMessage("Bạn có tin nhắn mới",$tv->MaTV));
+            event(new sendMessage($tinNhan,$tv->MaTV));
         }
         return response()->json("Đã gửi tin nhắn thành công");
     }

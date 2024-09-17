@@ -7,9 +7,9 @@ import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-export default function GuestLayout() {
+export default function LoginPH() {
     const { message, setMessage } = useStateContext();
-    const { userName, setUserName } = useUserContext();
+    const { userNamePH, setUserNamePH } = useUserContext();
     useEffect(() => {
     }, []);
     useEffect(() => {
@@ -21,24 +21,24 @@ export default function GuestLayout() {
             return () => clearTimeout(timer); // Cleanup timer on component unmount
         }
     }, [message]);
-    if (userName) {
-        return <Navigate to="/" />
+    if (userNamePH) {
+        return <Navigate to="/ph" />
     }
     const goToTop = () => {
         window.scrollTo(0, 0);
     }
     const handleSubmit = async (value) => {
-        value.MSHS = value.MSHS.toUpperCase();
+        value.TaiKhoan = value.TaiKhoan.toUpperCase();
         try {
-            const response = await axiosClient.post(`/tk/hs/login`,value);
-            setUserName(response.data);
+            const response = await axiosClient.post(`/hs/ph/login`,value);
+            setUserNamePH(response.data);
         } catch (error) {
             setMessage(error.response.data);
             console.log(error);
         }
     }
     const validationSchema = Yup.object({
-        MSHS: Yup.string().required("Vui lòng nhập mã số học sinh"),
+        TaiKhoan: Yup.string().required("Vui lòng nhập tên tài khoản"),
         password: Yup.string().required('Vui lòng nhập mật khẩu')
             .min(2, 'Mật khẩu có ít nhất 2 ký tự')
             .max(20, 'Mật khẩu có nhiều nhất 10 ký tự'),
@@ -52,7 +52,7 @@ export default function GuestLayout() {
             <div className="main-content">
                 <Formik
                     initialValues={{
-                        MSHS: '',
+                        TaiKhoan: '',
                         password: ''
                     }}
                     validationSchema={validationSchema}
@@ -64,15 +64,15 @@ export default function GuestLayout() {
                             <h2 className="text-2xl font-bold text-center">Đăng nhập</h2>
                             <div className="space-y-6">
                                 <div className="w-[70%] mx-auto">
-                                    <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
-                                        Mã số học sinh
+                                    <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="TaiKhoan">
+                                        Tên tài khoản
                                     </label>
                                     <Field
                                         type="text"
-                                        name="MSHS"
+                                        name="TaiKhoan"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
                                     />
-                                    <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
+                                    <ErrorMessage className="text-red-700 block mb-2" name="TaiKhoan" component="div" />
                                 </div>
                                 <div className="w-[70%] mx-auto">
                                     <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="password">

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import axiosClient from "../axios-client";
 import { useEffect } from "react";
 import { useUserContext } from "../context/userContext";
+import pusher from "../pusher";
 export default function Home() {
-    const {userName} = useUserContext();
+    const {userName,info} = useUserContext();
     const [tbCount,setTbCount] = useState(0);
+    const [tnCount,setTnCount] = useState(0);
     useEffect(()=>{
         const fetchTB = async () => {
             const TB = await axiosClient.get(`/tb/hs/${userName}`);
@@ -13,7 +15,26 @@ export default function Home() {
             setTbCount(count);
         }
         fetchTB();
-    },[userName])
+    },[userName]);
+    const fetchTN = async () => {
+        const c = await axiosClient.get(`tn/count/${userName}-${info?.HoTen}`);
+        setTnCount(c.data);
+    }
+    useEffect(()=>{
+        fetchTN();
+    },[userName,info]);
+    useEffect(() => {
+        const channel = pusher.subscribe(`chat.${userName}`);
+
+        channel.bind('App\\Events\\sendMessage', (data) => {
+            fetchTN();
+        });
+
+        return () => {
+            channel.unbind_all();
+            channel.unsubscribe();
+        };
+    }, [userName]); 
     const menu_items = [
         { id: 1, route: "/info", label: 'Thông tin cá nhân' },
         { id: 2, route: "/result", label: 'Kết quả học tập' },
@@ -34,7 +55,13 @@ export default function Home() {
                             className="border-2 border-slate-500 rounded-lg mx-1 py-2 hover:bg-cyan-400 button-animation text-center block mb-2 relative"
                             to={item.route}
                         >
-                            {item.label} {item.id == 4 && tbCount > 0 && <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>}
+                            {item.label} 
+                            {item.id == 4 && tbCount > 0 && 
+                                <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>
+                            }
+                            {item.id == 5 && tnCount > 0 && 
+                                <span className="absolute top-1 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tnCount}</span>
+                            }
                         </Link>
                     ))}
                 </div>

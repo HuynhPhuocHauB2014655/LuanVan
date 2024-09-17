@@ -7,6 +7,8 @@ import TKB from "./views/TKB.jsx";
 import Result from "./views/Result.jsx";
 import Notification from "./views/Notification.jsx";
 import Message from "./views/Message.jsx";
+import LoginPH from "./views/LoginPH.jsx";
+import GroupChatPH from "./views/GroupChatPH.jsx";
 
 
 const router = createBrowserRouter([
@@ -38,11 +40,19 @@ const router = createBrowserRouter([
                 path: "/tn",
                 element: <Message/>
             },
+            {
+                path: "/ph",
+                element: <GroupChatPH />,
+            },
         ]
     },
     {
         path: "/login",
         element: <GuestLayout />,
+    },
+    {
+        path: "/loginPH",
+        element: <LoginPH />,
     },
     {
         path: "*",

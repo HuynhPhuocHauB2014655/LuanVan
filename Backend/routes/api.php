@@ -40,7 +40,9 @@ Route::get('/hs/{MaNK}',[HSController::class,'oLaiLop']);
 Route::post('/hs/check',[HSController::class,'checkAdd']);
 Route::post('/hs/tkb',[HSController::class,'getTKB']);
 Route::post('/hs/ph',[HSController::class,'addPH']);
+Route::get('/hs/ph/{mshs}',[HSController::class,'showPH']);
 Route::put('/hs/ph',[HSController::class,'updatePH']);
+Route::post('/hs/ph/login',[HSController::class,'loginPH']);
 
 
 //nien khoa route
@@ -177,6 +179,8 @@ Route::delete('/tb/delete',[TBController::class,'delete']);
 Route::get('/tn/index/{NguoiNhan}',[TinNhanController::class,'index']);
 Route::get('/tn/name/{id}',[TinNhanController::class,'getName']);
 Route::get('/tn/group/{id}',[TinNhanController::class,'getTN']);
+Route::get('/tn/count/{id}',[TinNhanController::class,'countNotSeen']);
+Route::put('/tn',[TinNhanController::class,'setSeen']);
 Route::get('/tn/{id}',[TinNhanController::class,'getGroup']);
 Route::post('/tn/add',[TinNhanController::class,'store']);
 Route::get('/tn/test',[TinNhanController::class,'makeGroup']);

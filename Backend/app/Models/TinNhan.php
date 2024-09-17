@@ -19,6 +19,6 @@ class TinNhan extends Model
         'TrangThai'
     ];
     public function nhom():BelongsTo{
-        return $this->belongsTo(Nhom::class,'Nhom_id','id');
+        return $this->belongsTo(NhomTinNhan::class,'Nhom_id','id');
     }
 }
