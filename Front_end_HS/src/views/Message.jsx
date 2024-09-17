@@ -10,6 +10,7 @@ import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { useStateContext } from "../context/Context";
 import { useRef } from "react";
 import pusher from "../pusher";
+import moment from 'moment';
 export default function Message() {
     const { userName, info } = useUserContext();
     const [messages, setMessages] = useState([]);
@@ -160,6 +161,10 @@ export default function Message() {
         const element = document.getElementById(id);
         element.scrollIntoView();
     }
+    const getDate = (date) => {
+        const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
+        return d;
+    }
     // console.log(groups);
     return (
         <div className="main-content">
@@ -216,7 +221,10 @@ export default function Message() {
                                         {personalMessage().map((tn) => (
                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
-                                                <div className={`w-full whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>{tn.TinNhan}</div>
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>
+                                                    {tn.TinNhan}
+                                                    <div className={tn.NguoiGui !== `${userName}-${info.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
+                                                </div>
                                            </div>
                                         ))}
                                         <div ref={messageEndRef} />

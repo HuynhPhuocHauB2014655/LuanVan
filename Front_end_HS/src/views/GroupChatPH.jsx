@@ -11,6 +11,7 @@ import { useStateContext } from "../context/Context";
 import { useRef } from "react";
 import pusher from "../pusher";
 import { Navigate } from "react-router-dom";
+import moment from 'moment';
 export default function GroupChatPH() {
     const { userNamePH } = useUserContext();
     const [info,setInfo] = useState();
@@ -169,6 +170,10 @@ export default function GroupChatPH() {
         const element = document.getElementById(id);
         element.scrollIntoView();
     }
+    const getDate = (date) => {
+        const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
+        return d;
+    }
     // console.log(groups);
     return (
         <div className="main-content">
@@ -207,7 +212,7 @@ export default function GroupChatPH() {
                         {selectedGroup &&
                             <div className="h-full relative">
                                 <div className="relative h-full w-full">
-                                    <div className="border-b-2 border-slate-300 px-2 py-3 flex justify-between items-center h-[14%]">
+                                    <div className="border-b-2 border-slate-300 px-2 py-2 flex justify-between items-center h-[14%]">
                                         <div >
                                             <div className="text-xl font-bold">{selectedGroup.TenNhom}</div>
                                             <div>{countMem(selectedGroup?.thanh_vien)} thành viên</div>
@@ -224,7 +229,10 @@ export default function GroupChatPH() {
                                         {personalMessage().map((tn) => (
                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
-                                                <div className={`w-full whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>{tn.TinNhan}</div>
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>
+                                                    {tn.TinNhan}
+                                                    <div className={tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
+                                                </div>
                                            </div>
                                         ))}
                                         <div ref={messageEndRef} />
