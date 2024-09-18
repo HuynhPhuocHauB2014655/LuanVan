@@ -9,6 +9,10 @@ use App\Models\GiaoVien;
 use App\Models\MonHoc;
 use App\Models\NgayTrongTuan;
 use App\Models\PhanCong;
+use App\Models\DiemDanh;
+use App\Models\TietHoc;
+use App\Models\HocLop;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 class TKBController extends Controller
@@ -24,6 +28,51 @@ class TKBController extends Controller
     public function createPhanCong(Request $request){
         $data = PhanCong::create($request->all());
         return response()->json($data);
+    }
+    public function getByDay(Request $rq){
+        $data = TKB::with(['lop','monHoc','giaoVien'])->where("MaNgay",$rq->MaNgay)->where("MSGV",$rq->MSGV)->where("MaNK",$rq->MaNK)->get();
+        if($data->isNotEmpty()){
+            foreach ($data as $d){
+                $th = TietHoc::where("MaLop",$d->MaLop)->where("MaNgay",$d->MaNgay)->where("TietDay",$d->TietDay)->where("MSGV",$d->MSGV)->first();
+                if(!$th){
+                    $newTh = TietHoc::create([
+                        'MaLop' => $d->MaLop,
+                        'MaNgay' => $d->MaNgay,
+                        'TietDay' => $d->TietDay,
+                        'MSGV' => $d->MSGV,
+                        'Ngay' => Carbon::now()->format('d/m/Y'),
+                    ]);
+                    $hs = HocLop::where("MaLop",$d->MaLop)->get();
+                    foreach ($hs as $hs) {
+                        DiemDanh::create([
+                            'MSHS' => $hs->MSHS,
+                            'TietHoc' => $newTh->id,
+                        ]);
+                    }
+                }
+            }
+        }
+        return response()->json($data);
+    }
+    public function getTietHoc(Request $rq){
+        $th = TietHoc::with('diemDanh.hocSinh')->where("MaLop",$rq->MaLop)->where("MaNgay",$rq->MaNgay)->where("TietDay",$rq->TietDay)->where("MSGV",$rq->MSGV)->first();
+        return response()->json($th);
+    }
+    public function updateTietHoc(Request $rq){
+        $th = TietHoc::find($rq->id);
+        if($th){
+            $th->update([
+                'NoiDung' => $rq->NoiDung,
+                'DanhGia' => $rq->DanhGia
+            ]);
+            $dd = $rq->diem_danh;
+            foreach ($dd as $d) {
+                $diemDanh = DiemDanh::find($d['id']); 
+                $diemDanh->TrangThai = $d['TrangThai'];
+                $diemDanh->save();
+            }
+        }
+        return response()->json("Đã lưu lại thành công!",200);
     }
     public function create(Request $request, $nk)
     {

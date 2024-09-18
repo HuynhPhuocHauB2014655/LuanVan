@@ -11,6 +11,7 @@ import Notification from "./views/Notification.jsx";
 import Message from "./views/Message.jsx";
 import StudentResult from "./views/StudentResult.jsx";
 import StudentInfo from "./views/StudentInfo.jsx";
+import Teaching from "./views/Teach.jsx";
 
 
 const router = createBrowserRouter([
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
             {
                 path: "/tb",
                 element: <Notification/>,
+            },
+            {
+                path: "/teach",
+                element: <Teaching />,
             },
             {
                 path: "/ms",

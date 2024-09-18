@@ -51,6 +51,7 @@ export default function Menu({update}) {
         { id: 5, route: "/tkb", label: 'Thời khóa biểu' },
         { id: 6, route: "/tb", label: 'Thông báo' },
         { id: 7, route: "/ms", label: 'Tin nhắn' },
+        { id: 8, route: "/teach", label: 'Dạy học' },
     ];
     const activeItem = (id) => {
         setActive(id);

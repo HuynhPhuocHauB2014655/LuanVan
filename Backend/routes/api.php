@@ -107,6 +107,9 @@ Route::put('/tkb/update',[TKBController::class,'update']);
 Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);
 Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
 Route::get('/tkb/date',[TKBController::class,'indexDate']);
+Route::post('/tkb/date',[TKBController::class,'getByDay']);
+Route::post('/tkb/get',[TKBController::class,'getTietHoc']);
+Route::put('/tkb/updateTH',[TKBController::class,'updateTietHoc']);
 
 //tai khoan route
 Route::get('/tk/index/hs',[TaiKhoanController::class,'indexHS']);

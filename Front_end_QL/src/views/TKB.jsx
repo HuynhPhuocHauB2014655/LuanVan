@@ -335,7 +335,7 @@ export default function TKB() {
                                                                 <div>
                                                                     {subjectTN.map((tn) => (
                                                                         <div key={tn.MaMH} className="mb-1 ms-1">
-                                                                            <select name={tn.MaMH} required className="w-36">
+                                                                            <select name={tn.MaMH} required className="w-36 p-2 border-2 border-gray-300 rounded-md">
                                                                                 <option value="" defaultChecked>{tn.TenMH}</option>
                                                                                 {tn.giao_vien.map((gvtn) => (
                                                                                     <option key={gvtn.MSGV} value={gvtn.MSGV}>{gvtn.TenGV}</option>
@@ -348,7 +348,7 @@ export default function TKB() {
                                                                 <div>
                                                                     {subjectXH.map((xh) => (
                                                                         <div key={xh.MaMH} className="mb-1 ms-1">
-                                                                            <select name={xh.MaMH} required className="w-36">
+                                                                            <select name={xh.MaMH} required className="w-36 p-2 border-2 border-gray-300 rounded-md">
                                                                                 <option value="" defaultValue={xh.TenMH} >{xh.TenMH}</option>
                                                                                 {xh.giao_vien.map((gvxh) => (
                                                                                     <option key={gvxh.MSGV} value={gvxh.MSGV}>{gvxh.TenGV}</option>

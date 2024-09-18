@@ -54,6 +54,9 @@ input[type="number"] {
 .button-animation {
   @apply shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:text-white
 }
+input {
+  @apply w-full p-2 border-2 border-gray-400 rounded-md
+}
 .confirm-overlay {
   display: flex;
   position: fixed;
