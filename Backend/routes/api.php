@@ -99,6 +99,7 @@ Route::post('/lop/add',[LopController::class,'assignStudentsToClass']);
 Route::get('/lop/tn/{MaNK}',[LopController::class,'indexTN']);
 Route::get('/lop/xh/{MaNK}',[LopController::class,'indexXH']);
 Route::post('/lop/addHS',[LopController::class,'addToClass']);
+Route::post('/lop/change',[LopController::class,'changeClass']);
 Route::get('/lop/duyetkq/{MaLop}',[LopController::class,'DuyetKQHT']);
 
 //tkb route

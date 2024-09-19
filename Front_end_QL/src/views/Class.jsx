@@ -4,6 +4,8 @@ import { useStateContext } from "../context/Context";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Menu from "../components/Menu";
+import { useNavigate } from 'react-router-dom';
+import AlterConfirm from "../components/Confirm";
 export default function Class() {
     const [classes, setClasses] = useState([]);
     const [show, setShow] = useState(0);
@@ -13,15 +15,19 @@ export default function Class() {
     const [XHCount, setXHCount] = useState(0);
     const [showForm, setShowForm] = useState(0);
     const [nienKhoaList, setNienKhoaList] = useState([]);
-    const { setMessage } = useStateContext();
+    const { setMessage,setError } = useStateContext();
     const [visibleTables, setVisibleTables] = useState({});
     const { nienKhoa } = useStateContext();
     const [classTN, setClassTN] = useState([]);
     const [classXH, setClassXH] = useState([]);
     const [selected, setSelected] = useState({});
     const [oLaiLop, setOLaiLop] = useState([]);
-    const [checkAdd, setCheckAdd] = useState();
+    const [showConfirm, setShowConfirm] = useState(0);
+    const [confMessage, setConfMessage] = useState("");
+    const [classed, setClassed] = useState();
     const selectedClass = useRef();
+    const navigate = useNavigate();
+    const [defaultV, setDefaultV] = useState("default");
     const fetchNewStudent = async () => {
         try {
             const response = await axiosClient.get("/hs/new");
@@ -131,11 +137,48 @@ export default function Class() {
             console.log(error);
         }
     }
-    console.log(checkAdd)
+    const toStudentInfo = (mshs) => {
+        navigate('/student-info', { state: { Mshs: mshs } });
+    }
+    const listClass = (data) => {
+        return classes.filter(item => item.MaKhoi == data.MaKhoi && item.MaNK == nienKhoa.NienKhoa && item.MaLop != data.MaLop);
+    }
+    const changeClass = async () => {
+        try{
+            const response = await axiosClient.post("/lop/change",classed);
+            setMessage(response.data);
+        }catch(error){
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        }finally{
+            getClassNow();
+        }
+    }
+    const triggerConfirm = (e,data,MaLop,TenLop) => {
+        const c =  e.target.options[e.target.selectedIndex].text
+        setConfMessage(`Bạn có chắc chắn muốn chuyển ${data.HoTen} từ lớp ${TenLop} đến lớp ${c}`);
+        const payload = {
+            MSHS: data.MSHS,
+            MaNK: nienKhoa.NienKhoa,
+            oldClass: MaLop,
+            newClass: e.target.value
+        };
+        setClassed(payload);
+        setShowConfirm(1)
+    }
+    const onConfirm = () => {
+        changeClass();
+        setShowConfirm(0);
+    }
+    const onCancel = () => {
+        setShowConfirm(0);
+        setDefaultV("default")
+    }
+    // console.log(classes);
     return (
         <div className="main-content">
             <Menu />
             <div className="right-part relative">
+                {showConfirm == 1 && <AlterConfirm message={confMessage} onCancel={onCancel} onConfirm={onConfirm}/> }
                 <h2 className="page-name">Quản lí Lớp học</h2>
                 <div className="flex justify-between">
                     <div>
@@ -326,7 +369,7 @@ export default function Class() {
                                             </button>
                                         </div>
                                         {visibleTables[classItem.MaLop] &&
-                                            <table className="border-collapse mt-2 mb-2 w-full">
+                                            <table className="table-auto border-collapse mt-2 mb-2 w-full">
                                                 <thead>
                                                     <tr>
                                                         <th className="border border-gray-400 p-2">STT</th>
@@ -334,28 +377,27 @@ export default function Class() {
                                                         <th className="border border-gray-400 p-2">Tên học sinh</th>
                                                         <th className="border border-gray-400 p-2">Ngày Sinh</th>
                                                         <th className="border border-gray-400 p-2">Giới tính</th>
-                                                        <th className="border border-gray-400 p-2">Quê quán</th>
-                                                        <th className="border border-gray-400 p-2">Dân tộc</th>
-                                                        <th className="border border-gray-400 p-2">Tôn Giáo</th>
-                                                        <th className="border border-gray-400 p-2">Địa chỉ</th>
-                                                        <th className="border border-gray-400 p-2">Số điện thoại</th>
+                                                        <th className="border border-gray-400 p-2">Lớp</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {classItem.hoc_sinh.map((data, index) => (
-                                                        <tr key={index}>
-                                                            <td className="border border-gray-400 p-2">{index + 1}</td>
-                                                            <td className="border border-gray-400 p-2">{data.MSHS}</td>
-                                                            <td className="border border-gray-400 p-2">{data.HoTen}</td>
-                                                            <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
-                                                            <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
-                                                            <td className="border border-gray-400 p-2">{data.QueQuan}</td>
-                                                            <td className="border border-gray-400 p-2">{data.DanToc}</td>
-                                                            <td className="border border-gray-400 p-2">{data.TonGiao}</td>
-                                                            <td className="border border-gray-400 p-2">{data.DiaChi}</td>
-                                                            <td className="border border-gray-400 p-2">{data.SDT}</td>
-                                                        </tr>
-                                                    ))}
+                                                        {classItem.hoc_sinh.map((data, index) => (
+                                                            <tr key={index}>
+                                                                <td className="border border-gray-400 p-2">{index + 1}</td>
+                                                                <td className="border border-gray-400 p-2 cursor-pointer text-blue-500" onClick={() => toStudentInfo(data.MSHS)}>{data.MSHS}</td>
+                                                                <td className="border border-gray-400 p-2">{data.HoTen}</td>
+                                                                <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
+                                                                <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
+                                                                <td className="border border-gray-400 p-2">
+                                                                    <select className="w-full" value={defaultV} onChange={(e)=>triggerConfirm(e,data,classItem.MaLop,classItem.TenLop)}>
+                                                                        <option disabled value="default">{classItem.TenLop}</option>
+                                                                        {listClass(classItem).map((item) => (
+                                                                            <option key={item.MaLop} value={item.MaLop}>{item.TenLop}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
                                                 </tbody>
                                             </table>}
                                     </div>

@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class HocLop extends Model
 {
     use HasFactory;
-    public $incrementing = false;
     protected $table = 'HocLop';
     protected $fillable = [
+        'id',
         'MaLop',
         'MSHS',
         'MaRL',
@@ -28,19 +28,6 @@ class HocLop extends Model
         'MaHLL',
         'MaTT'
     ];
-    public function getKeyName()
-    {
-        return ['MaLop', 'MSHS', 'MaNK'];
-    }
-
-    protected function performUpdate(\Illuminate\Database\Eloquent\Builder $query)
-    {
-        foreach ($this->getKeyName() as $keyName) {
-            $query->where($keyName, '=', $this->getAttribute($keyName));
-        }
-
-        return $query->update($this->getDirty());
-    }
     public function lop(): BelongsTo{
         return $this->belongsTo(Lop::class,'MaLop','MaLop');
     }

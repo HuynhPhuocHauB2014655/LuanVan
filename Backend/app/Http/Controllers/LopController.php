@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Lop;
 use App\Models\HocSinh;
+use App\Models\PhuHuynh;
 use App\Models\HocLop;
 use App\Models\GiaoVien;
 use App\Models\Diem;
@@ -52,16 +53,34 @@ class LopController extends Controller
     }
     public function indexWithStudent()
     {
-        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien', 'tkb'])->orderBy('created_at','desc')->get();
+        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien'])->orderBy('created_at','desc')->get();
         return response()->json($lops, Response::HTTP_OK);
     }
 
     public function indexWithStudentNow($MaNK)
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien','tkb'])->where('MaNK','=',$MaNK)->orderBy('created_at','desc')->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->orderBy('created_at','desc')->get();
         return response()->json($lop, Response::HTTP_OK);
     }
-    
+    public function changeClass(Request $rq)
+    {
+        $data = HocLop::where("MSHS",$rq->MSHS)->where("MaLop",$rq->oldClass)->where("MaNK",$rq->MaNK)->first();
+        if($data){
+            $count = HocLop::where("MaLop",$rq->oldClass)->where("MaNK",$rq->MaNK)->count();
+            if($count <= 10){
+                return response()->json("Không thể chuyển lớp, sỉ số lớp tối thiểu 10",402);
+            }
+            $count = HocLop::where("MaLop",$rq->newClass)->where("MaNK",$rq->MaNK)->count();
+            if($count >= 40){
+                return response()->json("Không thể chuyển lớp, sỉ số lớp tối đa 40",402);
+            }
+            $data->update([
+                'MaLop' => $rq->newClass
+            ]);
+            return response()->json("Đã cập nhật thành công", Response::HTTP_OK);
+        }
+        return response()->json("Không tìm thấy thông tin", Response::HTTP_NOT_FOUND);
+    }
     public function store(Request $request)
     {
         $lop = Lop::create($request->all());
@@ -139,6 +158,15 @@ class LopController extends Controller
                     'MaTV' => $mshs,
                 ])->toArray()
             );
+            foreach($hocsinhTN as $hs){
+                $ph = PhuHuynh::where("MSHS",$hs->MSHS)->first();
+                if($ph){
+                    ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newNPH->id,
+                        'MaTV' => $ph->TaiKhoan,
+                    ]);
+                }
+            }
         }
         $hocsinhTN = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','TN')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
         if($hocsinhTN->count() > 0 && $hocsinhTN->count() < 10)
@@ -159,6 +187,13 @@ class LopController extends Controller
                         'MaTV' =>$hocsinhTN[$i],
                     ]
                 );
+                $ph = PhuHuynh::where("MSHS",$hocsinhTN[$i])->first();
+                if($ph){
+                    ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newNPH->id,
+                        'MaTV' => $ph->TaiKhoan,
+                    ]);
+                }
             }
         }
 
@@ -208,6 +243,15 @@ class LopController extends Controller
                     'MaTV' => $mshs,
                 ])->toArray()
             );
+            foreach($hocsinhTXH as $hs){
+                $ph = PhuHuynh::where("MSHS",$hs->MSHS)->first();
+                if($ph){
+                    ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newNPH->id,
+                        'MaTV' => $ph->TaiKhoan,
+                    ]);
+                }
+            }
         }
         $hocsinhXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->pluck('MSHS');
         if($hocsinhXH->count() > 0 && $hocsinhXH->count() < 10)
@@ -228,6 +272,13 @@ class LopController extends Controller
                         'MaTV' => $hocsinhXH[$i],
                     ]
                 );
+                $ph = PhuHuynh::where("MSHS",$hocsinhXH[$i])->first();
+                if($ph){
+                    ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newNPH->id,
+                        'MaTV' => $ph->TaiKhoan,
+                    ]);
+                }
             }
         }
         return response()->json("Đã xếp lớp thành công");
