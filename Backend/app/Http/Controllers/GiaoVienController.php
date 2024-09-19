@@ -48,16 +48,16 @@ class GiaoVienController extends Controller
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function showChuNhiem(Request $rq)
-{
-    $giaovien = GiaoVien::with(['monHoc', 'lop.hocSinh'])
-        ->where('MSGV', $rq->MSGV)
-        ->whereHas('lop', function($query) use ($rq) {
-            $query->where('MaNK', $rq->MaNK);
-        })
-        ->first();
+    {
+        $giaovien = GiaoVien::with(['monHoc', 'lop.hocSinh'])
+            ->where('MSGV', $rq->MSGV)
+            ->whereHas('lop', function($query) use ($rq) {
+                $query->where('MaNK', $rq->MaNK);
+            })
+            ->first();
 
-    return response()->json($giaovien, Response::HTTP_OK);
-}
+        return response()->json($giaovien, Response::HTTP_OK);
+    }
     public function showTeaching(Request $rq){
         // "23-24" -> "2324"
         $nienKhoa = str_replace("-","",$rq->MaNK);

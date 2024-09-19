@@ -15,16 +15,18 @@ class TietHoc extends Model
         'id',
         'MaLop',
         'MSGV',
+        'MaMH',
         'DanhGia',
         'NoiDung',
         'MaNgay',
         'TietDay',
         'Ngay',
-
-
     ];
     public function giaoVien(): BelongsTo{
         return $this->belongsTo(GiaoVien::class,'MSGV','MSGV');
+    }
+    public function monHoc(): BelongsTo{
+        return $this->belongsTo(MonHoc::class,'MaMH','MaMH');
     }
     public function lop(): BelongsTo{
         return $this->belongsTo(Lop::class,'MaLop','MaLop');

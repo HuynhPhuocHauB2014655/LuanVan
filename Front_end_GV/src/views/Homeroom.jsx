@@ -14,6 +14,7 @@ import RenLuyenForm from "../components/RenLuyenForm";
 import NotifyForm from "../components/NoitifyForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
+import moment from 'moment';
 
 export default function Homeroom() {
     const { userName } = useUserContext();
@@ -48,6 +49,8 @@ export default function Homeroom() {
     const [change, setChange] = useState(false);
     const [hanSuaDiem, setHanSuaDiem] = useState(true);
     const [initialValues, setInitialValues] = useState();
+    const [week, setWeek] = useState(0);
+    const [weeks, setWeeks] = useState([]);
     const dragRef = useRef();
     const [count, setCount] = useState({
         Siso: 0,
@@ -186,6 +189,9 @@ export default function Homeroom() {
     const handleState = async (view) => {
         if (view == 2) {
             fetchDiem();
+        }
+        if (view == 3) {
+            week > 0 ? getTHWeek(week) : getTHWeek(thisWeek());
         }
         setState(view);
     }
@@ -377,7 +383,7 @@ export default function Homeroom() {
     }
     const sendTB = async (value) => {
         const nguoiNhan = value.NguoiNhan.split(';').filter(id => id !== '');
-        nguoiNhan.map( async (item)=>{
+        nguoiNhan.map(async (item) => {
             const payload = {
                 NguoiGui: info.TenGV + " - " + userName,
                 NguoiNhan: item,
@@ -385,17 +391,63 @@ export default function Homeroom() {
                 TrangThai: 0,
                 TieuDe: value.TieuDe
             };
-            try{
-                await axiosClient.post("/tb/add",payload);
+            try {
+                await axiosClient.post("/tb/add", payload);
                 setMessage("Đã gửi thành công!");
-            }catch(error){
+            } catch (error) {
                 setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
-            }finally{
+            } finally {
                 setShowForm(0);
             }
         })
     }
-    // console.log(datas)
+    const thisWeek = () => {
+        if (nienKhoa?.NienKhoa) {
+            let day = new Date();
+            const firstDay = new Date(nienKhoa.NgayBD);
+            let week = Math.ceil((day - firstDay) / (1000 * 60 * 60 * 24 * 7));
+            day.getDay() == 1 && (week = week + 1);
+            return week;
+        }
+    }
+    const dayOfWeek = (weekNumber) => {
+        const startOfWeek = new Date(nienKhoa.NgayBD);
+        startOfWeek.setDate(startOfWeek.getDate() + (weekNumber - 1) * 7);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
+        const week = {
+            start: startOfWeek,
+            end: endOfWeek
+        }
+        return week;
+    }
+    const getDate = (date) => {
+        const d = moment(date).format("DD/MM/YYYY");
+        return d;
+    }
+    const formatDate = (date) => {
+        const d = moment(date).format("YYYY-MM-DD");
+        return d;
+    }
+    const selectWeek = (e) => {
+        setWeek(e.target.value);
+        getTHWeek(e.target.value);
+    }
+    const getTHWeek = async (week) => {
+        const day = dayOfWeek(week);
+        const payload = {
+            start: formatDate(day.start),
+            end: formatDate(day.end),
+            MaLop: datas.lop[0].MaLop
+        }
+        console.log(payload);
+        try {
+            const res = await axiosClient.post("tkb/week", payload);
+            setWeeks(res.data);
+        } catch (error) {
+            setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
+        }
+    }
     return (
         <div className="main-content">
             <Menu />
@@ -404,7 +456,7 @@ export default function Homeroom() {
                     <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
                 }
                 {showForm == 3 &&
-                    <NotifyForm MaLop={classInfo.MaLop} handleSubmit={sendTB} close={()=>setShowForm(0)}/>
+                    <NotifyForm MaLop={classInfo.MaLop} handleSubmit={sendTB} close={() => setShowForm(0)} />
                 }
                 <div className="page-name relative">
                     Quản lí lớp chủ nhiệm
@@ -414,8 +466,9 @@ export default function Homeroom() {
                     {Object.keys(datas).length > 0 ?
                         <div className="mt-2">
                             <div className="my-2 flex">
-                                <button className="teacher-head" onClick={() => handleState(1)}>Danh sách lớp</button>
-                                <button className="teacher-head" onClick={() => handleState(2)}>Xem điểm</button>
+                                <button className={`teacher-head ${state == 1 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(1)}>Danh sách lớp</button>
+                                <button className={`teacher-head ${state == 2 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(2)}>Xem điểm</button>
+                                <button className={`teacher-head ${state == 3 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(3)}>Quá trình học</button>
                             </div>
                             <div className="flex justify-between w-[90%] mx-auto">
                                 <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {classInfo.MaLop} - {classInfo.TenLop}</p>
@@ -423,8 +476,10 @@ export default function Homeroom() {
                                 <p className="text-2xl font-bold">Nam: {count.Nam}</p>
                                 <p className="text-2xl font-bold">Nữ: {count.Nu}</p>
                             </div>
-                            {state == 1 ? <HocSinhTable datas={classInfo?.hoc_sinh} />
-                                :
+                            {state == 1 &&
+                                <HocSinhTable datas={classInfo?.hoc_sinh} />
+                            }
+                            {state == 2 &&
                                 <div className="">
                                     <div className="w-full mx-auto grid grid-rows-1 grid-flow-col mt-2">
                                         <button
@@ -844,6 +899,63 @@ export default function Homeroom() {
 
                                     }
 
+                                </div>
+                            }
+                            {state == 3 &&
+                                <div>
+                                    <div className="relative mt-3 flex text-xl justify-between px-10 border-b-2 pb-2 border-cyan-300 items-center">
+                                        <div className="flex">
+                                            Tuần:
+                                            <select className="px-2 border-2 border-gray-200 rounded-md mx-2 text-lg outline-none focus:border-cyan-200" defaultValue={thisWeek()} onChange={selectWeek}>
+                                                {[...Array(thisWeek())].map((_, i) => (
+                                                    <option key={i} value={i + 1}>{i + 1}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>Từ ngày: {getDate(dayOfWeek(week || thisWeek()).start)} - Đến ngày: {getDate(dayOfWeek(week || thisWeek()).end)}</div>
+                                    </div>
+                                    {weeks.length == 0 ?
+                                        <div className="text-2xl text-center text-red-500 mt-10 font-bold">Không có dữ liệu</div>
+                                        :
+                                        <div className="p-3">
+                                            {[...Array(6)].map((_, i) => (
+                                                <div key={i}>
+                                                    <div className="text-xl font-bold">
+                                                        Thứ: {i + 2}
+                                                    </div>
+                                                    <table className="table-auto w-full border-2 border-collapse border-cyan-300">
+                                                        <thead>
+                                                            <tr>
+                                                                <th className="p-2 border border-slate-300">Tiết</th>
+                                                                <th className="p-2 border border-slate-300">Môn học</th>
+                                                                <th className="p-2 border border-slate-300">Giáo viên</th>
+                                                                <th className="p-2 border border-slate-300">Nội dung</th>
+                                                                <th className="p-2 border border-slate-300">Đánh giá</th>
+                                                                <th className="p-2 border border-slate-300">Vắng</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {[...Array(4)].map((_, j) => {
+                                                                const data = weeks.find(item => item.MaNgay == (i + 2) && item.TietDay == (j + 1));
+                                                                const vangCP = data?.diem_danh.filter(item => item.TrangThai == 2);
+                                                                const vangKP = data?.diem_danh.filter(item => item.TrangThai == 3);
+                                                                return (
+                                                                    <tr key={j}>
+                                                                        <td className="p-2 border border-slate-300">{j + 1}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? data.mon_hoc.TenMH : ""}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? data.giao_vien.TenGV : ""}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? data.NoiDung : ""}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? data.DanhGia : ""}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? `(${vangCP.length + vangKP.length}) ${vangCP.map((cp)=>(`${cp.hoc_sinh.HoTen}(CP)`))} ${vangKP.map((kp)=>(`${kp.hoc_sinh.HoTen}(KP)`))}` : ""}</td>
+                                                                    </tr>
+                                                                )
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    }
                                 </div>
                             }
                         </div>

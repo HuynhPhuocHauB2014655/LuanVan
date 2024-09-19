@@ -89,6 +89,10 @@ export default function Teaching() {
     const onCancel = () => {
         setShowConfirm(0);
     }
+    const getDate = (date) => {
+        const d = moment(date).format("DD/MM/YYYY");
+        return d;
+    }
     // console.log(state);
     return (
         <div className="main-content">
@@ -132,7 +136,7 @@ export default function Teaching() {
                         <form className="w-full p-3" onSubmit={saveChange}>
                             <div className="my-3 text-lg flex justify-between border-b-2 pb-3 items-center border-cyan-500">
                                 <div>
-                                    Tiết: {state.TietDay} Thứ: {state.MaNgay}, Ngày: {state.Ngay}
+                                    Tiết: {state.TietDay} Thứ: {state.MaNgay}, Ngày: {getDate(state.Ngay)}
                                 </div>
                                 <button type="button" onClick={triggerConfirm} className="button border-cyan-400 hover:text-white hover:bg-cyan-300">Lưu</button>
                             </div>

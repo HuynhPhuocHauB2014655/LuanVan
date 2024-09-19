@@ -125,7 +125,7 @@ export default function HK_NK() {
                         <div className="grid grid-cols-3 grid-flow-row space-x-2 w-[80%]">
                             <div>
                                 <label className="f-label" htmlFor="nienkhoahientai">Chọn niên khóa</label>
-                                <select ref={nienKhoaHienTaiRef} name="nienkhoahientai" required className="f-field">
+                                <select ref={nienKhoaHienTaiRef} defaultValue={nienKhoa.NienKhoa} name="nienkhoahientai" required className="f-field">
                                     {datas.map((item) => (
                                         <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
                                     ))}
@@ -133,11 +133,11 @@ export default function HK_NK() {
                             </div>
                             <div>
                                 <label className="f-label" htmlFor="startDate">Ngày bắt đầu năm học</label>
-                                <input type="datetime-local" name="startDate" className="f-field block" ref={NgayBDRef} />
+                                <input type="datetime-local" name="startDate" className="f-field block" defaultValue={nienKhoa.NgayBD} ref={NgayBDRef} />
                             </div>
                             <div>
                                 <label className="f-label" htmlFor="endDate">Hạn chỉnh sửa điểm</label>
-                                <input type="datetime-local" name="endDate" className="f-field block" ref={HanSuaDiemRef} />
+                                <input type="datetime-local" name="endDate" defaultValue={nienKhoa.HanSuaDiem} className="f-field block" ref={HanSuaDiemRef} />
                             </div>
                         </div>
                         <button type="submit" className="border px-3 mt-3 py-1 border-green-600 rounded bg-white hover:bg-green-600 text-slate-950">Lưu</button>
@@ -145,7 +145,7 @@ export default function HK_NK() {
                 }
                 <div className="hk_nk_content">
                     <div>
-                        <h1 className="text-2xl font-bold text-red-600 mt-2">Niên khóa hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
+                        <h1 className="text-2xl font-bold text-red-600 mt-2">Năm học hiện tại hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
                         <p className="text-xl ms-2">- Ngày bắt đầu năm học: {nienKhoa ? nienKhoa.NgayBD : "Chưa đặt"}</p>
                         <p className="text-xl ms-2">- Hạn cuối sửa điểm: {nienKhoa ? nienKhoa.HanSuaDiem : "Chưa đặt"}</p>
                     </div>

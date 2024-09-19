@@ -33,14 +33,20 @@ class TKBController extends Controller
         $data = TKB::with(['lop','monHoc','giaoVien'])->where("MaNgay",$rq->MaNgay)->where("MSGV",$rq->MSGV)->where("MaNK",$rq->MaNK)->get();
         if($data->isNotEmpty()){
             foreach ($data as $d){
-                $th = TietHoc::where("MaLop",$d->MaLop)->where("MaNgay",$d->MaNgay)->where("TietDay",$d->TietDay)->where("MSGV",$d->MSGV)->first();
+                $th = TietHoc::where("MaLop",$d->MaLop)
+                ->where("MaNgay",$d->MaNgay)
+                ->where("TietDay",$d->TietDay)
+                ->where("MSGV",$d->MSGV)
+                ->where("MaMH",$d->MaMH)
+                ->first();
                 if(!$th){
                     $newTh = TietHoc::create([
                         'MaLop' => $d->MaLop,
                         'MaNgay' => $d->MaNgay,
                         'TietDay' => $d->TietDay,
                         'MSGV' => $d->MSGV,
-                        'Ngay' => Carbon::now()->format('d/m/Y'),
+                        'MaMH' => $d->MaMH,
+                        'Ngay' => Carbon::now()->format('Y/m/d'),
                     ]);
                     $hs = HocLop::where("MaLop",$d->MaLop)->get();
                     foreach ($hs as $hs) {
@@ -57,6 +63,13 @@ class TKBController extends Controller
     public function getTietHoc(Request $rq){
         $th = TietHoc::with('diemDanh.hocSinh')->where("MaLop",$rq->MaLop)->where("MaNgay",$rq->MaNgay)->where("TietDay",$rq->TietDay)->where("MSGV",$rq->MSGV)->first();
         return response()->json($th);
+    }
+    public function getTHWeek(Request $rq){
+        $data = TietHoc::with(['diemDanh.hocSinh','giaoVien','monHoc'])
+        ->where("MaLop",$rq->MaLop)
+        ->whereBetween("Ngay", [$rq->start, $rq->end])
+        ->get();
+        return response()->json($data,200);
     }
     public function updateTietHoc(Request $rq){
         $th = TietHoc::find($rq->id);

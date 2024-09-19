@@ -127,7 +127,7 @@ input {
   @apply border border-black cursor-pointer text-red-500
 }
 .teacher-head{
-  @apply w-1/2 border py-2 text-xl border-collapse border-cyan-600 bg-slate-200 shadow-md hover:bg-cyan-200
+  @apply w-1/2 border py-2 text-xl border-collapse border-cyan-600 shadow-md hover:bg-cyan-200
 }
 .sub-head{
   @apply border-2 border-collapse px-2 text-xl py-1 w-full border-cyan-400 hover:bg-cyan-300 hover:text-white

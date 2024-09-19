@@ -110,6 +110,7 @@ Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
 Route::get('/tkb/date',[TKBController::class,'indexDate']);
 Route::post('/tkb/date',[TKBController::class,'getByDay']);
 Route::post('/tkb/get',[TKBController::class,'getTietHoc']);
+Route::post('/tkb/week',[TKBController::class,'getTHWeek']);
 Route::put('/tkb/updateTH',[TKBController::class,'updateTietHoc']);
 
 //tai khoan route
