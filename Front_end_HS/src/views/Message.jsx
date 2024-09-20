@@ -23,6 +23,7 @@ export default function Message() {
     const [value, setValue] = useState("");
     const [count, setCount] = useState(0);
     const [update, setUpdate] = useState(0);
+    const [fakeMessage, setFakeMessage] = useState("");
     const [resultSearch, setResultSearch] = useState();
     const [showResult, setShowResult] = useState(false);
     const { setMessage, setError } = useStateContext();
@@ -92,23 +93,24 @@ export default function Message() {
                 NguoiGui: `${userName}-${info.HoTen}`,
                 TinNhan: value
             };
-            setMessages(prevMessages => [...prevMessages, payload]);
+            setFakeMessage(payload.TinNhan);
             setValue("");
             try {
                 await axiosClient.post("tn/add", payload);
                 fetchMessages(selectedGroup.id);
+                setTimeout(() => {
+                    setFakeMessage("");
+                }, 900);
             } catch (error) {
                 console.log(error);
             }
         }
     }
-    const scrollToBottom = () => {
-        messageEndRef.current?.scrollIntoView();
-    };
-
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (fakeMessage || personalMessage().length > 0) {
+            messageEndRef.current.scrollIntoView();
+        }
+    }, [fakeMessage, messages]);
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
 
@@ -144,16 +146,16 @@ export default function Message() {
     }
     const ShowSearch = (state) => {
         setResultSearch(null);
-        setShowSearch(state);
         setShowResult(false);
+        setShowSearch(state);
     }
     const search = (e) => {
         const searchValue = e.target.value.toLowerCase();
         const filteredMessages = personalMessage().filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
         setResultSearch(filteredMessages);
-        if(searchValue){
+        if (searchValue) {
             setShowResult(true);
-        }else{
+        } else {
             setShowResult(false);
         }
     }
@@ -165,7 +167,10 @@ export default function Message() {
         const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
         return d;
     }
-    // console.log(groups);
+    const lastMessage = () => {
+        return personalMessage()[personalMessage().length -1];
+    }
+    // console.log(personalMessage());
     return (
         <div className="main-content">
             <Menu update={update} />
@@ -173,15 +178,15 @@ export default function Message() {
                 <div className="page-name">Tin nhắn</div>
                 <div className="flex h-[80vh] bg-white shadow-lg mt-2">
                     <div className="w-[30%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative">
-                        {showResult && 
+                        {showResult &&
                             <div className="w-full h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden">
                                 <div className="text-center font-bold my-3">Kết quả tìm kiếm</div>
-                                {resultSearch?.length == 0 ? 
+                                {resultSearch?.length == 0 ?
                                     <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
                                     :
-                                    resultSearch?.map((item)=>(
-                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={()=>scrollTo(item.id)}>
-                                             <div className="">{item.NguoiGui}</div>
+                                    resultSearch?.map((item) => (
+                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
+                                            <div className="">{item.NguoiGui}</div>
                                             <div className="">{item.TinNhan}</div>
                                         </div>
                                     ))
@@ -192,7 +197,7 @@ export default function Message() {
                             <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
-                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" :`${gr.tin_nhan[0].NguoiGui}: ${gr.tin_nhan[0].TinNhan.length > 10 ? `${gr.tin_nhan[0].TinNhan.substring(0, 10)}...` : gr.tin_nhan[0].TinNhan}`}</div>
+                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
                                 </div>
                                 {gr.tin_nhan_count > 0 &&
                                     <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{gr.tin_nhan_count}</div>
@@ -211,7 +216,7 @@ export default function Message() {
                                         </div>
                                         <div className="space-x-2 w-1/2 flex justify-end">
                                             {showSearch &&
-                                                <input type="text" className="w-full border-2 border-slate-400 rounded-full px-5 py-2" placeholder="Nhập từ khóa tìm kiếm..." onChange={search}/>
+                                                <input type="text" className="w-full border-2 border-slate-400 rounded-full px-5 py-2" placeholder="Nhập từ khóa tìm kiếm..." onChange={search} />
                                             }
                                             <button className="text-xl hover:text-blue-500"><FontAwesomeIcon icon={showSearch ? faXmark : faMagnifyingGlass} onClick={() => ShowSearch(!showSearch)} /></button>
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
@@ -219,14 +224,23 @@ export default function Message() {
                                     </div>
                                     <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2">
                                         {personalMessage().map((tn) => (
-                                           <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
+                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
-                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-3`}>
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
                                                     {tn.TinNhan}
                                                     <div className={tn.NguoiGui !== `${userName}-${info.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
                                                 </div>
-                                           </div>
+                                            </div>
                                         ))}
+                                        {fakeMessage &&
+                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
+                                                <div className="mx-2">{`${userName}-${info.HoTen}`}</div>
+                                                <div className="w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5">
+                                                    {fakeMessage}
+                                                    <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
+                                                </div>
+                                            </div>
+                                        }
                                         <div ref={messageEndRef} />
                                     </div>
                                     <div className="absolute bottom-0 w-full h-[10%]">

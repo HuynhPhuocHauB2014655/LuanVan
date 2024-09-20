@@ -29,7 +29,7 @@ export default function Menu({update}) {
         fetchTB();
     }
     if(update == 2){
-        fetchTB();
+        fetchTN();
     }
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
