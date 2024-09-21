@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Menu from "../components/Menu";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
@@ -12,7 +12,6 @@ import { useRef } from "react";
 import pusher from "../pusher";
 import moment from 'moment';
 export default function Message() {
-    const { userName, info } = useUserContext();
     const [messages, setMessages] = useState([]);
     const [groups, setGroups] = useState([]);
     const [groupsMember, setGroupsMember] = useState([]);
@@ -21,22 +20,18 @@ export default function Message() {
     const [show, setShow] = useState(false);
     const [showMem, setShowMem] = useState(false);
     const [value, setValue] = useState("");
-    const [count, setCount] = useState([]);
     const [update, setUpdate] = useState(0);
     const [focus, setForcus] = useState("");
     const [fakeMessage, setFakeMessage] = useState("");
     const [resultSearch, setResultSearch] = useState();
     const [showResult, setShowResult] = useState(false);
     const [showButton, setShowButton] = useState(false);
-    const { setMessage, setError } = useStateContext();
     const messageEndRef = useRef(null);
     const messageRef = useRef(null);
     const fetchGroup = async () => {
         try {
-            const group = await axiosClient.get(`tn/${userName}`);
+            const group = await axiosClient.get(`tn`);
             setGroups(group.data);
-            const c = await axiosClient.get(`tn/count/${userName}`);
-            setCount(c.data);
         } catch (error) {
             console.log(error);
         }
@@ -50,15 +45,12 @@ export default function Message() {
         }
     }
     useEffect(() => {
-        if (info?.HoTen) {
             fetchGroup();
-        }
-    }, [info]);
+    },[]);
     const select = (data) => {
         setShow(false);
         setShowMem(false);
         fetchMessages(data.id);
-        setSeen(data);
         setSelectedGroup(data);
     }
     const countMem = (data) => {
@@ -79,74 +71,13 @@ export default function Message() {
         };
         fetchMemberNames();
     }, [selectedGroup]);
-    const handleChange = (e) => {
-        setValue(e.target.value);
-    };
-    const pressKey = async (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            setValue(prevValue => prevValue + '\n');
-        }
-        if (!e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            const payload = {
-                "Nhom_id": selectedGroup.id,
-                NguoiGui: `${userName}-${info.HoTen}`,
-                TinNhan: value
-            };
-            setFakeMessage(payload.TinNhan);
-            setValue("");
-            try {
-                await axiosClient.post("tn/add", payload);
-                fetchMessages(selectedGroup.id);
-                setTimeout(() => {
-                    setFakeMessage("");
-                }, 900);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    }
     useEffect(() => {
-        if (fakeMessage || personalMessage().length > 0) {
+        if (fakeMessage || messages?.length > 0) {
             scrollBottom();
         }
     }, [fakeMessage, messages]);
     const scrollBottom = () => {
         messageEndRef.current.scrollIntoView();
-    }
-    useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
-
-        channel.bind('App\\Events\\sendMessage', (data) => {
-            fetchGroup();
-            if (selectedGroup && selectedGroup.id == data.message.Nhom_id) {
-                setSeen(selectedGroup);
-                setMessages(prevMessages => [...prevMessages, data.message]);
-            }
-        });
-
-        return () => {
-            channel.unbind_all();
-            channel.unsubscribe();
-        };
-    }, [userName, selectedGroup]);
-    const setSeen = async (data) => {
-        try {
-            const payload = {
-                'Nhom_id': data.id,
-                'NguoiNhan': `${userName}-${info.HoTen}`
-            }
-            await axiosClient.put('tn', payload);
-        } catch (error) {
-            console.log(error);
-        } finally {
-            fetchGroup();
-            setUpdate(2);
-        }
-    }
-    const personalMessage = () => {
-        return messages.filter(item => (item.NguoiGui == `${userName}-${info.HoTen}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userName}-${info.HoTen}`)
     }
     const ShowSearch = (state) => {
         setResultSearch(null);
@@ -156,7 +87,7 @@ export default function Message() {
     }
     const search = (e) => {
         const searchValue = e.target.value.toLowerCase();
-        const filteredMessages = personalMessage().filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
+        const filteredMessages = messages?.filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
         setResultSearch(filteredMessages);
         if (searchValue) {
             setShowResult(true);
@@ -173,9 +104,6 @@ export default function Message() {
         const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
         return d;
     }
-    const lastMessage = () => {
-        return personalMessage()[personalMessage().length - 1];
-    }
     const checkBottom = () => {
         if (messageRef.current) {
             const { scrollTop, clientHeight, scrollHeight } = messageRef.current;
@@ -186,12 +114,6 @@ export default function Message() {
                 setShowButton(false);
             }
         }
-    }
-    const countNotSeen = (id) => {
-        const c  = count.find(item => item.id == id);
-        if(c){
-            return c.unread_count;
-        }    
     }
     return (
         <div className="main-content">
@@ -219,11 +141,7 @@ export default function Message() {
                             <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
-                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
                                 </div>
-                                {countNotSeen(gr.id) > 0 &&
-                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{countNotSeen(gr.id)}</div>
-                                }
                             </div>
                         ))}
                     </div>
@@ -244,37 +162,22 @@ export default function Message() {
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
-                                        {personalMessage().map((tn) => (
-                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
+                                    <div className="h-[86%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
+                                        {messages?.map((tn) => (
+                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
                                                     {tn.TinNhan}
-                                                    <div className={tn.NguoiGui !== `${userName}-${info.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
+                                                    <div className={`absolute text-xs bottom-1 right-1`}>{getDate(tn.created_at)}</div>
                                                 </div>
                                             </div>
                                         ))}
-                                        {fakeMessage &&
-                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
-                                                <div className="mx-2">{`${userName}-${info.HoTen}`}</div>
-                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
-                                                    {fakeMessage}
-                                                    <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
-                                                </div>
-                                            </div>
-                                        }
                                         <div ref={messageEndRef} />
                                     </div>
                                     <div className="absolute bottom-0 w-full h-[10%]">
-                                        <textarea type="text" name="TinNhan"
-                                            placeholder="Nhập nội dung tin nhắn"
-                                            onKeyDown={pressKey}
-                                            onChange={handleChange}
-                                            value={value}
-                                            className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
                                         {showButton &&
                                             <button
-                                                className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
+                                                className="absolute right-5 h-[40%] top-[30%] hover:text-blue-400"
                                                 onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
                                                     className="h-full" />
                                             </button>

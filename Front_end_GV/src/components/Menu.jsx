@@ -16,15 +16,19 @@ export default function Menu({update}) {
         setTbCount(count);
     }
     const fetchTN = async () => {
-        const c = await axiosClient.get(`tn/count/${userName}-${info.TenGV}`);
-        setTnCount(c.data);
+        const c = await axiosClient.get(`tn/count/${userName}`);
+        let n = 0;
+        c.data.map((data)=>{
+            n += data.unread_count;
+        })
+        setTnCount(n);
     }
     useEffect(()=>{
-        if(userName && info){
+        if(userName){
             fetchTB();
             fetchTN();
         }
-    },[userName,info]);
+    },[userName]);
     if(update == 1){
         fetchTB();
     }

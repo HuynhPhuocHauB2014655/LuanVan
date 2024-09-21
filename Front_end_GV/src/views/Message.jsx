@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Menu from "../components/Menu";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faMagnifyingGlass, faXmark, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -21,15 +21,15 @@ export default function Message() {
     const [show, setShow] = useState(false);
     const [showMem, setShowMem] = useState(false);
     const [value, setValue] = useState("");
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState([]);
     const [update, setUpdate] = useState(0);
+    const [focus, setForcus] = useState("");
     const [fakeMessage, setFakeMessage] = useState("");
     const [resultSearch, setResultSearch] = useState();
     const [showResult, setShowResult] = useState(false);
-    const { setMessage, setError } = useStateContext();
+    const [showButton, setShowButton] = useState(false);
     const messageEndRef = useRef(null);
-
-
+    const messageRef = useRef(null);
     const fetchGroup = async () => {
         try {
             const group = await axiosClient.get(`tn/${userName}`);
@@ -108,9 +108,12 @@ export default function Message() {
     }
     useEffect(() => {
         if (fakeMessage || personalMessage().length > 0) {
-            messageEndRef.current.scrollIntoView();
+            scrollBottom();
         }
     }, [fakeMessage, messages]);
+    const scrollBottom = () => {
+        messageEndRef.current.scrollIntoView();
+    }
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
 
@@ -147,6 +150,7 @@ export default function Message() {
     const ShowSearch = (state) => {
         setResultSearch(null);
         setShowResult(false);
+        setForcus("");
         setShowSearch(state);
     }
     const search = (e) => {
@@ -161,16 +165,34 @@ export default function Message() {
     }
     const scrollTo = (id) => {
         const element = document.getElementById(id);
-        element.scrollIntoView();
+        element.scrollIntoView({ inline: 'center' });
+        setForcus(id);
     }
     const getDate = (date) => {
         const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
         return d;
     }
     const lastMessage = () => {
-        return personalMessage()[personalMessage().length -1];
+        return personalMessage()[personalMessage().length - 1];
     }
-    // console.log(personalMessage());
+    const checkBottom = () => {
+        if (messageRef.current) {
+            const { scrollTop, clientHeight, scrollHeight } = messageRef.current;
+            const scrollBottom = scrollHeight - scrollTop - clientHeight;
+            if (scrollBottom > 100) {
+                setShowButton(true);
+            } else {
+                setShowButton(false);
+            }
+        }
+    }
+    const countNotSeen = (id) => {
+        const c  = count.find(item => item.id == id);
+        if(c){
+            return c.unread_count;
+        }    
+    }
+    console.log(countNotSeen(62));
     return (
         <div className="main-content">
             <Menu update={update} />
@@ -199,8 +221,8 @@ export default function Message() {
                                     <div className="text-lg">{gr.TenNhom}</div>
                                     <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
                                 </div>
-                                {gr.tin_nhan_count > 0 &&
-                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{gr.tin_nhan_count}</div>
+                                {countNotSeen(gr.id) > 0 &&
+                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{countNotSeen(gr.id)}</div>
                                 }
                             </div>
                         ))}
@@ -222,11 +244,11 @@ export default function Message() {
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2">
+                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
                                         {personalMessage().map((tn) => (
                                             <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.TenGV}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
-                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
                                                     {tn.TinNhan}
                                                     <div className={tn.NguoiGui !== `${userName}-${info.TenGV}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
                                                 </div>
@@ -235,7 +257,7 @@ export default function Message() {
                                         {fakeMessage &&
                                             <div className={`w-[50%] mx-2 ml-auto text-end`}>
                                                 <div className="mx-2">{`${userName}-${info.TenGV}`}</div>
-                                                <div className="w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5">
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
                                                     {fakeMessage}
                                                     <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
                                                 </div>
@@ -250,6 +272,13 @@ export default function Message() {
                                             onChange={handleChange}
                                             value={value}
                                             className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
+                                        {showButton &&
+                                            <button
+                                                className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
+                                                onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
+                                                    className="h-full" />
+                                            </button>
+                                        }
                                     </div>
                                 </div>
                                 {show &&

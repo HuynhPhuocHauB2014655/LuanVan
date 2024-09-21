@@ -7,15 +7,15 @@ const StateContext = createContext({
 })
 
 export const UserProvider = ({children}) => {
-    const [maBaoMat,_setMaBaoMat] = useState("");
+    const [maBaoMat,_setMaBaoMat] = useState(sessionStorage.getItem('maBaoMat'));
     const setMaBaoMat = (maBaoMat) => {
         _setMaBaoMat(maBaoMat)
-        // if(maBaoMat){
-        //     localStorage.setItem('maBaoMat',maBaoMat)
-        // }
-        // else{
-        //     localStorage.removeItem('maBaoMat')
-        // }
+        if(maBaoMat){
+            sessionStorage.setItem('maBaoMat',maBaoMat)
+        }
+        else{
+            sessionStorage.removeItem('maBaoMat')
+        }
     }
     return(
         <StateContext.Provider value={{

@@ -28,19 +28,45 @@ class TinNhanController extends Controller
         ->whereHas('thanhVien', function ($query) use ($id) {
             $query->where('MaTV', $id);
         })
-        ->withCount(['tinNhan' => function ($query) use ($id) {
-            $query->where('TrangThai', 0)  
-                  ->where('NguoiNhan',"like", $id."%");
-        }])
+        ->select('NhomTinNhan.*')
+        ->orderBy(
+            \DB::raw('(SELECT MAX(created_at) FROM TinNhan WHERE TinNhan.Nhom_id = NhomTinNhan.id)'),
+            'desc'
+        )
         ->get();
         return response()->json($nhom,200);
+    }
+    public function getAllGroup(){
+        $nhom = NhomTinNhan::with(['thanhVien', 'tinNhan'])
+        ->select('NhomTinNhan.*') // Replace 'NhomTinNhan' with your actual table name
+        ->orderBy(
+            \DB::raw('(SELECT MAX(created_at) FROM TinNhan WHERE TinNhan.Nhom_id = NhomTinNhan.id)'),
+            'desc'
+        )
+        ->get();
+        return response()->json($nhom,200);
+    }
+    public function getAllTN($id){
+        $tinNhan = TinNhan::where('Nhom_id',$id)->where("NguoiNhan",$id)->get();
+        return response()->json($tinNhan,200);
     }
     public function getTN($id){
         $tinNhan = TinNhan::where('Nhom_id',$id)->get();
         return response()->json($tinNhan,200);
     }
+    public function getNew(Request $rq){
+        $tinNhan = TinNhan::where('Nhom_id',$id)->get();
+        return response()->json($tinNhan,200);
+    }
     public function countNotSeen($id){
-        $count = TinNhan::where('NguoiNhan',$id)->where('TrangThai',0)->count();
+        $count = NhomTinNhan::whereHas('thanhVien', function ($query) use ($id) {
+            $query->where('MaTV', $id);
+        })
+        ->withCount(['tinNhan as unread_count' => function ($query) use ($id) {
+            $query->where('TrangThai', 0)
+                  ->where('NguoiNhan', "like", $id . "%");
+        }])
+        ->get();
         return response()->json($count,200);
     }
     public function setSeen(Request $rq){

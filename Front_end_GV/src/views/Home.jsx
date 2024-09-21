@@ -16,12 +16,16 @@ export default function Home() {
         fetchTB();
     },[userName]);
     const fetchTN = async () => {
-        const c = await axiosClient.get(`tn/count/${userName}-${info?.TenGV}`);
-        setTnCount(c.data);
+        const c = await axiosClient.get(`tn/count/${userName}`);
+        let n = 0;
+        c.data.map((data)=>{
+            n += data.unread_count;
+        })
+        setTnCount(n);
     }
     useEffect(()=>{
         fetchTN();
-    },[userName,info]);
+    },[userName]);
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
 
@@ -41,6 +45,7 @@ export default function Home() {
         { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
         { id: 5, route: "/tb", label: 'Thông báo' },
         { id: 6, route: "/ms", label: 'Tin nhắn' },
+        { id: 7, route: "/teach", label: 'Dạy học' },
     ];
     return (
         <div className="main-content">

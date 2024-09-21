@@ -10,6 +10,7 @@ export default function Home() {
         { id: 7, route: "/account", label: 'Tài khoản' },
         { id: 8, route: "/rs", label: 'Kết quả học tập' },
         { id: 9, route: "/notify", label: 'Thông báo' },
+        { id: 10, route: "/ms", label: 'Tin nhắn' },
     ];
     return (
         <div className="main-content">

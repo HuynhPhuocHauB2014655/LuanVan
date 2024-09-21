@@ -17,12 +17,16 @@ export default function Home() {
         fetchTB();
     },[userName]);
     const fetchTN = async () => {
-        const c = await axiosClient.get(`tn/count/${userName}-${info?.HoTen}`);
-        setTnCount(c.data);
+        const c = await axiosClient.get(`tn/count/${userName}`);
+        let n = 0;
+        c.data.map((data)=>{
+            n += data.unread_count;
+        })
+        setTnCount(n);
     }
     useEffect(()=>{
         fetchTN();
-    },[userName,info]);
+    },[userName]);
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
 
