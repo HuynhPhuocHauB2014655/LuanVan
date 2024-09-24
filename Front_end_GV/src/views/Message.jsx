@@ -192,7 +192,7 @@ export default function Message() {
             return c.unread_count;
         }    
     }
-    console.log(countNotSeen(62));
+    console.log(messages);
     return (
         <div className="main-content">
             <Menu update={update} />

@@ -15,6 +15,8 @@ export default function Teaching() {
     const { nienKhoa, setMessage } = useStateContext();
     const [data, setData] = useState([]);
     const [view, setView] = useState(1);
+    const [onView, setOnView] = useState("");
+    const [page, setPage] = useState(1);
     const [state, setState] = useState();
     const [showConfirm, setShowConfirm] = useState(0);
 
@@ -23,7 +25,7 @@ export default function Teaching() {
         const payload = {
             MaNK: nienKhoa.NienKhoa,
             MaNgay: d.getDay() + 1,
-            MSGV: userName
+            MSGV: userName,
         };
         try {
             const res = await axiosClient.post("tkb/date", payload);
@@ -32,10 +34,26 @@ export default function Teaching() {
             console.log(error);
         }
     }
+    const fetchDataWeek = async () => {
+        const d = new Date();
+        const payload = {
+            MaNK: nienKhoa.NienKhoa,
+            MSGV: userName,
+        };
+        try {
+            const res = await axiosClient.post("tkb/gv/week", payload);
+            setData(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const getToDay = () => {
         const d = new Date();
-        const toDay = `Thứ: ${d.getDay() + 1}, Ngày: ${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+        const toDay = `Thứ: ${d.getDay() + 1}, Ngày: ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
         return toDay;
+    }
+    const getThisWeek = () => {
+        return dayOfWeek(thisWeek());
     }
     useEffect(() => {
         if (userName && nienKhoa?.NienKhoa) {
@@ -44,18 +62,23 @@ export default function Teaching() {
     }, [userName, nienKhoa]);
     const changeView = async (view, data) => {
         if (view == 2 && data) {
+            const d = new Date();
             const payload = {
                 MaLop: data.MaLop,
                 MaNgay: data.MaNgay,
                 TietDay: data.TietDay,
-                MSGV: userName
+                MSGV: userName,
+                Ngay: formatDate(d),
             };
+            setOnView(data.id);
             try {
                 const res = await axiosClient.post("tkb/get", payload);
                 setState(res.data);
             } catch (error) {
                 console.log(error);
             }
+        }else{
+            setState(null);
         }
         setView(view);
     }
@@ -79,6 +102,10 @@ export default function Teaching() {
         }
         // console.log(arr);
     }
+    const formatDate = (date) => {
+        const d = moment(date).format("YYYY-MM-DD");
+        return d;
+    }
     const triggerConfirm = () => {
         setShowConfirm(1)
     }
@@ -93,7 +120,37 @@ export default function Teaching() {
         const d = moment(date).format("DD/MM/YYYY");
         return d;
     }
-    // console.log(state);
+    const thisWeek = () => {
+        if (nienKhoa?.NienKhoa) {
+            let day = new Date();
+            const firstDay = new Date(nienKhoa.NgayBD);
+            let week = Math.ceil((day - firstDay) / (1000 * 60 * 60 * 24 * 7));
+            day.getDay() == 1 && (week = week + 1);
+            return week;
+        }
+    }
+    const dayOfWeek = (weekNumber) => {
+        const startOfWeek = new Date(nienKhoa.NgayBD);
+        startOfWeek.setDate(startOfWeek.getDate() + (weekNumber - 1) * 7);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
+        const week = {
+            start: startOfWeek,
+            end: endOfWeek
+        }
+        return week;
+    }
+    const changePage = (page) => {
+        if (page == 1) {
+            fetchData();
+        } else {
+            fetchDataWeek();
+        }
+        setOnView("");
+        setView(1);
+        setPage(page);
+    }
+    console.log();
     return (
         <div className="main-content">
             <Menu />
@@ -102,15 +159,32 @@ export default function Teaching() {
                     <AlterConfirm message={"Bạn có chắc với hành động này không"} onCancel={onCancel} onConfirm={onConfirm} />
                 }
                 <div className="page-name">Quản lí dạy học</div>
+                <div className="flex w-full">
+                    <button
+                        className={`w-1/2 text-xl border-y-2 border-s-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 1 ? 'bg-slate-200' : 'bg-slate-300'}`}
+                        onClick={() => changePage(1)}
+                    >
+                        Hôm nay
+                    </button>
+                    <button
+                        className={`w-1/2 text-xl border-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 2 ? 'bg-slate-200' : 'bg-slate-300'}`}
+                        onClick={() => changePage(2)}
+                    >
+                        Tuần này
+                    </button>
+                </div>
                 {data.length == 0 ?
                     <div className="mt-10 text-center text-2xl text-green-500">Bạn không có tiết dạy nào hôm nay</div>
                     :
                     <div>
-                        <div className="text-2xl text-center text-blue-400 font-bold mt-5">Danh sách các tiết dạy hôm nay</div>
-                        <div className="text-center text-green-400 font-bold mb-5">{getToDay()}</div>
+                        <div className="text-2xl text-center text-blue-400 font-bold mt-5">Danh sách các tiết dạy {page == 1 ? "hôm nay" : "tuần này"}</div>
+                        <div className="text-center text-green-400 font-bold mb-5">
+                            {page == 1 ? getToDay() : `Từ: ${getDate(getThisWeek().start)} Đến: ${getDate(getThisWeek().end)}`}
+                        </div>
                         <table className="table-fixed w-[80%] mx-auto border-2 border-blue-400 bg-white border-collapse shadow-lg">
                             <thead>
                                 <tr>
+                                    {page == 2 && <th className="border border-gray-400 p-2">Thứ</th>}
                                     <th className="border border-gray-400 p-2">Tiết</th>
                                     <th className="border border-gray-400 p-2">Môn học</th>
                                     <th className="border border-gray-400 p-2">Lớp</th>
@@ -118,7 +192,8 @@ export default function Teaching() {
                             </thead>
                             <tbody>
                                 {data.map((d) => (
-                                    <tr key={d.id} className="cursor-pointer hover:bg-gray-200" onClick={() => changeView(2, d)}>
+                                    <tr key={d.id} className={`cursor-pointer hover:bg-gray-200 ${onView == d.id && "bg-gray-200"}`} onClick={() => changeView(2, d)}>
+                                        {page == 2 && <td className="border border-gray-400 p-2">{d.MaNgay}</td>}
                                         <td className="border border-gray-400 p-2">{d.TietDay}</td>
                                         <td className="border border-gray-400 p-2">{d.mon_hoc.TenMH}</td>
                                         <td className="border border-gray-400 p-2">{d.lop.TenLop}</td>
@@ -128,8 +203,9 @@ export default function Teaching() {
                         </table>
                     </div>}
                 {view === 2 &&
+                    (Object.keys(state).length > 0 ?
                     <div className="bg-white border-2 border-blue-500 mt-5 w-full relative">
-                        <button className="absolute right-1 top-0 hover:text-red-400" onClick={()=>setView(1)}><FontAwesomeIcon icon={faMinus} /> </button>
+                        <button className="absolute right-1 top-0 hover:text-red-400" onClick={() => setView(1)}><FontAwesomeIcon icon={faMinus} /> </button>
                         <div className="my-2 text-center text-xl text-blue-400 font-bold">
                             Chi tiết Tiết dạy
                         </div>
@@ -186,6 +262,8 @@ export default function Teaching() {
                             </div>
                         </form>
                     </div>
+                    :
+                    <div className="text-center text-2xl mt-20 text-red-500 ">Không có dữ liệu</div>)
                 }
             </div>
         </div>

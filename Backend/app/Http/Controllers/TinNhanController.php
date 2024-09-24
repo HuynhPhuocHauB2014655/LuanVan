@@ -38,7 +38,7 @@ class TinNhanController extends Controller
     }
     public function getAllGroup(){
         $nhom = NhomTinNhan::with(['thanhVien', 'tinNhan'])
-        ->select('NhomTinNhan.*') // Replace 'NhomTinNhan' with your actual table name
+        ->select('NhomTinNhan.*')
         ->orderBy(
             \DB::raw('(SELECT MAX(created_at) FROM TinNhan WHERE TinNhan.Nhom_id = NhomTinNhan.id)'),
             'desc'
@@ -87,18 +87,18 @@ class TinNhanController extends Controller
         $tinNhan->Nhom_id = $rq->Nhom_id;
         $tinNhan->save();
         foreach($TVNhom as $tv){
-            $hs = HocSinh::find($tv->MaTV);
-            $gv = GiaoVien::find($tv->MaTV);
-            $ph = PhuHuynh::where("TaiKhoan",$tv->MaTV)->first();
             $tinNhan = new TinNhan();
             $tinNhan->NguoiGui = $rq->NguoiGui;
-            if($hs){
-                $tinNhan->NguoiNhan = $hs->MSHS."-".$hs->HoTen;
-            }elseif($gv){
+            if(substr($tv->MaTV,0,2) == 'GV'){
+                $gv = GiaoVien::find($tv->MaTV);
                 $tinNhan->NguoiNhan = $gv->MSGV."-".$gv->TenGV;
-            }else{
+            }elseif(substr($tv->MaTV,0,2) == 'PH'){
+                $ph = PhuHuynh::where("TaiKhoan",$tv->MaTV)->first();
                 $hocsinh = HocSinh::find($ph->MSHS);
                 $tinNhan->NguoiNhan = $ph->TaiKhoan."-Phụ huynh ".$hocsinh->HoTen;
+            }else{
+                $hs = HocSinh::find($tv->MaTV);
+                $tinNhan->NguoiNhan = $hs->MSHS."-".$hs->HoTen;
             }
             $tinNhan->TinNhan = $rq->TinNhan;
             $tinNhan->Nhom_id = $rq->Nhom_id;

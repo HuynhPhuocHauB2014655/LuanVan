@@ -38,7 +38,7 @@ export default function Message() {
     }
     const fetchMessages = async (id) => {
         try {
-            const res = await axiosClient.get(`tn/group/${id}`);
+            const res = await axiosClient.get(`tn/all/${id}`);
             setMessages(res.data);
         } catch (error) {
             console.log(error);

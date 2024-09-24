@@ -61,8 +61,18 @@ class TKBController extends Controller
         return response()->json($data);
     }
     public function getTietHoc(Request $rq){
-        $th = TietHoc::with('diemDanh.hocSinh')->where("MaLop",$rq->MaLop)->where("MaNgay",$rq->MaNgay)->where("TietDay",$rq->TietDay)->where("MSGV",$rq->MSGV)->first();
+        $th = TietHoc::with('diemDanh.hocSinh')
+        ->where("MaLop",$rq->MaLop)
+        ->where("MaNgay",$rq->MaNgay)
+        ->where("TietDay",$rq->TietDay)
+        ->where("MSGV",$rq->MSGV)
+        ->where("Ngay",$rq->Ngay)
+        ->first();
         return response()->json($th);
+    }
+    public function getByWeek(Request $rq){
+        $data = TKB::with(['lop','monHoc','giaoVien'])->where("MSGV",$rq->MSGV)->where("MaNK",$rq->MaNK)->get();
+        return response()->json($data);
     }
     public function getTHWeek(Request $rq){
         $data = TietHoc::with(['diemDanh.hocSinh','giaoVien','monHoc'])

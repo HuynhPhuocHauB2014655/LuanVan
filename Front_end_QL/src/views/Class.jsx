@@ -77,7 +77,11 @@ export default function Class() {
         if (show >= 2) {
             setSelected(data);
         }
+        goToTop();
         setShowForm(show);
+    }
+    const goToTop = () => {
+        window.scrollTo(0, 0);
     }
     const validationSchema = Yup.object({
         MaNK: Yup.string().required("Trường bắt buộc"),
@@ -297,7 +301,7 @@ export default function Class() {
                                     <td className="border border-gray-400 p-2">{selected.ban.TenBan}</td>
                                     <td className="border border-gray-400 p-2">
                                         <div className="flex justify-center">
-                                            <select name="lop" className="rounded-md bg-amber-50 shadow-md" ref={selectedClass}>
+                                            <select name="lop" className="rounded-md bg-amber-50 shadow-md p-1" ref={selectedClass}>
                                                 {selected.ban.MaBan == "TN" ? classTN.map((lop) => (
                                                     <option key={lop.MaLop} value={lop.MaLop}>{lop.TenLop}</option>
                                                 ))
