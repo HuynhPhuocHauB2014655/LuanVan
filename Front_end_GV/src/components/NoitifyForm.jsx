@@ -1,15 +1,14 @@
 import React from 'react';
 import { useRef, useState, useEffect } from "react";
-import Draggable from "react-draggable";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
-const NotifyForm = ({ MaLop, handleSubmit, close }) => {
+const NotifyForm = ({ handleSubmit, close }) => {
     return (
         <Formik
             initialValues={{
-                NguoiNhan: MaLop || '',
+                NguoiNhan: '',
                 NoiDung: '',
                 TieuDe: '',
             }}
@@ -23,11 +22,11 @@ const NotifyForm = ({ MaLop, handleSubmit, close }) => {
             <Form className='z-20 absolute w-[80%] border-2 border-black h-[60vh] top-[10%] left-[10%] bg-white p-2 rounded-lg'>
                 <button type='button' onClick={close} className='top-0 right-0 absolute px-1 hover:text-red-400'><FontAwesomeIcon icon={faX}/></button>
                 <div >
-                    <Field type="text" name="NguoiNhan" placeholder="Người nhận;..." className='w-full border-b-2 border-black p-2 outline-none'/>
+                    <Field type="text" name="NguoiNhan" placeholder="Người nhận;..." className="w-full p-2 outline-none border-t-0 border-s-0 border-e-0 rounded-none"/>
                     <ErrorMessage className="text-red-700 text-xs p-2 text-end" name="NguoiNhan" component="div" />
                 </div>
                 <div >
-                    <Field type="text" name="TieuDe" placeholder="Tiêu đề" className='w-full border-b-2 border-black p-2 outline-none'/>
+                    <Field type="text" name="TieuDe" placeholder="Tiêu đề" className='w-full p-2 outline-none border-t-0 border-s-0 border-e-0 rounded-none'/>
                     <ErrorMessage className="text-red-700 text-xs p-2 text-end" name="TieuDe" component="div" />
                 </div>
                 <div className='h-[55%]'>

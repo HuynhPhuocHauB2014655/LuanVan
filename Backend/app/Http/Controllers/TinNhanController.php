@@ -80,12 +80,12 @@ class TinNhanController extends Controller
     public function store(Request $rq)
     {
         $TVNhom = ThanhVienNhom::where("Nhom_id","=",$rq->Nhom_id)->where("MaTV","!=",explode('-', $rq->NguoiGui)[0])->get();
-        $tinNhan = new TinNhan();
-        $tinNhan->NguoiGui = $rq->NguoiGui;
-        $tinNhan->NguoiNhan = $rq->Nhom_id;
-        $tinNhan->TinNhan = $rq->TinNhan;
-        $tinNhan->Nhom_id = $rq->Nhom_id;
-        $tinNhan->save();
+        $tn = new TinNhan();
+        $tn->NguoiGui = $rq->NguoiGui;
+        $tn->NguoiNhan = $rq->Nhom_id;
+        $tn->TinNhan = $rq->TinNhan;
+        $tn->Nhom_id = $rq->Nhom_id;
+        $tn->save();
         foreach($TVNhom as $tv){
             $tinNhan = new TinNhan();
             $tinNhan->NguoiGui = $rq->NguoiGui;
@@ -105,7 +105,7 @@ class TinNhanController extends Controller
             $tinNhan->save();
             event(new sendMessage($tinNhan,$tv->MaTV));
         }
-        return response()->json("Đã gửi tin nhắn thành công");
+        return response()->json($tn);
     }
 
     public function makeGroup()

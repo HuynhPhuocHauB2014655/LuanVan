@@ -96,11 +96,9 @@ export default function Message() {
             setFakeMessage(payload.TinNhan);
             setValue("");
             try {
-                await axiosClient.post("tn/add", payload);
-                fetchMessages(selectedGroup.id);
-                setTimeout(() => {
-                    setFakeMessage("");
-                }, 900);
+                const res = await axiosClient.post("tn/add", payload);
+                setMessages(prevMessages => [...prevMessages, res.data]);
+                setFakeMessage("");
             } catch (error) {
                 console.log(error);
             }
