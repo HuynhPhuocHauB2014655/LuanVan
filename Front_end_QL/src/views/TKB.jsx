@@ -202,11 +202,11 @@ export default function TKB() {
         }
     }
     const onConfirm = () => {
-        setShowConfirm(0);
+        setShowConfirm(false);
         saveChange();
     }
     const onCancel = () => {
-        setShowConfirm(0);
+        setShowConfirm(false);
     }
     return (
         <div className="main-content">

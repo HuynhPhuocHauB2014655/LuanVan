@@ -54,9 +54,9 @@ export default function TKB() {
             setMatrix(tkbMatrix);
         }
     }, [tkb])
-    if(matrix){
-        console.log(matrix[0][0])
-    }
+    // if(matrix){
+    //     console.log(matrix[0][0])
+    // }
     return (
         <div className="main-content">
             <Menu />

@@ -177,17 +177,17 @@ export default function Account() {
                                             <h1 className="text-center border-b-2 mb-4 text-xl font-semibold border-cyan-500">Đổi mã bảo mật</h1>
                                             <div className="form-group mb-2">
                                                 <label className="form-label block" htmlFor="old_maBaoMat">Mã bảo mật cũ</label>
-                                                <Field type="password" name="old_maBaoMat" className="rounded w-full" />
+                                                <Field type="password" name="old_maBaoMat" className="rounded w-full px-2 py-1" />
                                                 <ErrorMessage name="old_maBaoMat" className="text-red-500" component="div" />
                                             </div>
                                             <div className="form-group mb-2">
-                                                <label className="form-label block" htmlFor="maBaoMat">Mã bảo mật</label>
-                                                <Field type="password" name="maBaoMat" className="rounded w-full" />
+                                                <label className="form-label block" htmlFor="maBaoMat">Mã bảo mật mới</label>
+                                                <Field type="password" name="maBaoMat" className="rounded w-full px-2 py-1" />
                                                 <ErrorMessage name="maBaoMat" className="text-red-500" component="div" />
                                             </div>
                                             <div className="form--auto">
                                                 <label className="form-label block" htmlFor="confirm_maBaoMat">Xác nhận mã bảo mật</label>
-                                                <Field type="password" name="confirm_maBaoMat" className="rounded w-full" />
+                                                <Field type="password" name="confirm_maBaoMat" className="rounded w-full px-2 py-1" />
                                                 <ErrorMessage name="confirm_maBaoMat" className="text-red-500" component="div" />
                                             </div>
                                             <div className="flex justify-center mt-2">
