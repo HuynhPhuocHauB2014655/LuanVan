@@ -3,7 +3,7 @@ import Menu from "../components/Menu";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faMagnifyingGlass, faXmark, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faMagnifyingGlass, faXmark, faArrowDown, faArrowLeft, faAnglesLeft, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +20,7 @@ export default function Message() {
     const [showSearch, setShowSearch] = useState(false);
     const [show, setShow] = useState(false);
     const [showMem, setShowMem] = useState(false);
+    const [toggleResult, setToggleResult] = useState(true);
     const [value, setValue] = useState("");
     const [count, setCount] = useState([]);
     const [update, setUpdate] = useState(0);
@@ -28,6 +29,8 @@ export default function Message() {
     const [resultSearch, setResultSearch] = useState();
     const [showResult, setShowResult] = useState(false);
     const [showButton, setShowButton] = useState(false);
+    const [onMd, setOnMd] = useState(false);
+    const [isGroupListVisible, setGroupListVisible] = useState(true);
     const messageEndRef = useRef(null);
     const messageRef = useRef(null);
     const fetchGroup = async () => {
@@ -59,7 +62,27 @@ export default function Message() {
         fetchMessages(data.id);
         setSeen(data);
         setSelectedGroup(data);
+        if (onMd) {
+            setGroupListVisible(false);
+        }
     }
+    const showGroupList = () => {
+        if (window.innerWidth <= 768) {
+            setGroupListVisible(true);
+        }
+    };
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setOnMd(true);
+            } else {
+                setOnMd(false);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     const countMem = (data) => {
         return data.length;
     }
@@ -150,6 +173,7 @@ export default function Message() {
         setShowResult(false);
         setForcus("");
         setShowSearch(state);
+        setToggleResult(true);
     }
     const search = (e) => {
         const searchValue = e.target.value.toLowerCase();
@@ -165,13 +189,11 @@ export default function Message() {
         const element = document.getElementById(id);
         element.scrollIntoView({ inline: 'center' });
         setForcus(id);
+        setToggleResult(false);
     }
     const getDate = (date) => {
         const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
         return d;
-    }
-    const lastMessage = () => {
-        return personalMessage()[personalMessage().length - 1];
     }
     const checkBottom = () => {
         if (messageRef.current) {
@@ -185,34 +207,53 @@ export default function Message() {
         }
     }
     const countNotSeen = (id) => {
-        const c  = count.find(item => item.id == id);
-        if(c){
+        const c = count.find(item => item.id == id);
+        if (c) {
             return c.unread_count;
-        }    
+        }
     }
-    console.log(messages);
+    const showListGroup = () => {
+        setSelectedGroup(null);
+        setGroupListVisible(true);
+    }
+    const changeToogleResult = (state) => {
+        setToggleResult(state);
+    }
     return (
         <div className="main-content">
             <Menu update={update} />
             <div className="right-part">
-                <div className="page-name">Tin nhắn</div>
-                <div className="flex h-[80vh] bg-white shadow-lg mt-2">
-                    <div className="w-[30%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative">
-                        {showResult &&
-                            <div className="w-full h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden">
-                                <div className="text-center font-bold my-3">Kết quả tìm kiếm</div>
-                                {resultSearch?.length == 0 ?
-                                    <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
-                                    :
-                                    resultSearch?.map((item) => (
-                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
-                                            <div className="">{item.NguoiGui}</div>
-                                            <div className="">{item.TinNhan}</div>
-                                        </div>
-                                    ))
-                                }
+                <div className="page-name relative">
+                    <button className={`absolute left-0 hover:text-blue-300 ${(!onMd || isGroupListVisible) && "hidden"}`} onClick={showListGroup}><FontAwesomeIcon icon={faArrowLeft} /></button>
+                    Tin nhắn
+                </div>
+                <div className="md:flex h-[80vh] bg-white shadow-lg mt-2 relative">
+                    {(showResult && !toggleResult) &&
+                        <button type="button" onClick={() => changeToogleResult(true)} className="absolute top-1/2 text-xl z-10"><FontAwesomeIcon icon={faAnglesRight} /></button>
+                    }
+                    {showResult &&
+                        <div className={`w-1/2 h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden ${!toggleResult && "hidden"}`}>
+                            <div className="text-center font-bold my-3 relative">
+                                Kết quả tìm kiếm
+                                <button type="button" onClick={() => changeToogleResult(false)} className="absolute right-1 text-xl"><FontAwesomeIcon icon={faAnglesLeft} /></button>
                             </div>
-                        }
+                            {resultSearch?.length == 0 ?
+                                <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
+                                :
+                                resultSearch?.map((item) => (
+                                    <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
+                                        <div className="">{item.NguoiGui}</div>
+                                        <div className="">{item.TinNhan}</div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    }
+                    <div
+                        className={`
+                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
+                            ${(!isGroupListVisible && onMd) && 'hidden'}
+                        `}>
                         {groups?.map((gr) => (
                             <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
@@ -225,7 +266,7 @@ export default function Message() {
                             </div>
                         ))}
                     </div>
-                    <div className="w-[70%]">
+                    <div className={`md:w-[70%] h-full w-full ${(onMd && isGroupListVisible) && "hidden"}`}>
                         {selectedGroup &&
                             <div className="h-full relative">
                                 <div className="relative h-full w-full">

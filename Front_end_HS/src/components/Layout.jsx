@@ -62,7 +62,7 @@ export default function Layout() {
         window.scrollTo(0, 0);
     }
     return (
-        <div className="mx-20 bg-amber-100 relative">
+        <div className="mx-2 bg-amber-100 relative">
             {showConfirm && (
                 <div className="confirm-overlay">
                 <div className="confirm-box">

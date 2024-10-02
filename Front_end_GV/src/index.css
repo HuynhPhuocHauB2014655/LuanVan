@@ -18,7 +18,7 @@
   min-height: 10vh;
 }
 .main-content{
-  display: flex;
+  @apply flex flex-col md:flex-row relative;
   min-height: 80vh;
 }
 .footer{
@@ -49,7 +49,8 @@ input[type="number"] {
  @apply text-2xl font-bold text-center border-b-2 border-cyan-400 py-3
 }
 .right-part{
-  @apply w-[80%] m-2
+  @apply m-2 md:w-4/5;
+  height: 100%;
 }
 .button-animation {
   @apply shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:text-white

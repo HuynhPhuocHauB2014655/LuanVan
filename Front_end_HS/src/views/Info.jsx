@@ -44,8 +44,7 @@ export default function Info() {
     return (
         <div className="main-content">
             <Menu />
-            <div className="right-part relative">
-                <div className="absolute bottom-0 left-0 text-sm">*Nếu thông tin có sai xót liên hệ với nhà trường để chỉnh sửa</div>
+            <div className="right-part">
                 <h1 className="page-name">Thông tin cá nhân</h1>
                 <button className="button mt-2 border-2 border-blue-400 hover:bg-blue-300" onClick={() => Show(!show)}>Đổi mật khẩu</button>
                 <div className="text-xl flex justify-center mt-5">
@@ -151,6 +150,7 @@ export default function Info() {
                         </Formik>
                     }
                 </div>
+                <div className="absolute bottom-0 right-1 text-sm">*Nếu thông tin có sai xót liên hệ với nhà trường để chỉnh sửa</div>
             </div>
         </div>
     )
