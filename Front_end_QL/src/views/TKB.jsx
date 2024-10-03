@@ -5,6 +5,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/userContext";
 export default function TKB() {
     const [classes, setClasses] = useState([]);
     const [subjectTN, setSubjectTN] = useState([]);
@@ -24,6 +26,14 @@ export default function TKB() {
     const [schedule, setSchedule] = useState(
         Array.from({ length: 6 }, () => Array(4).fill(null))
     );
+    const navigate = useNavigate();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName == "nhansu"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchData = async () => {
         try {
             const classes = await axiosClient.get('lop/list/withoutTkb');

@@ -34,7 +34,7 @@ const NotifyForm = ({ handleSubmit, close }) => {
                     <ErrorMessage className="text-red-700 text-xs p-2 text-end" name="NoiDung" component="div" />
                 </div>
                 <button type='submit' className='button border-blue-500 hover:bg-blue-300 hover:text-white absolute bottom-1'>Gửi</button>
-                <div className='absolute bottom-1 right-0 text-sm'>*Toàn trường: TT, Toàn Giáo viên: GV, Toàn Học sinh: HS</div>
+                <div className='absolute bottom-1 right-1 text-sm'>*Toàn trường: TT, Toàn Giáo viên: GV, Toàn Học sinh: HS</div>
             </Form>
         </Formik>
     )

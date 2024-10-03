@@ -78,28 +78,30 @@ Class TaiKhoanController extends Controller
     }
     public function changeAdmin(Request $request)
     {
-        $admin = Admin::pluck('MaBaoMat')->first();
-        if(!Hash::check($request->old_maBaoMat,$admin))
+        $admin = Admin::find($request->TaiKhoan);
+        if(!Hash::check($request->old_password,$admin->MatKhau))
         {
             return response()->json("Mã bảo mật không chính xác", 401);
         }
-        $baomat = new Admin();
-        $baomat->MaBaomat = $request->maBaoMat;
-        $baomat->save();
+        $admin->MatKhau = $request->new_password;
+        $admin->save();
         return response()->json("Đã cập nhật mã bảo mật thành công", 200);
     }
-    public function checkTime()
+    public function checkTime($id)
     {
-        $admin = Admin::pluck('updated_at')->first();
-        return response()->json($admin, 200);
+        $admin = Admin::find($id);
+        return response()->json($admin->created_at, 200);
     }
-    public function adminLogin($maBaoMat){
-        $admin = Admin::pluck('MaBaoMat')->first();
-        if(Hash::check($maBaoMat,$admin))
-        {
-            return response()->json("Đăng nhập thành công", 200);
+    public function adminLogin(Request $request){
+        $admin = Admin::find($request->TaiKhoan);
+        if(!$admin){
+            return response()->json("Không tìm thấy tài khoản", 404);
         }
-        return response()->json("Mã bảo mật không chính xác",401);
+        if(Hash::check($request->MatKhau,$admin->MatKhau))
+        {
+            return response()->json($admin->TaiKhoan, 200);
+        }
+        return response()->json("Mật khẩu không chính xác",401);
     }
     public function findHocSinh($MSHS)
     {
@@ -184,13 +186,18 @@ Class TaiKhoanController extends Controller
         return response()->json($giaovien->MSGV, 200);
     }
     public function test(){
-        $hs = HocSinh::where('MSHS','like','%2324%')->doesntHave('taiKhoan')->get();
-        foreach ($hs as $hs){
-            TKHocSinh::create([
-                'MSHS' => $hs->MSHS,
-                'MatKhau' => $hs->MSHS . "123",
-            ]);
-        }
+        $admin = Admin::create([
+            'TaiKhoan' => "admin",
+            'MatKhau' => "123456",
+        ]);
+        $daoTao = Admin::create([
+            'TaiKhoan' => "daotao",
+            'MatKhau' => "123456",
+        ]);
+        $nhanSu = Admin::create([
+            'TaiKhoan' => "nhansu",
+            'MatKhau' => "123456",
+        ]);
         return response()->json("OK",200);
     }
 }

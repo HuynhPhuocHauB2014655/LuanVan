@@ -11,6 +11,7 @@ import { useStateContext } from "../context/Context";
 import { useRef } from "react";
 import pusher from "../pusher";
 import moment from 'moment';
+import { useNavigate } from "react-router-dom";
 export default function Message() {
     const [messages, setMessages] = useState([]);
     const [groups, setGroups] = useState([]);
@@ -28,6 +29,15 @@ export default function Message() {
     const [showButton, setShowButton] = useState(false);
     const messageEndRef = useRef(null);
     const messageRef = useRef(null);
+    const navigate = useNavigate();
+    const {setError} = useStateContext();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName != "admin"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchGroup = async () => {
         try {
             const group = await axiosClient.get(`tn`);

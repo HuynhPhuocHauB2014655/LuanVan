@@ -14,12 +14,18 @@ import moment from 'moment';
 export default function Account() {
     const [time, setTime] = useState("");
     const [show, setShow] = useState(0);
-    const { setMessage } = useStateContext();
-    const { setMaBaoMat } = useUserContext();
+    const { setMessage, setError } = useStateContext();
+    const { setUserName } = useUserContext();
     const navigate = useNavigate();
     const searchString = useRef("");
     const [searchResponse, setSearchResponse] = useState({});
     const [searchresult, setSearchresult] = useState(0);
+    useEffect(()=>{
+        if(userName != "admin"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const checkTime = async () => {
         const response = await axiosClient.get("/tk/admin/check");
         const today = new Date().getTime();
@@ -51,7 +57,7 @@ export default function Account() {
             }
             const response = await axiosClient.post(`/tk/update/admin`, payload);
             setMessage(response.data);
-            setMaBaoMat(false);
+            setUserName(false);
             navigate("/login");
 
         } catch (error) {

@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/userContext";
 export default function Teacher() {
     const [teachersData, setTeachersData] = useState([]);
     const [subjectsData, setSubjectsData] = useState([]);
@@ -20,6 +22,15 @@ export default function Teacher() {
     const [endPage, setEndPage] = useState(0);
     const [showConfirm, setShowConfirm] = useState(0);
     const formRef = useRef();
+    const navigate = useNavigate();
+    const {setError} = useStateContext();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName == "daotao"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchData = async (page) => {
         const teachers = await axiosClient.get(`/gv/all?page=${page}`);
         setTeachersData(teachers.data.data);

@@ -13,7 +13,7 @@ export default function ClassInfo() {
     const [view, setView] = useState(1);
     const [loaiDiem, setLoaiDiem] = useState([]);
     const [diem, setDiem] = useState([]);
-    const { nienKhoa, setMessage } = useStateContext();
+    const { nienKhoa, setMessage,setError } = useStateContext();
     const [diemHK1, setDiemHK1] = useState([]);
     const [diemHK2, setDiemHK2] = useState([]);
     const [subjects, setSubjects] = useState([]);
@@ -21,6 +21,13 @@ export default function ClassInfo() {
     const [dsKhenThuong, setDsKhenThuong] = useState([]);
     const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(0);
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName == "nhansu"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -108,7 +115,7 @@ export default function ClassInfo() {
     const onCancel = () => {
         setShowConfirm(0);
     }
-    console.log(kqht)
+    console.log()
     return (
         <div className="main-content relative">
             {showConfirm === 1 &&

@@ -9,7 +9,7 @@ import AlterConfirm from "./Confirm";
 export default function Layout() {
     const { message, setMessage, error, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
-    const { maBaoMat, setMaBaoMat } = useUserContext();
+    const { userName, setUserName } = useUserContext();
     const [showConfirm, setShowConfirm] = useState(0);
     const navigate = useNavigate();
     const fetchData = async () => {
@@ -20,14 +20,14 @@ export default function Layout() {
             console.log(error);
         }
     }
-    if (!maBaoMat) {
+    if (!userName) {
         return <Navigate to="/login" replace/>
     }
     const showConfrim = () => {
         setShowConfirm(1);
     }
     const onConfirm = () => {
-        setMaBaoMat(false);
+        setUserName("");
         navigate("/login");
     }
     const onCancel = () => {

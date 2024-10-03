@@ -9,6 +9,7 @@ use App\Models\Lop;
 use App\Models\HocLop;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Events\sendNotify;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -34,7 +35,11 @@ class TBController extends Controller
         $params = array_map(function ($prefix) {
             return "{$prefix}%";
         }, $prefixes);
-        $tb = ThongBao::where('NguoiGui','like',"%{$MSGV}")->whereRaw($conditions, $params)->orderBy("created_at","DESC")->get();
+        if($MSGV == "Nhà trường"){
+            $tb = ThongBao::whereIn('NguoiGui', ["Nhà trường", "Phòng đào tạo", "Phòng nhân sự"])->whereRaw($conditions, $params)->orderBy("created_at","DESC")->get();
+        }else{
+            $tb = ThongBao::where('NguoiGui','like',"%{$MSGV}")->whereRaw($conditions, $params)->orderBy("created_at","DESC")->get();
+        }
         return response()->json($tb, 200);
     }
     public function getHS($MSHS)
@@ -67,6 +72,7 @@ class TBController extends Controller
                     "TrangThai"=>$rq->TrangThai,
                     "TieuDe"=>$rq->TieuDe
                 ]);
+                event(new sendNotify("Bạn có thông báo mới từ ".$rq->NguoiGui,$hs->MSHS));
             }
             foreach($gv as $gv){
                 ThongBao::create([
@@ -76,6 +82,7 @@ class TBController extends Controller
                     "TrangThai"=>$rq->TrangThai,
                     "TieuDe"=>$rq->TieuDe
                 ]);
+                event(new sendNotify("Bạn có thông báo mới từ ".$rq->NguoiGui,$gv->MSGV));
             }
             return response()->json('Đã gửi thông báo thành công!', 200);
         }
@@ -96,6 +103,7 @@ class TBController extends Controller
                     "TrangThai"=>$rq->TrangThai,
                     "TieuDe"=>$rq->TieuDe
                 ]);
+                event(new sendNotify("Bạn có thông báo mới từ ".$rq->NguoiGui,$hs->MSHS));
             }
             return response()->json('Đã gửi thông báo thành công!', 200);
         }
@@ -116,6 +124,7 @@ class TBController extends Controller
                     "TrangThai"=>$rq->TrangThai,
                     "TieuDe"=>$rq->TieuDe
                 ]);
+                event(new sendNotify("Bạn có thông báo mới từ ".$rq->NguoiGui,$gv->MSGV));
             }
             return response()->json('Đã gửi thông báo thành công!', 200);
         }
@@ -136,6 +145,7 @@ class TBController extends Controller
                     "TrangThai"=>$rq->TrangThai,
                     "TieuDe"=>$rq->TieuDe
                 ]);
+                event(new sendNotify("Bạn có thông báo mới từ ".$rq->NguoiGui,$hs->MSHS));
             }
             return response()->json('Đã gửi thông báo thành công!', 200);
         }

@@ -19,7 +19,17 @@ export default function Notification() {
     const [showForm, setShowForm] = useState(0);
     const [info, setInfo] = useState();
     const fetchTB = async () => {
-        const send = await axiosClient.get(`/tb/gv/send/Nhà trường`);
+        let NguoiGui;
+        if(userName == "admin"){
+            NguoiGui = "Nhà trường";
+        }
+        if(userName == "daotao"){
+            NguoiGui = "Phòng đào tạo";
+        }
+        if(userName == "nhansu"){
+            NguoiGui = "Phòng nhân sự";
+        }
+        const send = await axiosClient.get(`/tb/gv/send/${NguoiGui}`);
         setSended(send.data);
     };
     useEffect(() => {
@@ -29,7 +39,7 @@ export default function Notification() {
         const nguoiNhan = value.NguoiNhan.split(';').filter(id => id !== '');
         nguoiNhan.map( async (item)=>{
             const payload = {
-                NguoiGui: "Nhà trường",
+                NguoiGui: userName == "admin" ? "Nhà Trường" : (userName == "daotao") ? "Phòng đào tạo" : "Phòng nhân sự",
                 NguoiNhan: item,
                 NoiDung: value.NoiDung,
                 TrangThai: 0,

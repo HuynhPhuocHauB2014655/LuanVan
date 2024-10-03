@@ -1,27 +1,27 @@
 import {createContext, useContext, useState } from "react";
 
 const StateContext = createContext({
-    maBaoMat:null,
-    _setMaBaoMat:() => {},
-    setMaBaoMat:() => {}
+    userName:null,
+    _setUserName:() => {},
+    setUserName:() => {}
 })
 
 export const UserProvider = ({children}) => {
-    const [maBaoMat,_setMaBaoMat] = useState(sessionStorage.getItem('maBaoMat'));
-    const setMaBaoMat = (maBaoMat) => {
-        _setMaBaoMat(maBaoMat)
-        if(maBaoMat){
-            sessionStorage.setItem('maBaoMat',maBaoMat)
+    const [userName,_setUserName] = useState(sessionStorage.getItem('userName'));
+    const setUserName = (userName) => {
+        _setUserName(userName)
+        if(userName){
+            sessionStorage.setItem('userName',userName)
         }
         else{
-            sessionStorage.removeItem('maBaoMat')
+            sessionStorage.removeItem('userName')
         }
     }
     return(
         <StateContext.Provider value={{
-            maBaoMat,
-            _setMaBaoMat,
-            setMaBaoMat
+            userName,
+            _setUserName,
+            setUserName
         }}>
             {children}
         </StateContext.Provider>

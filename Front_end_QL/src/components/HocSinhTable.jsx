@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 const HocSinhTable = ({ datas}) => {
     const navigate = useNavigate();
+    const toStudentInfo = (mshs) => {
+        navigate('/student-info', { state: { Mshs: mshs } });
+    }
     return (
         <table className="border-collapse mt-2 mb-2 w-full">
             <thead>
@@ -22,7 +25,7 @@ const HocSinhTable = ({ datas}) => {
                 {datas.map((data, index) => (
                     <tr key={index}>
                         <td className="border border-gray-400 p-2">{index + 1}</td>
-                        <td className="border border-gray-400 p-2">{data.MSHS}</td>
+                        <td className="border border-gray-400 p-2 text-blue-400 cursor-pointer" onClick={()=>toStudentInfo(data.MSHS)}>{data.MSHS}</td>
                         <td className="border border-gray-400 p-2">{data.HoTen}</td>
                         <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
                         <td className="border border-gray-400 p-2">{data.GioiTinh}</td>

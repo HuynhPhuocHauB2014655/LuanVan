@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
 import AlterConfirm from "../components/Confirm";
+import { useUserContext } from "../context/userContext";
 export default function StudentInfo() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function StudentInfo() {
     const [showConfirm, setShowConfirm] = useState(0);
     const [initialValues, setInitialValues] = useState({});
     const formRef = useRef();
+    const {userName} = useUserContext();
     const fetchData = async () => {
         const res = await axiosClient.get(`hs/show/${Mshs}`);
         setInfo(res.data);

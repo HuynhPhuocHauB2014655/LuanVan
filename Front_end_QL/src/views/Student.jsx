@@ -8,6 +8,7 @@ import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, f
 import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/userContext";
 export default function Student() {
     const [datas, setDatas] = useState([]);
     const navigate = useNavigate();
@@ -21,6 +22,14 @@ export default function Student() {
     const [endPage, setEndPage] = useState(0);
     const [showConfirm, setShowConfirm] = useState(0);
     const formRef = useRef();
+    const {setError} = useStateContext();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName == "daotao"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchData = async (page) => {
         try {
             const response = await axiosClient.get(`/hs/all?page=${page}`);

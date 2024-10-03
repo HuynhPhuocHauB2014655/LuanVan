@@ -15,7 +15,7 @@ export default function Class() {
     const [XHCount, setXHCount] = useState(0);
     const [showForm, setShowForm] = useState(0);
     const [nienKhoaList, setNienKhoaList] = useState([]);
-    const { setMessage,setError } = useStateContext();
+    const { userName,setMessage,setError } = useStateContext();
     const [visibleTables, setVisibleTables] = useState({});
     const { nienKhoa } = useStateContext();
     const [classTN, setClassTN] = useState([]);
@@ -26,8 +26,14 @@ export default function Class() {
     const [confMessage, setConfMessage] = useState("");
     const [classed, setClassed] = useState();
     const selectedClass = useRef();
-    const navigate = useNavigate();
     const [defaultV, setDefaultV] = useState("default");
+    const navigate = useNavigate();
+    useEffect(()=>{
+        if(userName == "nhansu"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchNewStudent = async () => {
         try {
             const response = await axiosClient.get("/hs/new");

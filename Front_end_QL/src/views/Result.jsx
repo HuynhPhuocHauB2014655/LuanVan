@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
+import { useUserContext } from "../context/userContext";
 export default function Result() {
     const { nienKhoa } = useStateContext();
     const [classList, setClassLiss] = useState([]);
@@ -21,7 +22,14 @@ export default function Result() {
     const navigate = useNavigate();
     const [Nk, setNk] = useState([]);
     const NKRef = useRef();
-
+    const {setError} = useStateContext();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName == "nhansu"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     useEffect(() => {
         const fetchData = async () => {
             const nk = await axiosClient.get("/nk/index");

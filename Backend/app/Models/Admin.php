@@ -12,11 +12,12 @@ class Admin extends Model
     public $incrementing = false;
     protected $table = 'admin';
     protected $fillable = [
-        'MaBaoMat'
+        'TaiKhoan',
+        'MatKhau'
     ];
-    protected $primaryKey = 'MaBaoMat';
-    public function setMaBaoMatAttribute($value)
+    protected $primaryKey = 'TaiKhoan';
+    public function setMatKhauAttribute($value)
     {
-        $this->attributes['MaBaoMat'] = Hash::make($value);
+        $this->attributes['MatKhau'] = Hash::make($value);
     }
 }

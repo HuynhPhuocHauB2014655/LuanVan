@@ -2,8 +2,10 @@ import axiosClient from "../axios-client"
 import React, { useEffect, useRef, useState } from 'react';
 import { useStateContext } from "../context/Context";
 import Menu from "../components/Menu";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/userContext";
 export default function HK_NK() {
-    const { message, setMessage } = useStateContext();
+    const { message, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
     const [isShow, setIsShow] = useState(0);
     const [datas, setDatas] = useState([]);
@@ -12,6 +14,14 @@ export default function HK_NK() {
     const NgayBDRef = useRef();
     const HanSuaDiemRef = useRef();
     const nienKhoaHienTaiRef = useRef();
+    const navigate = useNavigate();
+    const {userName} = useUserContext();
+    useEffect(()=>{
+        if(userName != "admin"){
+            setError("Bạn không có quyền truy cập trang này");
+            navigate('/');
+        }
+    },[userName]);
     const fetchData = async () => {
         try {
             const response = await axiosClient.get('/nk/index');
