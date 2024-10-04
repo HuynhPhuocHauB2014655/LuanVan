@@ -75,6 +75,7 @@ export default function GuestLayout() {
                     onSubmit={handleSubmit}
                 >
                     <Form className="border-2 min-w-[30%] px-10 m-auto py-10 border-cyan-500 bg-white space-y-5 rounded">
+                        <div className="text-center text-xl font-bold text-blue-400 border-b-2 pb-3 border-blue-200">Đăng nhập</div>
                         <div className="w-[70%] mx-auto space-y-2">
                             <label htmlFor="TaiKhoan" className="f-lable">Tên tài khoản</label>
                             <Field name="TaiKhoan" type="text" className="f-field" placeholder="Nhập tên tài khoản"/>

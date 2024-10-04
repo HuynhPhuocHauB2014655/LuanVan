@@ -67,7 +67,7 @@ export default function Menu({ update }) {
         setActive(id + 1);
     }, []);
     return (
-        <div className={`md:w-1/5 w-1/2  fixed md:static md:z-0 z-10 bottom-2 md:border-e-4 md:border-cyan-200 ${menuOpen && "shadow-lg shadow-cyan-400 bg-white border-2 border-cyan-300"} md:bg-transparent`}>
+        <div className={`md:w-1/5 w-1/2  fixed md:static md:z-0 z-10 bottom-2 md:border-e-4 md:shadow-none md:border-cyan-200 ${menuOpen && "shadow-lg shadow-cyan-400 bg-white border-2 border-cyan-300"} md:bg-transparent`}>
             <ul className={` ${menuOpen ? "block" : "hidden"} md:block`}>
                 {menu_items.map((item) => (
                     <li

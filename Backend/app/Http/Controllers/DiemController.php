@@ -425,7 +425,7 @@ class DiemController extends Controller
     // Ham test nhap diem
 
     public function NhapDiem(){
-        $hs = HocSinh::all();
+        $hs = HocSinh::has('lop')->get();
         foreach ($hs as $hs){
             if($hs->MaBan == "XH"){
                 $monhoc = MonHoc::whereIn('MaMH',['CB1','CB2','CB3'])
@@ -436,21 +436,21 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "222-23";
+                    $diemtx->MaHK = "122-23";
                     $diemtx->MaLoai = "tx";
                     $diemtx->Diem = rand(6,10);
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "222-23";
+                    $diemgk->MaHK = "122-23";
                     $diemgk->MaLoai = "gk";
                     $diemgk->Diem = rand(6,10);
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "222-23";
+                    $diemck->MaHK = "122-23";
                     $diemck->MaLoai = "ck";
                     $diemck->Diem = rand(6,10);
                     $diemck->save();
@@ -460,21 +460,21 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "222-23";
+                    $diemtx->MaHK = "122-23";
                     $diemtx->MaLoai = "tx";
                     $diemtx->Diem = 1;
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "222-23";
+                    $diemgk->MaHK = "122-23";
                     $diemgk->MaLoai = "gk";
                     $diemgk->Diem = 1;
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "222-23";
+                    $diemck->MaHK = "122-23";
                     $diemck->MaLoai = "ck";
                     $diemck->Diem = 1;
                     $diemck->save();
@@ -488,21 +488,21 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "222-23";
+                    $diemtx->MaHK = "122-23";
                     $diemtx->MaLoai = "tx";
                     $diemtx->Diem = rand(6,10);
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "222-23";
+                    $diemgk->MaHK = "122-23";
                     $diemgk->MaLoai = "gk";
                     $diemgk->Diem = rand(6,10);
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "222-23";
+                    $diemck->MaHK = "122-23";
                     $diemck->MaLoai = "ck";
                     $diemck->Diem = rand(6,10);
                     $diemck->save();
@@ -512,21 +512,21 @@ class DiemController extends Controller
                     $diemtx = new Diem();
                     $diemtx->MSHS = $hs->MSHS;
                     $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "222-23";
+                    $diemtx->MaHK = "122-23";
                     $diemtx->MaLoai = "tx";
                     $diemtx->Diem = 1;
                     $diemtx->save();
                     $diemgk = new Diem();
                     $diemgk->MSHS = $hs->MSHS;
                     $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "222-23";
+                    $diemgk->MaHK = "122-23";
                     $diemgk->MaLoai = "gk";
                     $diemgk->Diem = 1;
                     $diemgk->save();
                     $diemck = new Diem();
                     $diemck->MSHS = $hs->MSHS;
                     $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "222-23";
+                    $diemck->MaHK = "122-23";
                     $diemck->MaLoai = "ck";
                     $diemck->Diem = 1;
                     $diemck->save();

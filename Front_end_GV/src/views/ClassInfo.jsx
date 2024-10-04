@@ -269,6 +269,7 @@ export default function ClassInfo() {
         } finally {
             handleShow(2);
             checkTongKet();
+            setShowButton(false);
         }
     }
     const TongKetHK = async (maHK) => {
@@ -286,6 +287,7 @@ export default function ClassInfo() {
         } finally {
             handleShow(2);
             checkTongKet();
+            setShowButton(false);
         }
     }
     const sendTB = async (value) => {
@@ -331,8 +333,8 @@ export default function ClassInfo() {
                     <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
                 </div>
                 <div className="my-2 flex">
-                    <button className="teacher-head" onClick={() => handleShow(1)}>Danh sách lớp</button>
-                    <button className="teacher-head" onClick={() => handleShow(2)}>Quản lí điểm</button>
+                    <button className={`teacher-head ${show == 1 && "bg-cyan-300"}`} onClick={() => handleShow(1)}>Danh sách lớp</button>
+                    <button className={`teacher-head ${show == 2 && "bg-cyan-300"}`} onClick={() => handleShow(2)}>Quản lí điểm</button>
                 </div>
                 <div className="flex justify-between px-2 text-xl">
                     <p><strong>Mã lớp:</strong> {classData.lop.MaLop}</p>

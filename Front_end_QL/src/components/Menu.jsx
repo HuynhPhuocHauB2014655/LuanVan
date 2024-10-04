@@ -3,10 +3,13 @@ import classNames from 'classnames';
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserContext } from "../context/userContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 export default function Menu() {
     const [active, setActive] = useState(0);
     const { userName } = useUserContext();
     const [menu, setMenu] = useState();
+    const [menuOpen, setMenuOpen] = useState(false);
     useEffect((() => {
         if (userName == "admin") {
             const menu_items = [
@@ -62,20 +65,25 @@ export default function Menu() {
         }
     }, [menu]);
     return (
-        <ul className="border-e-4 border-cyan-200 px-2 w-[15%]">
-            {menu?.map((item) => (
-                <li
-                    key={item.id}
-                    className={classNames('menu-item', { 'bg-slate-100 border-b-2 border-cyan-200': active === item.id })}
-                >
-                    <Link
-                        className="py-2 ps-2 block border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100"
-                        to={item.route} onClick={() => activeItem(item.id)}
+        <div className={`md:w-1/5 w-1/2  fixed md:static md:z-0 z-10 bottom-2 md:border-e-4 md:shadow-none md:border-cyan-200 ${menuOpen && "shadow-lg shadow-cyan-400 bg-white border-2 border-cyan-300"} md:bg-transparent`}>
+            <ul className={` ${menuOpen ? "block" : "hidden"} md:block`}>
+                {menu?.map((item) => (
+                    <li
+                        key={item.id}
+                        className={classNames('menu-item', { 'bg-slate-100 border-b-2 border-cyan-200': active === item.id })}
                     >
-                        {item.label}
-                    </Link>
-                </li>
-            ))}
-        </ul>
+                        <Link
+                            className="py-2 ps-2 block border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100 relative"
+                            to={item.route} onClick={() => activeItem(item.id)}
+                        >
+                            {item.label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+            <button className="md:hidden px-2 py-1 bg-blue-500 text-white mt-3 m-1 relative" onClick={() => setMenuOpen(!menuOpen)}>
+                <FontAwesomeIcon icon={faBars} />
+            </button>
+        </div>
     )
 }

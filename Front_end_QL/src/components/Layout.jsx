@@ -58,7 +58,7 @@ export default function Layout() {
         window.scrollTo(0, 0);
     }
     return (
-        <div className="mx-10 bg-amber-100 relative">
+        <div className="mx-3 bg-amber-100 relative">
             {message && <div className="fixed bg-blue-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{message}</div>}
             {error && <div className="fixed bg-red-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{error}</div>}
             <header className="bg-cyan-400 py-2 rounded header relative">

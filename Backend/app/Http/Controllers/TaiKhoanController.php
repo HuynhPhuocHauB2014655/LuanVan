@@ -81,16 +81,16 @@ Class TaiKhoanController extends Controller
         $admin = Admin::find($request->TaiKhoan);
         if(!Hash::check($request->old_password,$admin->MatKhau))
         {
-            return response()->json("Mã bảo mật không chính xác", 401);
+            return response()->json("Mật khẩu không chính xác", 401);
         }
         $admin->MatKhau = $request->new_password;
         $admin->save();
-        return response()->json("Đã cập nhật mã bảo mật thành công", 200);
+        return response()->json("Đã cập nhật mật khẩu thành công", 200);
     }
     public function checkTime($id)
     {
         $admin = Admin::find($id);
-        return response()->json($admin->created_at, 200);
+        return response()->json($admin->updated_at, 200);
     }
     public function adminLogin(Request $request){
         $admin = Admin::find($request->TaiKhoan);
