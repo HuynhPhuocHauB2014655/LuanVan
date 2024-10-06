@@ -155,7 +155,9 @@ Route::post('/diem/tk/namhoc',[DiemController::class,'TongKetNamHoc']);
 Route::post('/diem/mon/rlh',[DiemController::class,'monRLH']);
 Route::post('/diem/rlh',[DiemController::class,'diemRLH']);
 Route::get('/diem',[DiemController::class,'NhapDiem']);
-
+Route::get('/tongKet/truong/{MaNK}',[DiemController::class,'TongKetTruong']);
+Route::get('/tongKet/khoi/{MaNK}',[DiemController::class,'TongKetKhoi']);
+Route::get('/tongKet/lop/{MaNK}',[DiemController::class,'TongKetLop']);
 
 //ren luyen route
 Route::get('/rl/index',[RenLuyenController::class,'index']);

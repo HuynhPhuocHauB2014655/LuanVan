@@ -10,6 +10,7 @@ use App\Models\ThongBao;
 use App\Models\Lop;
 use App\Models\HocLop;
 use App\Models\MonHoc;
+use App\Models\KhenThuong;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
 class DiemController extends Controller
@@ -422,6 +423,141 @@ class DiemController extends Controller
         return response()->json("Đã cập nhật điểm thành công",200);
     }
     
+    public function TongKetTruong($MaNK)
+    {
+        $hs = HocLop::with("lop")->where("MaNK", $MaNK)->get();
+        $tong = $hs->count();
+        $k10 = $hs->filter(function ($hs) {
+            return $hs->lop->MaKhoi == 10;
+        })->count();
+        $k11 = $hs->filter(function ($hs) {
+            return $hs->lop->MaKhoi == 11;
+        })->count();
+        $k12 = $hs->filter(function ($hs) {
+            return $hs->lop->MaKhoi == 12;
+        })->count();
+        $ll = $hs->where("MaTT",3)->count();
+        $rlh = $hs->where("MaTT",2)->count();
+        $HLtot = $hs->where("MaHL", 4)->count();
+        $HLkha = $hs->where("MaHL", 3)->count();
+        $HLdat = $hs->where("MaHL", 2)->count();
+        $HLcd = $hs->where("MaHL", 1)->count();
+        $RLtot = $hs->where("MaRL",4)->count();
+        $RLkha = $hs->where("MaRL",3)->count();
+        $RLdat = $hs->where("MaRL",2)->count();
+        $RLcd = $hs->where("MaRL",1)->count();
+        $kt = KhenThuong::where("MaNK",$MaNK)->get();
+        $gioi = $kt->where("KhenThuong","Học sinh Giỏi")->count();
+        $xs = $kt->where("KhenThuong","Học sinh Xuất sắc")->count();
+        $data = [
+            'TongHS' => $tong,
+            'K10' => $k10,
+            'K11' => $k11,
+            'K12' => $k12,
+            'LL' => $ll,
+            'RLH' => $rlh,
+            'HLTot' => $HLtot,
+            'HLKha' => $HLkha,
+            'HLDat' => $HLdat,
+            'HLCD' => $HLcd,
+            'RLTot' => $RLtot,
+            'RLKha' => $RLkha,
+            'RLDat' => $RLdat,
+            'RLCD' => $RLcd,
+            'Gioi' => $gioi,
+            'Xuatsac' => $xs
+        ];
+
+        return response()->json($data, 200);
+    }
+    public function TongKetKhoi($MaNK)
+    {
+        $result = [];
+        for ($i = 12; $i >= 10; $i--) { 
+            $hs = HocLop::with("lop")->whereHas('lop', function ($query) use ($i) {
+                $query->where('MaKhoi', $i);
+            })->where("MaNK", $MaNK)->get();
+            $tong = $hs->count();
+            $ll = $hs->where("MaTT",3)->count();
+            $rlh = $hs->where("MaTT",2)->count();
+            $HLtot = $hs->where("MaHL", 4)->count();
+            $HLkha = $hs->where("MaHL", 3)->count();
+            $HLdat = $hs->where("MaHL", 2)->count();
+            $HLcd = $hs->where("MaHL", 1)->count();
+            $RLtot = $hs->where("MaRL",4)->count();
+            $RLkha = $hs->where("MaRL",3)->count();
+            $RLdat = $hs->where("MaRL",2)->count();
+            $RLcd = $hs->where("MaRL",1)->count();
+            $kt = KhenThuong::with("lop")->whereHas('lop', function ($query) use ($i) {
+                $query->where('MaKhoi', $i);
+            })->where("MaNK",$MaNK)->get();
+            $gioi = $kt->where("KhenThuong","Học sinh Giỏi")->count();
+            $xs = $kt->where("KhenThuong","Học sinh Xuất sắc")->count();
+            $data = [
+                'Khoi' => $i,
+                'TongHS' => $tong,
+                'LL' => $ll,
+                'RLH' => $rlh,
+                'HLTot' => $HLtot,
+                'HLKha' => $HLkha,
+                'HLDat' => $HLdat,
+                'HLCD' => $HLcd,
+                'RLTot' => $RLtot,
+                'RLKha' => $RLkha,
+                'RLDat' => $RLdat,
+                'RLCD' => $RLcd,
+                'Gioi' => $gioi,
+                'Xuatsac' => $xs
+            ];
+            $result[] = $data;
+        }
+        return response()->json($result, 200);
+    }
+    public function TongKetLop($MaNK)
+    {
+        $lop = Lop::with(['giaoVien'])->where("MaNK",$MaNK)->get();
+        $result = [];
+        foreach($lop as $lop){
+            $hs = HocLop::with("lop")->where("MaNK", $MaNK)->where("MaLop",$lop->MaLop)->get();
+            $tong = $hs->count();
+            $ll = $hs->where("MaTT",3)->count();
+            $rlh = $hs->where("MaTT",2)->count();
+            $HLtot = $hs->where("MaHL", 4)->count();
+            $HLkha = $hs->where("MaHL", 3)->count();
+            $HLdat = $hs->where("MaHL", 2)->count();
+            $HLcd = $hs->where("MaHL", 1)->count();
+            $RLtot = $hs->where("MaRL",4)->count();
+            $RLkha = $hs->where("MaRL",3)->count();
+            $RLdat = $hs->where("MaRL",2)->count();
+            $RLcd = $hs->where("MaRL",1)->count();
+            $kt = KhenThuong::where("MaNK",$MaNK)->where("MaLop",$lop->MaLop)->get();
+            $gioi = $kt->where("KhenThuong","Học sinh Giỏi")->count();
+            $xs = $kt->where("KhenThuong","Học sinh Xuất sắc")->count();
+            $data = [
+                'MaLop' => $lop->MaLop,
+                'TenLop' => $lop->TenLop,
+                'ChuNhiem' => $lop->giaoVien->MSGV . "-" . $lop->giaoVien->TenGV, 
+                'TongHS' => $tong,
+                'LL' => $ll,
+                'RLH' => $rlh,
+                'HLTot' => $HLtot,
+                'HLKha' => $HLkha,
+                'HLDat' => $HLdat,
+                'HLCD' => $HLcd,
+                'RLTot' => $RLtot,
+                'RLKha' => $RLkha,
+                'RLDat' => $RLdat,
+                'RLCD' => $RLcd,
+                'Gioi' => $gioi,
+                'Xuatsac' => $xs
+            ];
+            $result[] = $data; 
+        }
+
+        return response()->json($result, 200);
+    }
+
+
     // Ham test nhap diem
 
     public function NhapDiem(){

@@ -13,7 +13,11 @@ export default function Result() {
     const { nienKhoa } = useStateContext();
     const [classList, setClassLiss] = useState([]);
     const [studentList, setStudentList] = useState([]);
+    const [summary, setSummary] = useState([]);
+    const [summaryGrade, setSummaryGrade] = useState([]);
+    const [summaryClass, setSummaryClass] = useState([]);
     const [pages, setPages] = useState([]);
+    const [style, setStyle] = useState(1);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [startPage, setStartPage] = useState(0);
@@ -21,22 +25,23 @@ export default function Result() {
     const [view, setView] = useState(1);
     const navigate = useNavigate();
     const [Nk, setNk] = useState([]);
+    const [forcus, setForcus] = useState("");
     const NKRef = useRef();
-    const {setError} = useStateContext();
-    const {userName} = useUserContext();
-    useEffect(()=>{
-        if(userName == "nhansu"){
+    const { setError } = useStateContext();
+    const { userName } = useUserContext();
+    useEffect(() => {
+        if (userName == "nhansu") {
             setError("Bạn không có quyền truy cập trang này");
             navigate('/');
         }
-    },[userName]);
+    }, [userName]);
     useEffect(() => {
         const fetchData = async () => {
             const nk = await axiosClient.get("/nk/index");
             setNk(nk.data);
         }
         fetchData();
-    },[])
+    }, [])
     const fetchByClass = async (NK) => {
         try {
             const response = await axiosClient.get(`/lop/list/${NK}`);
@@ -99,6 +104,36 @@ export default function Result() {
     const classView = () => {
         setView(1);
     }
+    const fetchSummary = async () => {
+        try {
+            const response = await axiosClient.get(`/tongKet/truong/${nienKhoa.NienKhoa}`);
+            setSummary(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    const fetchSummaryClass = async () => {
+        try {
+            const response = await axiosClient.get(`/tongKet/lop/${nienKhoa.NienKhoa}`);
+            setSummaryClass(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    const fetchSummaryGrade = async () => {
+        try {
+            const response = await axiosClient.get(`/tongKet/khoi/${nienKhoa.NienKhoa}`);
+            setSummaryGrade(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    const sumView = () => {
+        if (summary.length == 0) {
+            fetchSummary();
+        }
+        setView(3);
+    }
     const handlePageChange = (page) => {
         fetchByStudent(page);
     }
@@ -128,15 +163,49 @@ export default function Result() {
         }
 
     }
-    console.log();
+    const changeStyle = (e) => {
+        if (e.target.value == 2 && summaryGrade.length == 0) {
+            fetchSummaryGrade();
+        }
+        if (e.target.value == 3 && summaryClass.length == 0) {
+            fetchSummaryClass();
+        }
+        setStyle(e.target.value);
+    }
+    const searchClass = (e) => {
+        e.preventDefault();
+        const searchValue = e.target.search.value;
+        const filter = summaryClass.find(item => item.TenLop === searchValue);
+        if (filter) {
+            scrollTo(filter.MaLop);
+        } else {
+            setError("Không tìm thấy kết quả");
+        }
+    }
+    const scrollTo = (id) => {
+        const element = document.getElementById(id);
+        element.scrollIntoView();
+        setForcus(id);
+    }
+    useEffect(() => {
+        if (forcus) {
+            const timer = setTimeout(() => {
+                setForcus("");
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [forcus]);
+    // console.log(summary);
     return (
         <div className="main-content">
             <Menu />
             <div className="right-part">
                 <h1 className="page-name">Kết quả học tập</h1>
                 <div className="flex w-full">
-                    <button onClick={classView} className="button bg-slate-100 shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-[1.02] hover:shadow-lg mt-2 border-blue-400 hover:text-white w-1/2">Theo lớp</button>
-                    <button onClick={studentView} className="button bg-slate-100 shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-[1.02] hover:shadow-lg mt-2 border-blue-400 hover:text-white w-1/2">Theo học sinh</button>
+                    <button onClick={classView} className={`${view == 1 ? "bg-blue-600 text-white" : "bg-slate-100"} button shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-[1.02] hover:shadow-lg mt-2 border-blue-400 hover:text-white w-1/2`}>Theo lớp</button>
+                    <button onClick={studentView} className={`${view == 2 ? "bg-blue-600 text-white" : "bg-slate-100"} button shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-[1.02] hover:shadow-lg mt-2 border-blue-400 hover:text-white w-1/2`}>Theo học sinh</button>
+                    <button onClick={sumView} className={`${view == 3 ? "bg-blue-600 text-white" : "bg-slate-100"} button shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-[1.02] hover:shadow-lg mt-2 border-blue-400 hover:text-white w-1/2`}>Tổng kết năm học</button>
                 </div>
                 {view == 1 &&
                     <div>
@@ -144,7 +213,7 @@ export default function Result() {
                         <div className="w-[90%] mx-auto">
                             <div className="my-2 grid grid-rows-1 grid-flow-col w-[30%] space-x-2">
                                 <button className="button border border-blue-400 hover:bg-blue-300" onClick={fetchAllClass}>Tất cả</button>
-                                <button className="button border border-blue-400 hover:bg-blue-300" onClick={()=>fetchByClass(nienKhoa.NienKhoa)}>Hiện tại</button>
+                                <button className="button border border-blue-400 hover:bg-blue-300" onClick={() => fetchByClass(nienKhoa.NienKhoa)}>Hiện tại</button>
                                 <select ref={NKRef} className="rounded-md border-2 px-2" onChange={fetchByNK}>
                                     <option value="">Chọn niên khóa</option>
                                     {Nk.map((item) => (
@@ -254,6 +323,199 @@ export default function Result() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                }
+                {view == 3 &&
+                    <div className="mx-3 mt-5">
+                        <div className="flex justify-center">
+                            <select name="style"
+                                className="block appearance-none w-1/2 text-center bg-white border-4 border-blue-300 
+                                text-gray-700 p-4 text-lg font-bold pr-8 rounded-lg leading-tight focus:outline-none focus:ring focus:border-blue-300"
+                                onChange={changeStyle}
+                            >
+                                <option value="1">Toàn trường</option>
+                                <option value="2">Theo khối</option>
+                                <option value="3">Theo lớp</option>
+                            </select>
+                        </div>
+                        {style == 1 &&
+                            <table className="table-fixed border-4 border-separate  border-blue-300 text-lg w-full border-spacing-1 mt-3 bg-white">
+                                <tbody>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TongHS}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Tốt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh khối 10:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.K10}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Khá:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLKha} ({Math.round((summary.HLKha * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh khối 11:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.K11}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Đạt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLDat} ({Math.round((summary.HLDat * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh khối 12:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.K12}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Chưa đạt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLCD} ({Math.round((summary.HLCD * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Xuất sắc:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Xuatsac}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Tốt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLTot} ({Math.round((summary.RLTot * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Giỏi:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Gioi}</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Khá:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLKha} ({Math.round((summary.RLKha * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh lên lớp:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.LL} ({Math.round((summary.LL * 100) / summary.TongHS)}%)</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Đạt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLDat} ({Math.round((summary.RLDat * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh phải rèn luyện hè:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLH} ({Math.round((summary.RLH * 100) / summary.TongHS)}%)</td>
+                                        <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Chưa đạt:</th>
+                                        <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLCD} ({Math.round((summary.RLCD * 100) / summary.TongHS)}%)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                        {style == 2 &&
+                            <div className="mt-3">
+                                {summaryGrade?.map((summary) => (
+                                    <div key={summary.Khoi}>
+                                        <table className={`table-fixed border-4 border-separate ${forcus == summary.MaLop ? "border-red-300" : "border-blue-300"} text-lg w-full border-spacing-1 mt-3 bg-white`}>
+                                            <tbody>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Khối:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Khoi}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Tốt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh lên lớp:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.LL} ({Math.round((summary.LL * 100) / summary.TongHS) || ""}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Khá:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLKha} ({Math.round((summary.HLKha * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh phải rèn luyện hè:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLH} ({Math.round((summary.RLH * 100) / summary.TongHS) || ""}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLDat} ({Math.round((summary.HLDat * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TongHS}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Chưa đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLCD} ({Math.round((summary.HLCD * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Xuất sắc:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Xuatsac}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Tốt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLTot} ({Math.round((summary.RLTot * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Giỏi:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Gioi}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Khá:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLKha} ({Math.round((summary.RLKha * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200"></th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200"></td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLDat} ({Math.round((summary.RLDat * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200"></th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200"></td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Chưa đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLCD} ({Math.round((summary.RLCD * 100) / summary.TongHS) || ""}%)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))}
+                            </div>
+                        }
+                        {style == 3 &&
+                            <div className="mt-3">
+                                <form onSubmit={searchClass} className="flex justify-end items-center">
+                                    <input type="text" name="search" className="px-2 py-1 w-1/3 border-2 border-cyan-300" placeholder="Nhập tên lớp cần tìm..." />
+                                    <button type="submit" className="border-2 px-2 py-1 ms-1 rounded-lg border-blue-300 hover:bg-blue-500 text-blue-500 hover:text-white"><FontAwesomeIcon icon={faSearch} /></button>
+                                </form>
+                                {summaryClass?.map((summary) => (
+                                    <div key={summary.MaLop} id={summary.MaLop}>
+                                        <table className={`table-fixed border-4 border-separate ${forcus == summary.MaLop ? "border-red-300" : "border-blue-300"} text-lg w-full border-spacing-1 mt-3 bg-white`}>
+                                            <tbody>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Mã lớp:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.MaLop}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Tốt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tên lớp:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TenLop}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Khá:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLKha} ({Math.round((summary.HLKha * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Chủ nhiệm:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.ChuNhiem}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLDat} ({Math.round((summary.HLDat * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TongHS}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Chưa đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLCD} ({Math.round((summary.HLCD * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Xuất sắc:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Xuatsac}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Tốt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLTot} ({Math.round((summary.RLTot * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Khen thưởng học sinh Giỏi:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Gioi}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Khá:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLKha} ({Math.round((summary.RLKha * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh lên lớp:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.LL} ({Math.round((summary.LL * 100) / summary.TongHS)}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLDat} ({Math.round((summary.RLDat * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh phải rèn luyện hè:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLH} ({Math.round((summary.RLH * 100) / summary.TongHS)}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh rèn luyện Chưa đạt:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLCD} ({Math.round((summary.RLCD * 100) / summary.TongHS)}%)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))}
+                            </div>
+                        }
                     </div>
                 }
             </div>
