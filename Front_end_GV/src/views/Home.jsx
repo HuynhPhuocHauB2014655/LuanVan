@@ -54,13 +54,13 @@ export default function Home() {
                     <p className="text-4xl font-extrabold text-blue-600">Chào mừng bạn đến với hệ thống quản lí Trường THPT Cần Thơ</p> <br/>
                 </div>
                 <p className="text-xl text-center mt-16 mb-10">Danh sách các chức năng</p>
-                <div className="grid grid-cols-3 gap-4 w-[70%] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-screen-lg mx-auto">
                     {menu_items.map((item) => (
                         <Link key={item.id}
-                            className="border-2 border-slate-500 rounded-lg mx-1 py-2 hover:bg-cyan-400 button-animation text-center block mb-2"
+                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
                             to={item.route}
                         >
-                            {item.label} 
+                            <p className="text-lg font-semibold text-gray-700">{item.label}</p>
                             {item.id == 5 && tbCount > 0 && 
                                 <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>
                             }
@@ -70,6 +70,17 @@ export default function Home() {
                         </Link>
                     ))}
                 </div>
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-screen-lg mx-auto">
+                    {menu?.map((item) => (
+                        <Link
+                            key={item.id}
+                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
+                            to={item.route}
+                        >
+                            <p className="text-lg font-semibold text-gray-700">{item.label}</p>
+                        </Link>
+                    ))}
+                </div> */}
             </div>
         </div>
     )

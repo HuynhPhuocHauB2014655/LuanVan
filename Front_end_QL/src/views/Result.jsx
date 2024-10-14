@@ -400,7 +400,7 @@ export default function Result() {
                                             <tbody>
                                                 <tr>
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Khối:</th>
-                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.Khoi}</td>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200 font-bold">{summary.Khoi}</td>
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Tốt:</th>
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS) || ""}%)</td>
                                                 </tr>
@@ -464,7 +464,7 @@ export default function Result() {
                                             <tbody>
                                                 <tr>
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Mã lớp:</th>
-                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.MaLop}</td>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200 font-bold">{summary.MaLop}</td>
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Tốt:</th>
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS)}%)</td>
                                                 </tr>

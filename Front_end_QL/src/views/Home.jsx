@@ -61,7 +61,7 @@ export default function Home() {
                     {menu?.map((item) => (
                         <Link
                             key={item.id}
-                            className="border-2 border-gray-200 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
+                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
                             to={item.route}
                         >
                             <p className="text-lg font-semibold text-gray-700">{item.label}</p>
