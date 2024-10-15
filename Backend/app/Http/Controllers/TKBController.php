@@ -38,6 +38,7 @@ class TKBController extends Controller
                 ->where("TietDay",$d->TietDay)
                 ->where("MSGV",$d->MSGV)
                 ->where("MaMH",$d->MaMH)
+                ->where("Ngay",Carbon::now()->format('Y/m/d'))
                 ->first();
                 if(!$th){
                     $newTh = TietHoc::create([
