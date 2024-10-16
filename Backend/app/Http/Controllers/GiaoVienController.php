@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\GiaoVien;
 use App\Models\PhanCong;
 use App\Models\TKB;
+use App\Models\TietHoc;
 use App\Models\TKGiaoVien;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
@@ -41,7 +42,14 @@ class GiaoVienController extends Controller
         ]);
         return response()->json($giaovien, Response::HTTP_CREATED);
     }
-
+    public function classes(Request $rq){
+        $data = TKB::with('lop')
+            ->where("MaNK", $rq->MaNK)
+            ->where("MSGV", $rq->MSGV)
+            ->get(['MaLop','MaMH'])
+            ->unique('MaLop');
+        return response()->json($data, Response::HTTP_OK);
+    }
     public function show($MSGV)
     {
         $giaovien = GiaoVien::with(['monHoc','lop.hocSinh'])->find($MSGV);
@@ -59,7 +67,6 @@ class GiaoVienController extends Controller
         return response()->json($giaovien, Response::HTTP_OK);
     }
     public function showTeaching(Request $rq){
-        // "23-24" -> "2324"
         $nienKhoa = str_replace("-","",$rq->MaNK);
         $class = PhanCong::with(['lop.hocSinh','monHoc'])->where('MSGV',$rq->MSGV)->where('MaLop','like',"%{$nienKhoa}%")->get();
         return response()->json($class, Response::HTTP_OK);
@@ -96,5 +103,9 @@ class GiaoVienController extends Controller
     public function getTKB(Request $rq){
         $tkb = TKB::with(['lop','monHoc'])->where("MSGV",$rq->MSGV)->where("MaNK",$rq->MaNK)->get();
         return response()->json($tkb, Response::HTTP_OK);
+    }
+    public function getDayBu(Request $rq){
+        $data = TietHoc::with(['lop','monHoc'])->where("MSGV",$rq->MSGV)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
+        return response()->json($data, Response::HTTP_OK);
     }
 }

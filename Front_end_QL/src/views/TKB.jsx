@@ -27,13 +27,13 @@ export default function TKB() {
         Array.from({ length: 6 }, () => Array(4).fill(null))
     );
     const navigate = useNavigate();
-    const {userName} = useUserContext();
-    useEffect(()=>{
-        if(userName == "nhansu"){
+    const { userName } = useUserContext();
+    useEffect(() => {
+        if (userName == "nhansu") {
             setError("Bạn không có quyền truy cập trang này");
             navigate('/');
         }
-    },[userName]);
+    }, [userName]);
     const fetchData = async () => {
         try {
             const classes = await axiosClient.get('lop/list/withoutTkb');
@@ -197,16 +197,26 @@ export default function TKB() {
     }
     const saveChange = async () => {
         if (change1 && change2) {
-            const payload = {
-                change1 : change1.id,
-                change2 : change2.id,
+            var payload;
+            if(change2.id == "empty"){
+                payload = {
+                    change1: change1.id,
+                    change2: change2.id,
+                    MaNgay: change2.MaNgay,
+                    TietDay: change2.TietDay
+                }
+            }else{
+                payload = {
+                    change1: change1.id,
+                    change2: change2.id,
+                }
             }
-            try{
-                const response = await axiosClient.put("/tkb/update",payload);
+            try {
+                const response = await axiosClient.put("/tkb/update", payload);
                 setMessage(response.data);
                 fetchTKB();
                 activeChangeTKB(null);
-            }catch(error){
+            } catch (error) {
                 console.log(error);
             }
         }
@@ -218,12 +228,19 @@ export default function TKB() {
     const onCancel = () => {
         setShowConfirm(false);
     }
+    const chooseEmptyCell = (MaNgay, TietDay) => {
+        setChange2({
+            id: "empty",
+            MaNgay: MaNgay,
+            TietDay: TietDay,
+        });
+    }
     return (
         <div className="main-content">
             <Menu />
             <div className="right-part relative">
-                {showConfirm && 
-                    <AlterConfirm message={`Bạn có chắc chắn với thao tác này không?`}  onCancel={onCancel} onConfirm={onConfirm}/>
+                {showConfirm &&
+                    <AlterConfirm message={`Bạn có chắc chắn với thao tác này không?`} onCancel={onCancel} onConfirm={onConfirm} />
                 }
                 <h1 className="page-name">Quản lí thời khóa biểu</h1>
                 <div className="flex my-2">
@@ -245,8 +262,8 @@ export default function TKB() {
                                     </div>
                                     {changeTKB == data.MaLop ?
                                         <div className="space-x-1 flex">
-                                            {change2 && 
-                                                <button className="border-2 rounded-lg px-2 py-1 text-sm border-green-500 hover:text-green-500 hover:bg-white hover:shadow-m" onClick={()=>setShowConfirm(true)}>Lưu</button>
+                                            {change2 &&
+                                                <button className="border-2 rounded-lg px-2 py-1 text-sm border-green-500 hover:text-green-500 hover:bg-white hover:shadow-m" onClick={() => setShowConfirm(true)}>Lưu</button>
                                             }
                                             {(change1 || change2) &&
                                                 <button className="border-2 rounded-lg px-2 py-1 text-sm border-red-500 hover:text-red-500 hover:bg-white hover:shadow-md" onClick={() => chooseTKB(null)}>Chọn lại</button>
@@ -273,16 +290,20 @@ export default function TKB() {
                                                 {[...Array(6)].map((_, j) => (
                                                     data.tkbMatrix[j][i] ?
                                                         changeTKB == data.MaLop && data.tkbMatrix[j][i].id != -1 && data.tkbMatrix[j][i].id != -2 && data.tkbMatrix[j][i].MaMH != change1?.MaMH ?
-                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td cursor-pointer text-red-500" : "td cursor-pointer"} onClick={() => chooseTKB(data.tkb.find(item => item.id == data.tkbMatrix[j][i].id))} key={j + 1}>
+                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td cursor-pointer text-red-500 hover:bg-slate-300" : "td cursor-pointer hover:bg-slate-300"} onClick={() => chooseTKB(data.tkb.find(item => item.id == data.tkbMatrix[j][i].id))} key={j + 1}>
                                                                 {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
                                                             </td>
                                                             :
-                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td text-red-500" : "td "} key={j + 1}>
+                                                            <td className={change1?.id == data.tkbMatrix[j][i].id || change2?.id == data.tkbMatrix[j][i].id ? "td text-red-500 " : "td "} key={j + 1}>
                                                                 {data.tkbMatrix[j][i].TenMon} <br /> {data.tkbMatrix[j][i].TenGV}
                                                             </td>
                                                         :
-                                                        <td className="td invisible" key={j + 1}>
-                                                            N/A <br /> N/A
+                                                        <td
+                                                            className={`td ${(change1 && changeTKB == data.MaLop) && !(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1) ? "cursor-pointer hover:bg-slate-300" : ""} `}
+                                                            key={j + 1}
+                                                            onClick={() => chooseEmptyCell(j + 2, i + 1)}
+                                                        >
+                                                            {(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                         </td>
                                                 ))}
                                             </tr>
@@ -307,8 +328,12 @@ export default function TKB() {
                                                                     {data.tkbMatrix[j][currentIndex].TenMon} <br /> {data.tkbMatrix[j][currentIndex].TenGV}
                                                                 </td>
                                                             :
-                                                            <td className="td invisible" key={j + 1}>
-                                                                N/A <br /> N/A
+                                                            <td
+                                                                className={`td ${(change1 && changeTKB == data.MaLop) && !(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1) ? "cursor-pointer hover:bg-slate-300" : ""} `}
+                                                                key={j + 1}
+                                                                onClick={() => chooseEmptyCell(j + 2, currentIndex + 1)}
+                                                            >
+                                                                {(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                             </td>
                                                     ))}
                                                 </tr>

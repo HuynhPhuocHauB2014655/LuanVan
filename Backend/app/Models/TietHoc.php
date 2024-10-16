@@ -21,6 +21,7 @@ class TietHoc extends Model
         'MaNgay',
         'TietDay',
         'Ngay',
+        'Loai',
     ];
     public function giaoVien(): BelongsTo{
         return $this->belongsTo(GiaoVien::class,'MSGV','MSGV');

@@ -83,7 +83,8 @@ Route::delete('/gv/delete/{MSGV}',[GiaoVienController::class,'destroy']);
 Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 Route::post('/gv/teaching',[GiaoVienController::class,'showTeaching']);
 Route::post('/gv/tkb',[GiaoVienController::class,'getTKB']);
-
+Route::post('/gv/daybu',[GiaoVienController::class,'getDayBu']);
+Route::post('/gv/class',[GiaoVienController::class,'classes']);
 
 //lop route
 Route::post('/lop/create',[LopController::class,'store']);
@@ -101,18 +102,22 @@ Route::get('/lop/xh/{MaNK}',[LopController::class,'indexXH']);
 Route::post('/lop/addHS',[LopController::class,'addToClass']);
 Route::post('/lop/change',[LopController::class,'changeClass']);
 Route::get('/lop/duyetkq/{MaLop}',[LopController::class,'DuyetKQHT']);
+Route::post('/lop/daybu',[LopController::class,'getDayBu']);
 
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);
 Route::put('/tkb/update',[TKBController::class,'update']);
 Route::post('/tkb/createPC',[TKBController::class,'createPhanCong']);
 Route::get('/tkb/index/{nk}',[TKBController::class,'index']);
+Route::get('/tkb/index/class/{MaLop}',[TKBController::class,'indexClass']);
 Route::get('/tkb/date',[TKBController::class,'indexDate']);
 Route::post('/tkb/date',[TKBController::class,'getByDay']);
 Route::post('/tkb/gv/week',[TKBController::class,'getByWeek']);
 Route::post('/tkb/get',[TKBController::class,'getTietHoc']);
 Route::post('/tkb/week',[TKBController::class,'getTHWeek']);
+Route::post('/tkb/createTH',[TKBController::class,'createTietHoc']);
 Route::put('/tkb/updateTH',[TKBController::class,'updateTietHoc']);
+Route::delete('/tkb/deleteTH/{id}',[TKBController::class,'deleteTietHoc']);
 
 //tai khoan route
 Route::get('/tk/index/hs',[TaiKhoanController::class,'indexHS']);

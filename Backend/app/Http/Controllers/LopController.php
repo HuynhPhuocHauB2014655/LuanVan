@@ -10,6 +10,7 @@ use App\Models\HocLop;
 use App\Models\GiaoVien;
 use App\Models\Diem;
 use App\Models\KhenThuong;
+use App\Models\TietHoc;
 use App\Models\NhomTinNhan;
 use App\Models\ThanhVienNhom;
 use Illuminate\Http\Response;
@@ -393,4 +394,8 @@ class LopController extends Controller
     //         }
     //     }
     // }
+    public function getDayBu(Request $rq){
+        $data = TietHoc::with(['monHoc','giaoVien'])->where("MaLop",$rq->MaLop)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
+        return response()->json($data, Response::HTTP_OK);
+    }
 }

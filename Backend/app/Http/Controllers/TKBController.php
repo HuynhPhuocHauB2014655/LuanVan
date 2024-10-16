@@ -25,6 +25,10 @@ class TKBController extends Controller
         $date = NgayTrongTuan::all();
         return response()->json($date);
     }
+    public function indexClass($MaLop){
+        $tkb = TKB::with(['lop','monHoc','giaoVien'])->where("MaLop",$MaLop)->get();
+        return response()->json($tkb);
+    }
     public function createPhanCong(Request $request){
         $data = PhanCong::create($request->all());
         return response()->json($data);
@@ -82,6 +86,25 @@ class TKBController extends Controller
         ->get();
         return response()->json($data,200);
     }
+    public function createTietHoc(Request $rq){
+        $newTh = TietHoc::create([
+            'Loai' => $rq->Loai,
+            'MaLop' => $rq->MaLop,
+            'MaNgay' => $rq->MaNgay,
+            'TietDay' => $rq->TietDay,
+            'MSGV' => $rq->MSGV,
+            'MaMH' => $rq->MaMH,
+            'Ngay' => $rq->Ngay,
+        ]);
+        $hs = HocLop::where("MaLop",$rq->MaLop)->get();
+        foreach ($hs as $hs) {
+            DiemDanh::create([
+                'MSHS' => $hs->MSHS,
+                'TietHoc' => $newTh->id,
+            ]);
+        }
+        return response()->json("Đã cập nhật thành công!",200);
+    }
     public function updateTietHoc(Request $rq){
         $th = TietHoc::find($rq->id);
         if($th){
@@ -97,6 +120,14 @@ class TKBController extends Controller
             }
         }
         return response()->json("Đã lưu lại thành công!",200);
+    }
+    public function deleteTietHoc($id){
+        $th = TietHoc::find($id);
+        if($th){
+            $th->delete();
+            return response()->json("Đã xóa thành công!",200);
+        }
+        return response()->json("Không tìm thấy dữ liệu!",404);
     }
     public function create(Request $request, $nk)
     {
@@ -248,6 +279,12 @@ class TKBController extends Controller
     public function update(Request $rq)
     {
         $c1 = TKB::find($rq->change1);
+        if($rq->change2 === "empty"){
+            $c1->MaNgay = $rq->MaNgay;
+            $c1->TietDay = $rq->TietDay;
+            $c1->save();
+            return response()->json("Đã cập nhật thời khóa biểu thành công",200);
+        }
         $c2 = TKB::find($rq->change2);
         $tmpMH = $c1->MaMH;
         $tmpGV = $c1->MSGV;
