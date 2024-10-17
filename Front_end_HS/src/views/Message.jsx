@@ -129,7 +129,7 @@ export default function Message() {
         }
     }, [fakeMessage, messages]);
     const scrollBottom = () => {
-        messageEndRef.current.scrollIntoView();
+        messageEndRef.current.scrollIntoView({block: 'nearest'});
     }
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);

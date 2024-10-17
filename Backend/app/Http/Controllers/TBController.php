@@ -44,7 +44,11 @@ class TBController extends Controller
     }
     public function getHS($MSHS)
     {
-        $tb = ThongBao::where("NguoiNhan",$MSHS)->orWhere("NguoiNhan","L_{$MSHS}")->orWhere("NguoiNhan","TT_{$MSHS}")->orWhere("NguoiNhan","_{$MSHS}")->orderBy("created_at","DESC")->get();
+        $tb = ThongBao::where("NguoiNhan",$MSHS)
+        ->orWhere("NguoiNhan","L_{$MSHS}")
+        ->orWhere("NguoiNhan","TT_{$MSHS}")
+        ->orWhere("NguoiNhan","_{$MSHS}")
+        ->orderByRaw("TrangThai = 0 DESC, created_at DESC")->get();
         return response()->json($tb, 200);
     }
     public function create(Request $rq)

@@ -105,7 +105,11 @@ class GiaoVienController extends Controller
         return response()->json($tkb, Response::HTTP_OK);
     }
     public function getDayBu(Request $rq){
-        $data = TietHoc::with(['lop','monHoc'])->where("MSGV",$rq->MSGV)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
+        $data = TietHoc::with(['lop','monHoc','diemDanh.hocSinh'])->where("MSGV",$rq->MSGV)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
+        return response()->json($data, Response::HTTP_OK);
+    }
+    public function getDayBuNgay(Request $rq){
+        $data = TietHoc::with(['lop','monHoc','diemDanh.hocSinh'])->where("MSGV",$rq->MSGV)->where("Loai",1)->where("Ngay",$rq->Ngay)->get();
         return response()->json($data, Response::HTTP_OK);
     }
 }

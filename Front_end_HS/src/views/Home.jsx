@@ -60,10 +60,10 @@ export default function Home() {
                             to={item.route}
                         >
                             <p className="text-lg font-semibold text-gray-700">{item.label}</p>
-                            {item.id == 5 && tbCount > 0 && 
+                            {item.id == 4 && tbCount > 0 && 
                                 <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>
                             }
-                            {item.id == 6 && tnCount > 0 && 
+                            {item.id == 5 && tnCount > 0 && 
                                 <span className="absolute top-1 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tnCount}</span>
                             }
                         </Link>

@@ -133,7 +133,9 @@ export default function Message() {
         }
     }, [fakeMessage, messages]);
     const scrollBottom = () => {
-        messageEndRef.current.scrollIntoView();
+        messageEndRef.current.scrollIntoView({
+            block: 'nearest',
+        });
     }
     useEffect(() => {
         const channel = pusher.subscribe(`chat.${userName}`);
@@ -187,7 +189,7 @@ export default function Message() {
     }
     const scrollTo = (id) => {
         const element = document.getElementById(id);
-        element.scrollIntoView({ inline: 'center' });
+        element.scrollIntoView({ inline: 'center'});
         setForcus(id);
         setToggleResult(false);
     }

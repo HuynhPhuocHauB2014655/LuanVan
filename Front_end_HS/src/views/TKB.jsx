@@ -3,7 +3,7 @@ import Menu from "../components/Menu";
 import { useStateContext } from "../context/Context";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
-
+import moment from 'moment';
 export default function TKB() {
     const { nienKhoa } = useStateContext();
     const { userName } = useUserContext();
@@ -11,9 +11,11 @@ export default function TKB() {
     const [matrix, setMatrix] = useState();
     const [date, setDate] = useState([]);
     const [info, setInfo] = useState([]);
+    const [week, setWeek] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
     const fetchData = async () => {
         const _info = await axiosClient.get(`/hs/show/${userName}`);
-            setInfo(_info.data);
+        setInfo(_info.data);
         const payload = {
             MaNK: nienKhoa.NienKhoa,
             MaLop: _info.data.lop[0].MaLop,
@@ -29,76 +31,171 @@ export default function TKB() {
     }
     useEffect(() => {
         fetchData();
+        setWeek(thisWeek())
     }, [nienKhoa, userName])
     useEffect(() => {
-        if (tkb.length > 0) {
-            const tkbMatrix = Array(6).fill(null).map(() => Array(8).fill(null));
+        const dayBu = async () => {
+            const payload = {
+                MaLop: info.lop[0].MaLop,
+                start: formatDate(dayOfWeek(week || thisWeek()).start),
+                end: formatDate(dayOfWeek(week || thisWeek()).end)
+            };
+            console.log(payload);
+            try {
+                const response = await axiosClient.post('/lop/daybu', payload);
+                return response.data;
+            } catch (error) {
+                console.error("Error fetching dayBu data:", error);
+                return [];
+            }
+        };
 
-            tkb.forEach(schedule => {
-                const dayIndex = schedule.MaNgay - 2;
-                const periodIndex = schedule.TietDay - 1;
+        const fetchDayBuAndSetMatrix = async () => {
+            if (tkb.length > 0) {
+                const tkbMatrix = Array.from({ length: 6 }, () => Array(8).fill(null));
 
-                tkbMatrix[dayIndex][periodIndex] = {
-                    TenMon: schedule.mon_hoc.TenMH,
-                    TenGV: schedule.giao_vien.TenGV
+                tkb.forEach(schedule => {
+                    const dayIndex = schedule.MaNgay - 2;
+                    const periodIndex = schedule.TietDay - 1;
+
+                    tkbMatrix[dayIndex][periodIndex] = {
+                        TenMon: schedule.mon_hoc.TenMH,
+                        TenGV: schedule.giao_vien.TenGV
+                    };
+                });
+
+                const dayBuData = await dayBu();
+                dayBuData.forEach(item => {
+                    const dayIndex = item.MaNgay - 2;
+                    const periodIndex = item.TietDay - 1
+
+                    tkbMatrix[dayIndex][periodIndex] = {
+                        TenMon: item.mon_hoc.TenMH + " (Dạy bù)",
+                        TenGV: item.giao_vien.TenGV
+                    };
+                });
+
+                tkbMatrix[0][0] = {
+                    TenMon: 'Chào cờ',
+                    TenGV: ''
                 };
-            });
-            tkbMatrix[0][0] = {
-                TenMon: 'Chào cờ',
-                TenGV: ''
+                tkbMatrix[5][3] = {
+                    TenMon: 'Sinh hoạt lớp',
+                    TenGV: ''
+                };
+
+                setMatrix(tkbMatrix);
             }
-            tkbMatrix[5][3] = {
-                TenMon: 'Sinh hoạt lớp',
-                TenGV: ''
-            }
-            // const newTKB = {...tkb,tkbMatrix}
-            setMatrix(tkbMatrix);
+        };
+
+        fetchDayBuAndSetMatrix();
+    }, [week, tkb]);
+    const formatDate = (date) => {
+        const d = moment(date).format("YYYY-MM-DD");
+        return d;
+    }
+    const getDate = (date) => {
+        const d = moment(date).format("DD/MM/YYYY");
+        return d;
+    }
+    const thisWeek = () => {
+        if (nienKhoa?.NienKhoa) {
+            let day = new Date();
+            const firstDay = new Date(nienKhoa.NgayBD);
+            let week = Math.ceil((day - firstDay) / (1000 * 60 * 60 * 24 * 7));
+            day.getDay() == 1 && (week = week + 1);
+            return week;
         }
-    }, [tkb])
+    }
+    const dayOfWeek = (weekNumber) => {
+        const startOfWeek = new Date(nienKhoa.NgayBD);
+        startOfWeek.setDate(startOfWeek.getDate() + (weekNumber - 1) * 7);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
+        const week = {
+            start: startOfWeek,
+            end: endOfWeek
+        }
+        return week;
+    }
+    const getDay = (weekNumber, dayOfWeek) => {
+        const startOfWeek = new Date(nienKhoa.NgayBD);
+        startOfWeek.setDate(startOfWeek.getDate() + (weekNumber - 1) * 7);
+
+        const dayOfWeekOffset = dayOfWeek - startOfWeek.getDay();
+        const desiredDate = new Date(startOfWeek);
+        desiredDate.setDate(startOfWeek.getDate() + dayOfWeekOffset);
+
+        return desiredDate;
+    };
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen)
+    };
+    useEffect(() => {
+        if (isOpen) {
+            document.getElementById(week).scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+        }
+    }, [isOpen])
+    const handleOptionClick = (key, option) => {
+        setIsOpen(false);
+        setWeek(option);
+        if (option < thisWeek()) {
+            setSelected(null);
+        }
+        if (key == 1 && selectedClass) {
+            chooseClass(selectedClass, option);
+        }
+    };
     console.log(info);
     return (
         <div className="main-content">
             <Menu />
             <div className="right-part">
-                <table className="border-2 table-auto border-black border-collapse text-center w-[90%] mx-auto mt-5">
-                    <thead>
-                        <tr>
-                            <th className="td"></th>
-                            {date.map((date) => (
-                                <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {[...Array(4)].map((_, i) => (
-                            <tr key={i + 1}>
-                                <td className="td px-3">{i + 1}</td>
-                                {[...Array(6)].map((_, j) => (
-                                    matrix && matrix[j][i] ?
-                                    <td className="td" key={j + 1}>
-                                        {matrix[j][i].TenMon} <br /> {matrix[j][i].TenGV}
-                                    </td>
-                                    :
-                                    <td className="td invisible" key={j + 1}>
-                                        N/A <br /> N/A
-                                    </td>
+                <div className="w-[80%] mx-auto">
+                    <div className="flex items-center space-x-2 mb-1">
+                        <div className="text-lg">Tuần: </div>
+                        <div className="relative">
+                            <button
+                                onClick={toggleDropdown}
+                                className="block w-full px-5 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                            >
+                                {week}
+                            </button>
+                            {isOpen && (
+                                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                    {[...Array(thisWeek() + 1)].map((_, i) => (
+                                        <li
+                                            key={i} id={i + 1}
+                                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${week == i + 1 && "bg-slate-300"}`}
+                                            onClick={() => handleOptionClick(2, i + 1)}
+                                        >
+                                            {i + 1}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                    <table className="border-2 table-auto border-black border-collapse text-center w-full ">
+                        <thead>
+                            <tr>
+                                <th className="td"></th>
+                                {date.map((date) => (
+                                    <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
                                 ))}
                             </tr>
-                        ))}
-                        <tr className="">
-                            <td colSpan="6" className="h-10"></td>
-                        </tr>
-                        {[...Array(4)].map((_, i) => {
-                            const startIndex = 4; // Start value for i
-                            const currentIndex = i + startIndex;
-
-                            return (
-                                <tr key={currentIndex}>
-                                    <td className="td">{currentIndex + 1}</td>
+                        </thead>
+                        <tbody>
+                            {[...Array(4)].map((_, i) => (
+                                <tr key={i + 1}>
+                                    <td className="td px-3">{i + 1}</td>
                                     {[...Array(6)].map((_, j) => (
-                                       matrix &&  matrix[j][currentIndex] ?
+                                        matrix && matrix[j][i] ?
                                             <td className="td" key={j + 1}>
-                                                {matrix[j][currentIndex].TenMon} <br /> {matrix[j][currentIndex].TenGV}
+                                                {matrix[j][i].TenMon} <br /> {matrix[j][i].TenGV}
                                             </td>
                                             :
                                             <td className="td invisible" key={j + 1}>
@@ -106,10 +203,33 @@ export default function TKB() {
                                             </td>
                                     ))}
                                 </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                            ))}
+                            <tr className="">
+                                <td colSpan="6" className="h-10"></td>
+                            </tr>
+                            {[...Array(4)].map((_, i) => {
+                                const startIndex = 4; // Start value for i
+                                const currentIndex = i + startIndex;
+
+                                return (
+                                    <tr key={currentIndex}>
+                                        <td className="td">{currentIndex + 1}</td>
+                                        {[...Array(6)].map((_, j) => (
+                                            matrix && matrix[j][currentIndex] ?
+                                                <td className="td" key={j + 1}>
+                                                    {matrix[j][currentIndex].TenMon} <br /> {matrix[j][currentIndex].TenGV}
+                                                </td>
+                                                :
+                                                <td className="td invisible" key={j + 1}>
+                                                    N/A <br /> N/A
+                                                </td>
+                                        ))}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

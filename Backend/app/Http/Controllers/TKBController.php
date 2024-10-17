@@ -10,6 +10,7 @@ use App\Models\MonHoc;
 use App\Models\NgayTrongTuan;
 use App\Models\PhanCong;
 use App\Models\DiemDanh;
+use App\Models\ThongBao;
 use App\Models\TietHoc;
 use App\Models\HocLop;
 use Carbon\Carbon;
@@ -103,6 +104,21 @@ class TKBController extends Controller
                 'TietHoc' => $newTh->id,
             ]);
         }
+        $hocsinh = HocLop::where('MaLop',$rq->MaLop)->get();
+        ThongBao::create([
+            "NguoiGui"=>"Hệ thống",
+            "NguoiNhan"=>$rq->MaLop,
+            "NoiDung"=> "Bạn có một tiết học mới vào ngày " . $rq->Ngay . ", thứ " . $rq->MaNgay . ", tiết " . $rq->TietDay,
+            "TieuDe"=>"Tiết học mới",
+        ]);
+        foreach($hocsinh as $hs){
+            ThongBao::create([
+                "NguoiGui" => "Hệ thống",
+                "NguoiNhan" => "L_" . $hs->MSHS,
+                "NoiDung" => "Bạn có một tiết học mới vào ngày " . $rq->Ngay . ", thứ " . $rq->MaNgay . ", tiết " . $rq->TietDay,
+                "TieuDe" => "Tiết học mới",
+            ]);
+        }
         return response()->json("Đã cập nhật thành công!",200);
     }
     public function updateTietHoc(Request $rq){
@@ -124,6 +140,21 @@ class TKBController extends Controller
     public function deleteTietHoc($id){
         $th = TietHoc::find($id);
         if($th){
+            $hocsinh = HocLop::where('MaLop',$th->MaLop)->get();
+            ThongBao::create([
+                "NguoiGui"=>"Hệ thống",
+                "NguoiNhan"=>$th->MaLop,
+                "NoiDung"=> "Tiết học vào ngày " . $th->Ngay . ", thứ " . $th->MaNgay . ", tiết " . $th->TietDay . " đã bị xóa",
+                "TieuDe"=>"Tiết học bị xóa",
+            ]);
+            foreach($hocsinh as $hs){
+                ThongBao::create([
+                    "NguoiGui" => "Hệ thống",
+                    "NguoiNhan" => "L_" . $hs->MSHS,
+                    "NoiDung"=> "Tiết học vào ngày " . $th->Ngay . ", thứ " . $th->MaNgay . ", tiết " . $th->TietDay . " đã bị xóa",
+                    "TieuDe" => "Tiết học bị xóa",
+                ]);
+            }
             $th->delete();
             return response()->json("Đã xóa thành công!",200);
         }

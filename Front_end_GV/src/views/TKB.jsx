@@ -20,7 +20,7 @@ export default function TKB() {
     const [selected, setSelected] = useState();
     const [selectedClass, setSelectedClass] = useState();
     const [showConfirm, setShowConfirm] = useState(0);
-    const [chooseDelete,setChooseDelete] = useState();
+    const [chooseDelete, setChooseDelete] = useState();
     const fetchData = async () => {
         const payload = {
             MaNK: nienKhoa.NienKhoa,
@@ -227,7 +227,10 @@ export default function TKB() {
     };
     useEffect(() => {
         if (isOpen) {
-            document.getElementById(week).scrollIntoView();
+            document.getElementById(week).scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
         }
     }, [isOpen])
     const handleOptionClick = (key, option) => {
@@ -256,9 +259,9 @@ export default function TKB() {
             });
         }
     }
-    const triggerConfirm = (id,data) => {
+    const triggerConfirm = (id, data) => {
         setShowConfirm(id);
-        if(data){
+        if (data) {
             setChooseDelete(data);
         }
     }
@@ -282,12 +285,12 @@ export default function TKB() {
         }
     }
     const deleteDB = async () => {
-        try{
+        try {
             const res = await axiosClient.delete(`/tkb/deleteTH/${chooseDelete}`);
             setMessage(res.data);
             changeView();
             fetchData();
-        }catch(error){
+        } catch (error) {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         }
         setShowConfirm(0);
@@ -346,7 +349,7 @@ export default function TKB() {
                                 </div>
                                 <div>
                                     {selected &&
-                                        <button onClick={()=>triggerConfirm(1)} className="button border-green-500 hover:bg-green-500 hover:text-white">Xác nhận</button>
+                                        <button onClick={() => triggerConfirm(1)} className="button border-green-500 hover:bg-green-500 hover:text-white">Xác nhận</button>
                                     }
                                 </div>
                             </div>
@@ -366,11 +369,11 @@ export default function TKB() {
                                                 <td className="td px-3">{i + 1}</td>
                                                 {[...Array(6)].map((_, j) => (
                                                     matrixClass && matrixClass[j][i] ?
-                                                        <td 
-                                                            className={`td ${(matrixClass[j][i].TenMon?.includes("(Dạy bù)") 
-                                                                && matrixClass[j][i].MSGV === userName) && "cursor-pointer hover:bg-slate-300"}`} 
+                                                        <td
+                                                            className={`td ${(matrixClass[j][i].TenMon?.includes("(Dạy bù)")
+                                                                && matrixClass[j][i].MSGV === userName) && "cursor-pointer hover:bg-slate-300"}`}
                                                             key={j + 1}
-                                                            onClick={(matrixClass[j][i].TenMon?.includes("(Dạy bù)") && matrixClass[j][i].MSGV === userName) ? ()=>triggerConfirm(2,matrixClass[j][i].id) : undefined}
+                                                            onClick={(matrixClass[j][i].TenMon?.includes("(Dạy bù)") && matrixClass[j][i].MSGV === userName) ? () => triggerConfirm(2, matrixClass[j][i].id) : undefined}
                                                         >
                                                             {matrixClass[j][i].TenMon} <br /> {matrixClass[j][i].TenLop}
                                                         </td>
@@ -397,7 +400,12 @@ export default function TKB() {
                                                     <td className="td">{currentIndex + 1}</td>
                                                     {[...Array(6)].map((_, j) => (
                                                         matrixClass && matrixClass[j][currentIndex] ?
-                                                            <td className="td" key={j + 1}>
+                                                            <td
+                                                                className={`td ${(matrixClass[j][currentIndex].TenMon?.includes("(Dạy bù)")
+                                                                    && matrixClass[j][currentIndex].MSGV === userName) && "cursor-pointer hover:bg-slate-300"}`}
+                                                                key={j + 1}
+                                                                onClick={(matrixClass[j][currentIndex].TenMon?.includes("(Dạy bù)") && matrixClass[j][currentIndex].MSGV === userName) ? () => triggerConfirm(2, matrixClass[j][currentIndex].id) : undefined}
+                                                            >
                                                                 {matrixClass[j][currentIndex].TenMon} <br /> {matrixClass[j][currentIndex].TenLop}
                                                             </td>
                                                             :

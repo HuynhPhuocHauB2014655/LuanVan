@@ -21,6 +21,7 @@ export default function Teaching() {
     const [showConfirm, setShowConfirm] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [week, setWeek] = useState(0);
+    const [dayBu, setDayBu] = useState([]);
     const [weeks, setWeeks] = useState([]);
 
     const fetchData = async () => {
@@ -61,6 +62,7 @@ export default function Teaching() {
     useEffect(() => {
         if (userName && nienKhoa?.NienKhoa) {
             fetchData();
+            fetchDayBuNgay();
         }
     }, [userName, nienKhoa]);
     const changeView = async (view, data) => {
@@ -80,10 +82,17 @@ export default function Teaching() {
             } catch (error) {
                 console.log(error);
             }
-        } else {
-            setState(null);
+            setView(view);
+        } else if(view == 3 && data){
+            setOnView(`id${data.id}`);
+            setState(data);
+            console.log(data);
+            setView(2);
         }
-        setView(view);
+        else {
+            setState(null);
+            setView(view);
+        }
     }
     const saveChange = async () => {
         const formData = new FormData(document.querySelector("form"));
@@ -146,8 +155,10 @@ export default function Teaching() {
     const changePage = (page) => {
         if (page == 1) {
             fetchData();
+            fetchDayBuNgay();
         } else {
             fetchDataWeek();
+            fetchDayBu();
         }
         setOnView("");
         setView(1);
@@ -160,6 +171,33 @@ export default function Teaching() {
     const handleOptionClick = (option) => {
         setIsOpen(false);
         setWeek(option);
+    };
+    const fetchDayBu = async () => {
+        const payload = {
+            MSGV: userName,
+            start: formatDate(dayOfWeek(week || thisWeek()).start),
+            end: formatDate(dayOfWeek(week || thisWeek()).end)
+        };
+
+        try {
+            const response = await axiosClient.post('/gv/daybu', payload);
+            setDayBu(response.data);
+        } catch (error) {
+            console.error("Error fetching dayBu data:", error);
+        }
+    };
+    const fetchDayBuNgay = async () => {
+        const payload = {
+            MSGV: userName,
+            Ngay: formatDate(new Date()),
+        };
+
+        try {
+            const response = await axiosClient.post('/gv/daybu/ngay', payload);
+            setDayBu(response.data);
+        } catch (error) {
+            console.error("Error fetching dayBu data:", error);
+        }
     };
     console.log();
     return (
@@ -184,7 +222,7 @@ export default function Teaching() {
                         Theo Tuần
                     </button>
                 </div>
-                {data.length == 0 ?
+                {data.length == 0 && dayBu.length == 0 ?
                     <div className="mt-10 text-center text-2xl text-green-500">Bạn không có tiết dạy nào hôm nay</div>
                     :
                     <div>
@@ -238,6 +276,23 @@ export default function Teaching() {
                                         <td className="border border-gray-400 p-2">{d.lop.TenLop}</td>
                                     </tr>
                                 ))}
+                                <tr>
+                                    <td className="text-xl text-center py-2 font-bold" colSpan={page == 2 ? 4 : 3}>Dạy bù</td>
+                                </tr>
+                                {dayBu.length == 0 ?
+                                    <tr>
+                                        <td className="text-center" colSpan={page == 2 ? 4 : 3}>Không có dữ liệu</td>
+                                    </tr>
+                                    :
+                                    dayBu.map((d) => (
+                                        <tr key={d.id} className={`cursor-pointer hover:bg-gray-200 ${onView == `id${d.id}` && "bg-gray-200"}`} onClick={() => changeView(3, d)}>
+                                            {page == 2 && <td className="border border-gray-400 p-2">{d.MaNgay}</td>}
+                                            <td className="border border-gray-400 p-2">{d.TietDay}</td>
+                                            <td className="border border-gray-400 p-2">{d.mon_hoc.TenMH}</td>
+                                            <td className="border border-gray-400 p-2">{d.lop.TenLop}</td>
+                                        </tr>
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>}

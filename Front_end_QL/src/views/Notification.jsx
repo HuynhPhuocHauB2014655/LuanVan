@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPlusCircle, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 import NoitifyForm from "../components/NoitifyForm";
 import { useStateContext } from "../context/Context";
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export default function Notification() {
     const { userName } = useUserContext();
@@ -57,8 +57,7 @@ export default function Notification() {
         })
     }
     const getDate = (date) => {
-        console.log(moment(date));
-        const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
+        const d = moment(date).utc().format("HH:mm:ss DD/MM/YYYY");
         return d;
     }
     return (

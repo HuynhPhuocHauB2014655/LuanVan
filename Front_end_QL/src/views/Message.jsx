@@ -87,7 +87,7 @@ export default function Message() {
         }
     }, [fakeMessage, messages]);
     const scrollBottom = () => {
-        messageEndRef.current.scrollIntoView();
+        messageEndRef.current.scrollIntoView({block: 'nearest',});
     }
     const ShowSearch = (state) => {
         setResultSearch(null);

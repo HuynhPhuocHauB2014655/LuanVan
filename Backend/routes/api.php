@@ -84,6 +84,7 @@ Route::get('/gv/last',[GiaoVienController::class,'lastTeacher']);
 Route::post('/gv/teaching',[GiaoVienController::class,'showTeaching']);
 Route::post('/gv/tkb',[GiaoVienController::class,'getTKB']);
 Route::post('/gv/daybu',[GiaoVienController::class,'getDayBu']);
+Route::post('/gv/daybu/ngay',[GiaoVienController::class,'getDayBuNgay']);
 Route::post('/gv/class',[GiaoVienController::class,'classes']);
 
 //lop route
