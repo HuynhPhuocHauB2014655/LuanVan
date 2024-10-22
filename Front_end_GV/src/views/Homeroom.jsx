@@ -115,7 +115,7 @@ export default function Homeroom() {
         }
         const diemtb = await axiosClient.post(`/diem/tb`, payload1);
         setDiemTB(diemtb.data);
-        fetchKhenThuong();
+        const array = getDSKhenThuong(diemtb.data);
         var checkRL = false;
         var checkTT = false;
         var checkBC = false;
@@ -126,7 +126,7 @@ export default function Homeroom() {
             if (item.MaRL == 0 || item.MaHL == 0) {
                 checkTT = true;
             }
-            if (item.MaTT == 0 || item.MaTT == 2 || dsKhenThuong.length > 0) {
+            if (item.MaTT == 0 || item.MaTT == 2 || array.length > 0) {
                 checkBC = true;
             }
         })
@@ -139,6 +139,21 @@ export default function Homeroom() {
         setRenLuyenHeRL(rlhrl);
 
         getDSKhenThuong(diemtb.data);
+    }
+    const checkBCButton = () => {
+        if (diemTB.length > 0) {
+            const array = getDSKhenThuong(diemTB);
+            var checkBC = false;
+            diemTB.map((item) => {
+                if (item.MaTT == 0 || item.MaTT == 2) {
+                    checkBC = true;
+                }
+            })
+            if(array.length > 0){
+                checkBC = true;
+            }
+            setDisableBC(checkBC);
+        }
     }
     const fetchRLH = async () => {
         const payload2 = {
@@ -159,7 +174,7 @@ export default function Homeroom() {
         const res = await axiosClient.post('/diem/rlh', payload3);
         setDiemRLH(res.data);
     }
-    const getDSKhenThuong = (data) => {
+    const getDSKhenThuong = async (data) => {
         if (!data.find(item => item.MaHL == 0 || item.MaRL == 0)) {
             var array = [];
             data.map((hs) => {
@@ -184,6 +199,11 @@ export default function Homeroom() {
                 }
             })
             setDXKhenThuong(array);
+            const ds = await fetchKhenThuong();
+            if(ds.length> 0){
+                return [];
+            }
+            return array;
         }
     }
     const handleState = async (view) => {
@@ -198,6 +218,9 @@ export default function Homeroom() {
     const handleSubState = (view) => {
         if (view >= 3 && diemTB.length == 0) {
             fetchDiemTB();
+        }
+        if(view == 5) {
+            checkBCButton();
         }
         if (view == 6) {
             fetchRLH();
@@ -222,6 +245,7 @@ export default function Homeroom() {
         try {
             const kt = await axiosClient.get(`/kt/get/${classInfo.MaLop}`);
             setDsKhenThuong(kt.data);
+            return kt.data;
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -269,9 +293,14 @@ export default function Homeroom() {
             const tbhk1 = diemHK1.filter(data => data.MaLoai == 'tbhk1' && data.MSHS == item.MSHS);
             const tbhk2 = diemHK2.filter(data => data.MaLoai == 'tbhk2' && data.MSHS == item.MSHS);
             const tbcn = diemCN.filter(data => data.MaLoai == 'tbcn' && data.MSHS == item.MSHS);
+            const tkhk1 = diemTB.find(data => data.Diem_TB_HKI && data.MSHS == item.MSHS);
+            const tkhk2 = diemTB.find(data => data.Diem_TB_HKII && data.MSHS == item.MSHS);
+            // const tkcn = diemTB.find(data => data.Diem_TB_CN && data.MSHS == item.MSHS);
             if (tbhk1.length < 10) checkHK1 = true;
             if (tbhk2.length < 10) checkHK2 = true;
-            if (tbcn.length < 10) checkCN = true;
+            if (tbcn.length < 10 || !tkhk1 || !tkhk2) {
+                checkCN = true;
+            };
         })
         setDisableHK1(checkHK1);
         setDisableHK2(checkHK2);
@@ -946,7 +975,7 @@ export default function Homeroom() {
                                                                         <td className="p-2 border border-slate-300">{data ? data.giao_vien.TenGV : ""}</td>
                                                                         <td className="p-2 border border-slate-300">{data ? data.NoiDung : ""}</td>
                                                                         <td className="p-2 border border-slate-300">{data ? data.DanhGia : ""}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? `(${vangCP.length + vangKP.length}) ${vangCP.map((cp)=>(`${cp.hoc_sinh.HoTen}(CP)`))} ${vangKP.map((kp)=>(`${kp.hoc_sinh.HoTen}(KP)`))}` : ""}</td>
+                                                                        <td className="p-2 border border-slate-300">{data ? `(${vangCP.length + vangKP.length}) ${vangCP.map((cp) => (`${cp.hoc_sinh.HoTen}(CP)`))} ${vangKP.map((kp) => (`${kp.hoc_sinh.HoTen}(KP)`))}` : ""}</td>
                                                                     </tr>
                                                                 )
                                                             })}

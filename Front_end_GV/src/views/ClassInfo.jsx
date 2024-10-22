@@ -114,6 +114,7 @@ export default function ClassInfo() {
     const updateDiem = async (value) => {
         try {
             const response = await axiosClient.post("/diem/update", value);
+            setShowForm(0);
             setMessage(response.data);
         } catch (error) {
             console.log(error);
@@ -154,6 +155,7 @@ export default function ClassInfo() {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         } finally {
             fetchDiem();
+            setShowForm(0);
             setShowButton(false);
         }
     }

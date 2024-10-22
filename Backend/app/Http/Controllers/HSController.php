@@ -57,7 +57,7 @@ class HSController extends Controller
     public function show($mshs)
     {
         $hocsinh = HocSinh::with(['ban','phuHuynh','taiKhoan','lop' => function ($query) {
-            $query->latest()->first();
+            $query->latest()->get();
         }])->find($mshs);
         return response()->json($hocsinh, Response::HTTP_OK);
     }

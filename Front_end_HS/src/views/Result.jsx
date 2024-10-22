@@ -37,8 +37,10 @@ export default function Result() {
                 setSubjects(sujs.data);
                 const nk = await axiosClient.get("/nk/index");
                 let listNK = [];
+                console.log(_info.data);
                 _info.data.lop.forEach((lop) => {
                     const Nk = nk.data.find(item => item.MaNK === lop.MaNK);
+                    
                     if (Nk) {
                         listNK.push(Nk);
                     }
@@ -150,6 +152,7 @@ export default function Result() {
             }
         }
     }, [info, NK, NKRef.current?.value]);
+    console.log();
     return (
         <div className="main-content">
             <Menu />

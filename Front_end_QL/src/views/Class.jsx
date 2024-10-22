@@ -370,7 +370,7 @@ export default function Class() {
                                 {classes.map((classItem, index) => (
                                     <div key={index} className="bg-slate-50 p-3 border-2 mb-2">
                                         <div className="w-full flex justify-between">
-                                            <h3 className="text-xl">Lớp: {classItem.TenLop} Niên Khóa: {classItem.nien_khoa.TenNK} Chủ Nhiệm: {classItem.giao_vien.TenGV}</h3>
+                                            <h3 className="text-xl"><b>Mã lớp:</b> {classItem.MaLop} <b>Tên lớp:</b> {classItem.TenLop} <b>Niên Khóa:</b> {classItem.nien_khoa.TenNK} <b>Chủ Nhiệm:</b> {classItem.giao_vien.TenGV}</h3>
                                             <button
                                                 onClick={() => toggleTable(classItem.MaLop)}
                                                 className="border px-3 py-1 rounded hover:bg-gray-200"

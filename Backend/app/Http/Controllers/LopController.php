@@ -31,15 +31,15 @@ class LopController extends Controller
             'tkb.ngayTrongTuan',
             'nienKhoa'
         )
-        ->where('MaNK',$nk)->get();
+        ->where('MaNK',$nk)->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexTN($MaNK){
-        $lop = Lop::where('MaLop','like','A%')->where('MaNK','=',$MaNK)->get();
+        $lop = Lop::where('MaLop','like','A%')->where('MaNK','=',$MaNK)->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexXH($MaNK){
-        $lop = Lop::where('MaLop','like','C%')->where('MaNK','=',$MaNK)->get();
+        $lop = Lop::where('MaLop','like','C%')->where('MaNK','=',$MaNK)->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexWithoutTKB()
@@ -49,18 +49,18 @@ class LopController extends Controller
             'phanCong.monHoc',
             'phanCong.lop',
             'nienKhoa')
-            ->doesntHave('tkb')->get();
+            ->doesntHave('tkb')->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexWithStudent()
     {
-        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien'])->orderBy('created_at','desc')->get();
+        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien'])->latest()->orderBy("MaLop","asc")->get();
         return response()->json($lops, Response::HTTP_OK);
     }
 
     public function indexWithStudentNow($MaNK)
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->orderBy('created_at','desc')->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->latest()->orderBy("MaLop","asc")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function changeClass(Request $rq)
@@ -159,8 +159,8 @@ class LopController extends Controller
                     'MaTV' => $mshs,
                 ])->toArray()
             );
-            foreach($hocsinhTN as $hs){
-                $ph = PhuHuynh::where("MSHS",$hs->MSHS)->first();
+            foreach($hocsinhTN as $mshs){
+                $ph = PhuHuynh::where("MSHS", $mshs)->first();
                 if($ph){
                     ThanhVienNhom::insert([
                         'Nhom_id' =>  $newNPH->id,
@@ -230,22 +230,22 @@ class LopController extends Controller
                 'Nhom_id' => $newNPH->id,
                 'MaTV' => $gvcn->MSGV
             ]);
-            $hocsinhTXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->limit($soHSXH)->pluck('MSHS');
+            $hocsinhXH = HocSinh::with(['ban','lop'])->doesntHave('lop')->where('MaBan','XH')->where("TrangThai",0)->inRandomOrder()->limit($soHSXH)->pluck('MSHS');
             HocLop::insert(
-                $hocsinhTXH->map(fn($mshs) => [
+                $hocsinhXH->map(fn($mshs) => [
                     'MaLop' => $maLop,
                     'MSHS' => $mshs,
                     'MaNK' => $request->MaNK,
                 ])->toArray()
             );
             ThanhVienNhom::insert(
-                $hocsinhTXH->map(fn($mshs) => [
+                $hocsinhXH->map(fn($mshs) => [
                     'Nhom_id' =>  $newN->id,
                     'MaTV' => $mshs,
                 ])->toArray()
             );
-            foreach($hocsinhTXH as $hs){
-                $ph = PhuHuynh::where("MSHS",$hs->MSHS)->first();
+            foreach($hocsinhXH as $mshs){
+                $ph = PhuHuynh::where("MSHS", $mshs)->first();
                 if($ph){
                     ThanhVienNhom::insert([
                         'Nhom_id' =>  $newNPH->id,
@@ -324,76 +324,112 @@ class LopController extends Controller
 
     public function DuyetKQHT($MaLop)
     {
-        $lop = Lop::find($MaLop);
-        $hocsinh = $lop->hocSinh;
-        $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",3)->get();
-        $totnghiep = [];
-        $ban = substr($MaLop, 0, 1);
-        $MSGV = $lop->MSGV;
-        $NK = substr($MaLop, 3, 2);
-        $MaNK = $NK . "-" . $NK+1;
-        $NK = $NK.$NK+1;
-        $sttLop = substr($MaLop, 7, 1);
-        $MaKhoi = $lop->MaKhoi+1;
-        $MaLopMoi = $ban . $NK . $MaKhoi . $sttLop;
-        $khenThuong = KhenThuong::where("MaLop",$MaLop)->get();
-        if($khenThuong){
-            foreach ($khenThuong as $kt) {
-                $kt->TrangThai = 1;
-                $kt->save();
+        return DB::transaction(function() use ($MaLop)  {
+            $lop = Lop::find($MaLop);
+            $lop = Lop::find($MaLop);
+            if (!$lop) {
+                return response()->json("Lớp không tồn tại!", 404);
             }
-        }
-        if($lop->MaKhoi == 12){
-            $totnghiep = $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",4)->get();
-            foreach($totnghiep as $tn){
-                $hs = HocSinh::find($tn->MSHS);
-                $hs->TrangThai = 2;
-                $hs->save();
+            $hocsinh = $lop->hocSinh;
+            $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",3)->get();
+            $totnghiep = [];
+            $ban = substr($MaLop, 0, 1);
+            $MSGV = $lop->MSGV;
+            $NK = substr($MaLop, 3, 2);
+            $MaNK = $NK . "-" . ($NK + 1);
+            $NK = $NK . ($NK + 1);
+            $sttLop = substr($MaLop, 7, 1);
+            $MaKhoi = $lop->MaKhoi+1;
+            $MaLopMoi = $ban . $NK . $MaKhoi . $sttLop;
+            $khenThuong = KhenThuong::where("MaLop",$MaLop)->get();
+            if ($khenThuong->isNotEmpty()){
+                foreach ($khenThuong as $kt) {
+                    $kt->TrangThai = 1;
+                    $kt->save();
+                }
             }
-        }else{
-            $lopmoi = Lop::create(
-                [
+            if($lop->MaKhoi == 12){
+                $totnghiep = $lenlop = HocLop::where('MaLop',$MaLop)->where("MaTT",4)->get();
+                foreach($totnghiep as $tn){
+                    $hs = HocSinh::find($tn->MSHS);
+                    $hs->TrangThai = 2;
+                    $hs->save();
+                }
+            }else{
+                $lopmoi = Lop::create(
+                    [
+                        'MaLop' => $MaLopMoi,
+                        'MaKhoi' => $MaKhoi,
+                        'TenLop' => $MaKhoi . $ban . $sttLop,
+                        'MaNK' => $MaNK,
+                        'MSGV' => $MSGV,
+                    ]
+                );
+
+                $newN = NhomTinNhan::create([
                     'MaLop' => $MaLopMoi,
-                    'MaKhoi' => $MaKhoi,
-                    'TenLop' => $MaKhoi . $ban . $sttLop,
-                    'MaNK' => $MaNK,
-                    'MSGV' => $MSGV,
-                ]
-            );
-            
-            foreach ($lenlop as $hs) {
-                HocLop::create([
-                    'MaLop' => $MaLopMoi,
-                    'MSHS' => $hs->MSHS,
-                    'MaNK' => $MaNK,
+                    'TenNhom' => $lopmoi->TenLop . "_" . $MaNK
                 ]);
+                
+                $newNPH = NhomTinNhan::create([
+                    'MaLop' => $MaLopMoi,
+                    'TenNhom' => "PH_".$lopmoi->TenLop . "_" . $MaNK
+                ]);
+
+                ThanhVienNhom::create([
+                    'Nhom_id' => $newN->id,
+                    'MaTV' => $MSGV
+                ]);
+                ThanhVienNhom::create([
+                    'Nhom_id' => $newNPH->id,
+                    'MaTV' => $MSGV
+                ]);
+
+                foreach ($lenlop as $hs) {
+                    HocLop::create([
+                        'MaLop' => $MaLopMoi,
+                        'MSHS' => $hs->MSHS,
+                        'MaNK' => $MaNK,
+                    ]);
+                    ThanhVienNhom::insert([
+                        'Nhom_id' =>  $newN->id,
+                        'MaTV' => $hs->MSHS,
+                    ]);
+                    $ph = PhuHuynh::where("MSHS",$hs->MSHS)->first();
+                    if($ph){
+                        ThanhVienNhom::insert([
+                            'Nhom_id' =>  $newNPH->id,
+                            'MaTV' => $ph->TaiKhoan,
+                        ]);
+                    }
+                }
+            }
+            $lop->TrangThai = 2;
+            $lop->save();
+            return response()->json("Đã duyệt thành công!",200);
+        });
+    }
+    public function createDiem(){
+        $diem = new Diem();
+        $monhocTN = MonHoc::where('MaMH', 'like', 'TN%')
+            ->orWhere('MaMH', 'like', 'CB%')
+            ->orWhereIn('MaMH', ['XH1', 'TC2'])
+            ->get();
+        $monhocXH = MonHoc::where('MaMH', 'like', 'XH%')
+            ->orWhere('MaMH', 'like', 'CB%')
+            ->orWhereIn('MaMH', ['TN1', 'TC1'])
+            ->get();
+        $hocsinhTN = HocSinh::where('MaBan',"TN")->get();
+        $hocsinhXH = HocSinh::where('MaBan',"XH")->get();
+        foreach($hocsinhTN as $hocsinh)
+        {
+            foreach($monhocTN as $monhoc)
+            {
+                $diem->MaHS = $hocsinh->MSHS;
+                $diem->MaMH = $monhoc->MaMH;
             }
         }
-        $lop->TrangThai = 2;
-        $lop->save();
-        return response()->json("Đã duyệt thành công!",200);
     }
-    // public function createDiem(){
-    //     $diem = new Diem();
-    //     $monhocTN = MonHoc::where('MaMH', 'like', 'TN%')
-    //         ->orWhere('MaMH', 'like', 'CB%')
-    //         ->orWhereIn('MaMH', ['XH1', 'TC2'])
-    //         ->get();
-    //     $monhocXH = MonHoc::where('MaMH', 'like', 'XH%')
-    //         ->orWhere('MaMH', 'like', 'CB%')
-    //         ->orWhereIn('MaMH', ['TN1', 'TC1'])
-    //         ->get();
-    //     $hocsinhTN = HocSinh::where('MaBan',"TN")->get();
-    //     $hocsinhXH = HocSinh::where('MaBan',"XH")->get();
-    //     foreach($hocsinhTN as $hocsinh)
-    //     {
-    //         foreach($monhocTN as $monhoc)
-    //         {
-    //             $diem->MaHS = $hocsinh->MSHS;
-    //             $diem->MaMH = $monhoc->MaMH;
-    //         }
-    //     }
-    // }
     public function getDayBu(Request $rq){
         $data = TietHoc::with(['monHoc','giaoVien'])->where("MaLop",$rq->MaLop)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
         return response()->json($data, Response::HTTP_OK);

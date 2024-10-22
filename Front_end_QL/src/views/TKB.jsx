@@ -198,14 +198,14 @@ export default function TKB() {
     const saveChange = async () => {
         if (change1 && change2) {
             var payload;
-            if(change2.id == "empty"){
+            if (change2.id == "empty") {
                 payload = {
                     change1: change1.id,
                     change2: change2.id,
                     MaNgay: change2.MaNgay,
                     TietDay: change2.TietDay
                 }
-            }else{
+            } else {
                 payload = {
                     change1: change1.id,
                     change2: change2.id,
@@ -228,12 +228,28 @@ export default function TKB() {
     const onCancel = () => {
         setShowConfirm(false);
     }
-    const chooseEmptyCell = (MaNgay, TietDay) => {
-        setChange2({
-            id: "empty",
-            MaNgay: MaNgay,
-            TietDay: TietDay,
-        });
+    const chooseEmptyCell = (MaNgay, TietDay, MaLop) => {
+        var check = false;
+        for (let i = 0; i < tkb.length; i++) {
+            if (tkb[i].MaLop != MaLop) {
+                const check1 = tkb[i].tkb.find(item => TietDay == item.TietDay && MaNgay == item.MaNgay && item.MSGV == change1.MSGV);
+                if (check1) {
+                    check = true;
+                }
+            }
+            if (check) {
+                break;
+            }
+        }
+        if (check) {
+            setError("Tiết dạy bạn chon bị trùng lặp");
+        } else {
+            setChange2({
+                id: "empty",
+                MaNgay: MaNgay,
+                TietDay: TietDay,
+            });
+        }
     }
     return (
         <div className="main-content">
@@ -301,9 +317,9 @@ export default function TKB() {
                                                         <td
                                                             className={`td ${(change1 && changeTKB == data.MaLop) && !(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1) ? "cursor-pointer hover:bg-slate-300" : ""} `}
                                                             key={j + 1}
-                                                            onClick={() => chooseEmptyCell(j + 2, i + 1)}
+                                                            onClick={() => chooseEmptyCell(j + 2, i + 1,data.MaLop)}
                                                         >
-                                                            {(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1) && <p className="font-bold text-red-400">Đã chọn</p>}
+                                                            {(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1 && changeTKB == data.MaLop) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                         </td>
                                                 ))}
                                             </tr>
@@ -333,7 +349,7 @@ export default function TKB() {
                                                                 key={j + 1}
                                                                 onClick={() => chooseEmptyCell(j + 2, currentIndex + 1)}
                                                             >
-                                                                {(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1) && <p className="font-bold text-red-400">Đã chọn</p>}
+                                                                {(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1 && changeTKB == data.MaLop) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                             </td>
                                                     ))}
                                                 </tr>

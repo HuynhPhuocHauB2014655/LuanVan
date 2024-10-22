@@ -25,8 +25,10 @@ export default function Result() {
     const [view, setView] = useState(1);
     const navigate = useNavigate();
     const [Nk, setNk] = useState([]);
+    const [namHoc, setNamHoc] = useState();
     const [forcus, setForcus] = useState("");
     const NKRef = useRef();
+    const namhocRef = useRef();
     const { setError } = useStateContext();
     const { userName } = useUserContext();
     useEffect(() => {
@@ -104,25 +106,25 @@ export default function Result() {
     const classView = () => {
         setView(1);
     }
-    const fetchSummary = async () => {
+    const fetchSummary = async (nk) => {
         try {
-            const response = await axiosClient.get(`/tongKet/truong/${nienKhoa.NienKhoa}`);
+            const response = await axiosClient.get(`/tongKet/truong/${nk ? nk : nienKhoa.NienKhoa}`);
             setSummary(response.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     }
-    const fetchSummaryClass = async () => {
+    const fetchSummaryClass = async (nk) => {
         try {
-            const response = await axiosClient.get(`/tongKet/lop/${nienKhoa.NienKhoa}`);
+            const response = await axiosClient.get(`/tongKet/lop/${nk ? nk : nienKhoa.NienKhoa}`);
             setSummaryClass(response.data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     }
-    const fetchSummaryGrade = async () => {
+    const fetchSummaryGrade = async (nk) => {
         try {
-            const response = await axiosClient.get(`/tongKet/khoi/${nienKhoa.NienKhoa}`);
+            const response = await axiosClient.get(`/tongKet/khoi/${nk ? nk : nienKhoa.NienKhoa}`);
             setSummaryGrade(response.data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -130,7 +132,8 @@ export default function Result() {
     }
     const sumView = () => {
         if (summary.length == 0) {
-            fetchSummary();
+            setNamHoc(namhocRef.current?.value);
+            fetchSummary(namhocRef.current?.value);
         }
         setView(3);
     }
@@ -164,13 +167,29 @@ export default function Result() {
 
     }
     const changeStyle = (e) => {
-        if (e.target.value == 2 && summaryGrade.length == 0) {
-            fetchSummaryGrade();
-        }
-        if (e.target.value == 3 && summaryClass.length == 0) {
-            fetchSummaryClass();
-        }
         setStyle(e.target.value);
+        if (e.target.value == 1) {
+            fetchSummaryGrade(namHoc);
+        }
+        if (e.target.value == 2 ) {
+            fetchSummaryGrade(namHoc);
+        }
+        if (e.target.value == 3) {
+            fetchSummaryClass(namHoc);
+        }
+    }
+    const changeNH = (e) => {
+        setNamHoc(e.target.value);
+        console.log(style);
+        if (style == 1) {
+            fetchSummary(e.target.value);
+        }
+        if (style == 2) {
+            fetchSummaryGrade(e.target.value);
+        }
+        if (style == 3) {
+            fetchSummaryClass(e.target.value);
+        }
     }
     const searchClass = (e) => {
         e.preventDefault();
@@ -196,7 +215,7 @@ export default function Result() {
             return () => clearTimeout(timer);
         }
     }, [forcus]);
-    // console.log(summary);
+    console.log();
     return (
         <div className="main-content">
             <Menu />
@@ -327,15 +346,26 @@ export default function Result() {
                 }
                 {view == 3 &&
                     <div className="mx-3 mt-5">
-                        <div className="flex justify-center">
+                        <div className="flex justify-center w-1/2 mx-auto">
                             <select name="style"
-                                className="block appearance-none w-1/2 text-center bg-white border-4 border-blue-300 
-                                text-gray-700 p-4 text-lg font-bold pr-8 rounded-lg leading-tight focus:outline-none focus:ring focus:border-blue-300"
+                                className="block w-2/3 appearance-none text-center bg-white border-4 border-r-0 border-blue-300 
+                                text-gray-700 p-4 text-lg font-bold pr-8 rounded-lg rounded-r-none leading-tight focus:outline-none focus:ring focus:border-blue-300"
                                 onChange={changeStyle}
                             >
                                 <option value="1">Toàn trường</option>
                                 <option value="2">Theo khối</option>
                                 <option value="3">Theo lớp</option>
+                            </select>
+                            <select className="block appearance-none w-1/3 text-center bg-white border-4 border-blue-300 
+                                text-gray-700 p-4 text-lg font-bold pr-8 rounded-lg rounded-l-none leading-tight focus:outline-none focus:ring focus:border-blue-300"
+                                defaultValue={nienKhoa.NienKhoa}
+                                onChange={changeNH}
+                                ref={namhocRef}
+                            >
+                                <option value="">Chọn niên khóa</option>
+                                {Nk.map((item) => (
+                                    <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
+                                ))}
                             </select>
                         </div>
                         {style == 1 &&
@@ -405,20 +435,22 @@ export default function Result() {
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLTot} ({Math.round((summary.HLTot * 100) / summary.TongHS) || ""}%)</td>
                                                 </tr>
                                                 <tr>
-                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh lên lớp:</th>
-                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.LL} ({Math.round((summary.LL * 100) / summary.TongHS) || ""}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TongHS}</td>
+
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Khá:</th>
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLKha} ({Math.round((summary.HLKha * 100) / summary.TongHS) || ""}%)</td>
                                                 </tr>
                                                 <tr>
-                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh phải rèn luyện hè:</th>
-                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLH} ({Math.round((summary.RLH * 100) / summary.TongHS) || ""}%)</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh lên lớp:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.LL} ({Math.round((summary.LL * 100) / summary.TongHS) || ""}%)</td>
+
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Đạt:</th>
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLDat} ({Math.round((summary.HLDat * 100) / summary.TongHS) || ""}%)</td>
                                                 </tr>
                                                 <tr>
-                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh:</th>
-                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.TongHS}</td>
+                                                    <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh phải rèn luyện hè:</th>
+                                                    <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.RLH} ({Math.round((summary.RLH * 100) / summary.TongHS) || ""}%)</td>
                                                     <th className="text-left py-1 px-2 border-2 border-blue-200">Tổng số học sinh học lực Chưa đạt:</th>
                                                     <td className="text-center py-1 px-2 border-2 border-blue-200">{summary.HLCD} ({Math.round((summary.HLCD * 100) / summary.TongHS) || ""}%)</td>
                                                 </tr>
