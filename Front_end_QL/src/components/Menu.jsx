@@ -5,11 +5,29 @@ import { useEffect } from "react";
 import { useUserContext } from "../context/userContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-export default function Menu() {
+import axiosClient from "../axios-client";
+export default function Menu({ update }) {
     const [active, setActive] = useState(0);
     const { userName } = useUserContext();
     const [menu, setMenu] = useState();
+    const [tnCount, setTnCount] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
+    const fetchTN = async () => {
+        const c = await axiosClient.get(`tn/count/${userName}`);
+        let n = 0;
+        c.data.map((data) => {
+            n += data.unread_count;
+        })
+        setTnCount(n);
+    }
+    useEffect(() => {
+        if (userName) {
+            fetchTN();
+        }
+    }, [userName]);
+    if (update == 2) {
+        fetchTN();
+    }
     useEffect((() => {
         if (userName == "admin") {
             const menu_items = [
@@ -23,7 +41,7 @@ export default function Menu() {
                 { id: 8, route: "/account", label: 'Tài khoản' },
                 { id: 9, route: "/rs", label: 'Kết quả học tập' },
                 { id: 10, route: "/notify", label: 'Thông báo' },
-                { id: 11, route: "/ms", label: 'Tin nhắn' },
+                { id: 100, route: "/ms", label: 'Tin nhắn' },
             ];
             setMenu(menu_items);
         }
@@ -35,6 +53,7 @@ export default function Menu() {
                 { id: 4, route: "/notify", label: 'Thông báo' },
                 { id: 5, route: "/class", label: 'Lớp Học' },
                 { id: 6, route: "/tkb", label: 'Thời Khóa Biểu' },
+                { id: 100, route: "/ms", label: 'Tin nhắn' },
             ];
             setMenu(menu_items);
         }
@@ -45,6 +64,7 @@ export default function Menu() {
                 { id: 3, route: "/teacher", label: 'Giáo Viên' },
                 { id: 4, route: "/account", label: 'Tài khoản' },
                 { id: 5, route: "/notify", label: 'Thông báo' },
+                { id: 100, route: "/ms", label: 'Tin nhắn' },
             ];
             setMenu(menu_items);
         }
@@ -77,6 +97,9 @@ export default function Menu() {
                             to={item.route} onClick={() => activeItem(item.id)}
                         >
                             {item.label}
+                            {item.id == 100 && tnCount > 0 &&
+                                <span className="absolute top-1 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tnCount}</span>
+                            }
                         </Link>
                     </li>
                 ))}

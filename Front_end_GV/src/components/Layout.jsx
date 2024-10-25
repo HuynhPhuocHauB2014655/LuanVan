@@ -85,7 +85,7 @@ export default function Layout() {
             <footer className="footer bg-cyan-200 rounded flex items-center justify-center">
                 Footer
             </footer>
-            <button className="border-2 border-blue-600 px-3 py-1 text-2xl fixed bottom-1 right-1 rounded" onClick={goToTop}><FontAwesomeIcon icon={faArrowUp} color="blue" /></button>
+            <button className="border-2 border-blue-600 px-3 py-1 text-2xl fixed bottom-1 right-1 rounded z-20" onClick={goToTop}><FontAwesomeIcon icon={faArrowUp} color="blue" /></button>
         </div>
     )
 }

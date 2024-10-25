@@ -1,11 +1,35 @@
 import { Link } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
 import { useState, useEffect } from "react";
-
+import axiosClient from "../axios-client";
+import pusher from "../pusher";
 export default function Home() {
     const { userName } = useUserContext();
     const [menu, setMenu] = useState([]);
+    const [tnCount,setTnCount] = useState(0);
+    const fetchTN = async () => {
+        const c = await axiosClient.get(`tn/count/${userName}`);
+        let n = 0;
+        c.data.map((data)=>{
+            n += data.unread_count;
+        })
+        setTnCount(n);
+    }
+    useEffect(()=>{
+        fetchTN();
+    },[userName]);
+    useEffect(() => {
+        const channel = pusher.subscribe(`chat.${userName}`);
 
+        channel.bind('App\\Events\\sendMessage', (data) => {
+            fetchTN();
+        });
+
+        return () => {
+            channel.unbind_all();
+            channel.unsubscribe();
+        };
+    }, [userName]); 
     useEffect(() => {
         let menu_items = [];
         if (userName === "admin") {
@@ -20,7 +44,7 @@ export default function Home() {
                 { id: 8, route: "/account", label: "Tài khoản" },
                 { id: 9, route: "/rs", label: "Kết quả học tập" },
                 { id: 10, route: "/notify", label: "Thông báo" },
-                { id: 11, route: "/ms", label: "Tin nhắn" },
+                { id: 100, route: "/ms", label: "Tin nhắn" },
             ];
         } else if (userName === "daotao") {
             menu_items = [
@@ -30,6 +54,7 @@ export default function Home() {
                 { id: 4, route: "/notify", label: "Thông báo" },
                 { id: 5, route: "/class", label: "Lớp Học" },
                 { id: 6, route: "/tkb", label: "Thời Khóa Biểu" },
+                { id: 100, route: "/ms", label: 'Tin nhắn' },
             ];
         } else if (userName === "nhansu") {
             menu_items = [
@@ -37,6 +62,7 @@ export default function Home() {
                 { id: 2, route: "/student", label: "Học sinh" },
                 { id: 3, route: "/teacher", label: "Giáo Viên" },
                 { id: 5, route: "/notify", label: "Thông báo" },
+                { id: 100, route: "/ms", label: 'Tin nhắn' },
             ];
         }
         setMenu(menu_items);
@@ -61,10 +87,13 @@ export default function Home() {
                     {menu?.map((item) => (
                         <Link
                             key={item.id}
-                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
+                            className="relative border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
                             to={item.route}
                         >
                             <p className="text-lg font-semibold text-gray-700">{item.label}</p>
+                            {item.id == 100 && tnCount > 0 && 
+                                <span className="absolute top-1 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tnCount}</span>
+                            }
                         </Link>
                     ))}
                 </div>

@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class TinNhan extends Model
+class GroupMessage extends Model
 {
     use HasFactory;
-    protected $table = 'TinNhan';
+    protected $table = 'GroupMessage';
     protected $fillable = [
         'id',
         'TinNhan',
@@ -19,7 +19,7 @@ class TinNhan extends Model
         'TrangThai',
         'Nhom_id'
     ];
-    public function nhom():BelongsTo{
-        return $this->belongsTo(NhomTinNhan::class,'Nhom_id','id');
+    public function group():BelongsTo{
+        return $this->belongsTo(CustomGroup::class,'Nhom_id','id');
     }
 }

@@ -3,7 +3,7 @@ import Menu from "../components/Menu";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faMagnifyingGlass, faXmark, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faMagnifyingGlass, faXmark, faArrowDown, faArrowLeft, faAnglesLeft, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -13,40 +13,57 @@ import pusher from "../pusher";
 import moment from 'moment';
 import { useNavigate } from "react-router-dom";
 export default function Message() {
+    const { userName } = useUserContext();
     const [messages, setMessages] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [allGroups, setAllGroups] = useState([]);
     const [groupsMember, setGroupsMember] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState();
+    const [toggleResult, setToggleResult] = useState(true);
+    const [onMd, setOnMd] = useState(false);
+    const [isGroupListVisible, setGroupListVisible] = useState(true);
     const [showSearch, setShowSearch] = useState(false);
     const [show, setShow] = useState(false);
     const [showMem, setShowMem] = useState(false);
     const [value, setValue] = useState("");
+    const [count, setCount] = useState([]);
     const [update, setUpdate] = useState(0);
     const [focus, setForcus] = useState("");
     const [fakeMessage, setFakeMessage] = useState("");
     const [resultSearch, setResultSearch] = useState();
     const [showResult, setShowResult] = useState(false);
     const [showButton, setShowButton] = useState(false);
+    const { setMessage, setError } = useStateContext();
     const messageEndRef = useRef(null);
     const messageRef = useRef(null);
-    const navigate = useNavigate();
-    const {setError} = useStateContext();
-    const {userName} = useUserContext();
-    useEffect(()=>{
-        if(userName != "admin"){
-            setError("Bạn không có quyền truy cập trang này");
-            navigate('/');
-        }
-    },[userName]);
     const fetchGroup = async () => {
         try {
-            const group = await axiosClient.get(`tn`);
+            const group = await axiosClient.get(`tn/${userName}`);
             setGroups(group.data);
+            const c = await axiosClient.get(`tn/count/${userName}`);
+            setCount(c.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const fetchAllGroup = async () => {
+        try {
+            const group = await axiosClient.get(`tn`);
+            setAllGroups(group.data);
         } catch (error) {
             console.log(error);
         }
     }
     const fetchMessages = async (id) => {
+        try {
+            const res = await axiosClient.get(`tn/group/${id}`);
+            const data = res.data.filter(item => (item.NguoiGui == `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` && item.NguoiNhan == id) || item.NguoiNhan == `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`)
+            setMessages(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const fetchAllMessages = async (id) => {
         try {
             const res = await axiosClient.get(`tn/all/${id}`);
             setMessages(res.data);
@@ -55,14 +72,42 @@ export default function Message() {
         }
     }
     useEffect(() => {
+        if (userName) {
             fetchGroup();
-    },[]);
+            fetchAllGroup();
+        }
+    }, [userName]);
     const select = (data) => {
         setShow(false);
         setShowMem(false);
-        fetchMessages(data.id);
+        setSeen(data);
         setSelectedGroup(data);
+        fetchMessages(data.id);
+        if (onMd) {
+            setGroupListVisible(false);
+        }
     }
+    const selectAll = (data) => {
+        setShow(false);
+        setShowMem(false);
+        fetchAllMessages(data.id);
+        setSelectedGroup(data);
+        if (onMd) {
+            setGroupListVisible(false);
+        }
+    }
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setOnMd(true);
+            } else {
+                setOnMd(false);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     const countMem = (data) => {
         return data.length;
     }
@@ -81,23 +126,83 @@ export default function Message() {
         };
         fetchMemberNames();
     }, [selectedGroup]);
+    const handleChange = (e) => {
+        setValue(e.target.value);
+    };
+    const pressKey = async (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            setValue(prevValue => prevValue + '\n');
+        }
+        if (!e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            const payload = {
+                "Nhom_id": selectedGroup.id,
+                NguoiGui: `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`,
+                TinNhan: value
+            };
+            setFakeMessage(payload.TinNhan);
+            setValue("");
+            try {
+                const res = await axiosClient.post("tn/add", payload);
+                setMessages(prevMessages => [...prevMessages, res.data]);
+                setFakeMessage("");
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
     useEffect(() => {
         if (fakeMessage || messages?.length > 0) {
             scrollBottom();
         }
     }, [fakeMessage, messages]);
     const scrollBottom = () => {
-        messageEndRef.current.scrollIntoView({block: 'nearest',});
+        messageEndRef.current.scrollIntoView({ block: 'nearest' });
+    }
+    useEffect(() => {
+        const channel = pusher.subscribe(`chat.${userName}`);
+
+        channel.bind('App\\Events\\sendMessage', (data) => {
+            fetchGroup();
+            if (selectedGroup && selectedGroup.id == data.message.Nhom_id) {
+                setSeen(selectedGroup);
+                setMessages(prevMessages => [...prevMessages, data.message]);
+            }
+        });
+
+        return () => {
+            channel.unbind_all();
+            channel.unsubscribe();
+        };
+    }, [userName, selectedGroup]);
+    const setSeen = async (data) => {
+        try {
+            const payload = {
+                'Nhom_id': data.id,
+                'NguoiNhan': `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`,
+            }
+            await axiosClient.put('tn', payload);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            fetchGroup();
+            setUpdate(2);
+        }
+    }
+    const personalMessage = () => {
+        return messages.filter(item => (item.NguoiGui == `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` && item.NguoiNhan == selectedGroup.id) || item.NguoiNhan == `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`)
     }
     const ShowSearch = (state) => {
         setResultSearch(null);
         setShowResult(false);
         setForcus("");
         setShowSearch(state);
+        setToggleResult(true);
     }
     const search = (e) => {
         const searchValue = e.target.value.toLowerCase();
-        const filteredMessages = messages?.filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
+        const filteredMessages = personalMessage().filter(item => item.Nhom_id == selectedGroup.id && item.TinNhan.toLowerCase().includes(searchValue));
         setResultSearch(filteredMessages);
         if (searchValue) {
             setShowResult(true);
@@ -109,6 +214,7 @@ export default function Message() {
         const element = document.getElementById(id);
         element.scrollIntoView({ inline: 'center' });
         setForcus(id);
+        setToggleResult(false);
     }
     const getDate = (date) => {
         const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
@@ -125,37 +231,76 @@ export default function Message() {
             }
         }
     }
+    const countNotSeen = (id) => {
+        const c = count.find(item => item.id == id);
+        if (c) {
+            return c.unread_count;
+        }
+    }
+    const showListGroup = () => {
+        setSelectedGroup(null);
+        setGroupListVisible(true);
+    }
+    const changeToogleResult = (state) => {
+        setToggleResult(state);
+    }
+    console.log();
     return (
         <div className="main-content">
             <Menu update={update} />
             <div className="right-part">
-                <div className="page-name">Tin nhắn</div>
-                <div className="flex h-[80vh] bg-white shadow-lg mt-2">
-                    <div className="w-[30%] border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative">
-                        {showResult &&
-                            <div className="w-full h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden">
-                                <div className="text-center font-bold my-3">Kết quả tìm kiếm</div>
-                                {resultSearch?.length == 0 ?
-                                    <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
-                                    :
-                                    resultSearch?.map((item) => (
-                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
-                                            <div className="">{item.NguoiGui}</div>
-                                            <div className="">{item.TinNhan}</div>
-                                        </div>
-                                    ))
-                                }
+                <div className="page-name relative">
+                    <button className={`absolute left-0 hover:text-blue-300 ${(!onMd || isGroupListVisible) && "hidden"}`} onClick={showListGroup}><FontAwesomeIcon icon={faArrowLeft} /></button>
+                    Tin nhắn
+                </div>
+                <div className="md:flex h-[80vh] bg-white shadow-lg mt-2 relative">
+                    {(showResult && !toggleResult) &&
+                        <button type="button" onClick={() => changeToogleResult(true)} className="absolute top-1/2 text-xl z-10"><FontAwesomeIcon icon={faAnglesRight} /></button>
+                    }
+                    {showResult &&
+                        <div className={`w-1/2 h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden ${!toggleResult && "hidden"}`}>
+                            <div className="text-center font-bold my-3 relative">
+                                Kết quả tìm kiếm
+                                <button type="button" onClick={() => changeToogleResult(false)} className="absolute right-1 text-xl"><FontAwesomeIcon icon={faAnglesLeft} /></button>
                             </div>
-                        }
+                            {resultSearch?.length == 0 ?
+                                <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
+                                :
+                                resultSearch?.map((item) => (
+                                    <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
+                                        <div className="">{item.NguoiGui}</div>
+                                        <div className="">{item.TinNhan}</div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    }
+                    <div
+                        className={`
+                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
+                            ${(!isGroupListVisible && onMd) && 'hidden'}
+                        `}>
                         {groups?.map((gr) => (
                             <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
+                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
+                                </div>
+                                {countNotSeen(gr.id) > 0 &&
+                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{countNotSeen(gr.id)}</div>
+                                }
+                            </div>
+                        ))}
+                        {userName == "admin" && allGroups?.map((gr) => (
+                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => selectAll(gr)}>
+                                <div>
+                                    <div className="text-lg">{gr.TenNhom}</div>
+                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="w-[70%]">
+                    <div className={`md:w-[70%] h-full w-full ${(onMd && isGroupListVisible) && "hidden"}`}>
                         {selectedGroup &&
                             <div className="h-full relative">
                                 <div className="relative h-full w-full">
@@ -172,27 +317,44 @@ export default function Message() {
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className="h-[86%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
+                                    <div className={`h-[${selectedGroup.id == 155 ? "76%" : "86%"}] overflow-y-scroll w-full space-y-7 py-2`} ref={messageRef} onScroll={checkBottom}>
                                         {messages?.map((tn) => (
-                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2`}>
+                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
                                                     {tn.TinNhan}
-                                                    <div className={`absolute text-xs bottom-1 right-1`}>{getDate(tn.created_at)}</div>
+                                                    <div className={tn.NguoiGui !== `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
                                                 </div>
                                             </div>
                                         ))}
+                                        {fakeMessage &&
+                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
+                                                <div className="mx-2">{`${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`}</div>
+                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
+                                                    {fakeMessage}
+                                                    <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
+                                                </div>
+                                            </div>
+                                        }
                                         <div ref={messageEndRef} />
                                     </div>
-                                    <div className="absolute bottom-0 w-full h-[10%]">
-                                        {showButton &&
-                                            <button
-                                                className="absolute right-5 h-[40%] top-[30%] hover:text-blue-400"
-                                                onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
-                                                    className="h-full" />
-                                            </button>
-                                        }
-                                    </div>
+                                    {selectedGroup.id == 155 &&
+                                        <div className="absolute bottom-0 w-full h-[10%]">
+                                            <textarea type="text" name="TinNhan"
+                                                placeholder="Nhập nội dung tin nhắn"
+                                                onKeyDown={pressKey}
+                                                onChange={handleChange}
+                                                value={value}
+                                                className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
+                                            {showButton &&
+                                                <button
+                                                    className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
+                                                    onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
+                                                        className="h-full" />
+                                                </button>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                                 {show &&
                                     <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">

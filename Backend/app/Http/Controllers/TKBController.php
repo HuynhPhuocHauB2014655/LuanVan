@@ -164,12 +164,12 @@ class TKBController extends Controller
     {
         $nienKhoa = str_replace('-', '', $nk);
         $lopTN = Lop::doesntHave('tkb')
-                    ->where('MaLop', 'like', 'A'.$nienKhoa.'%')
+                    ->where('MaLop', 'like', 'A'.$nienKhoa.'%')->where("MaLop","!=","GV")
                     ->inRandomOrder()
                     ->get();
 
         $lopXH = Lop::doesntHave('tkb')
-                    ->where('MaLop', 'like', 'C'.$nienKhoa.'%')
+                    ->where('MaLop', 'like', 'C'.$nienKhoa.'%')->where("MaLop","!=","GV")
                     ->inRandomOrder()
                     ->get();
         foreach ($lopTN as $lop) {

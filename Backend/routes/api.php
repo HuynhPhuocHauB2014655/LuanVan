@@ -16,6 +16,7 @@ use App\Http\Controllers\RenLuyenController;
 use App\Http\Controllers\KhenThuongController;
 use App\Http\Controllers\TBController;
 use App\Http\Controllers\TinNhanController;
+use App\Http\Controllers\GroupController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -199,4 +200,21 @@ Route::put('/tn',[TinNhanController::class,'setSeen']);
 Route::get('/tn/{id}',[TinNhanController::class,'getGroup']);
 Route::get('/tn',[TinNhanController::class,'getAllGroup']);
 Route::post('/tn/add',[TinNhanController::class,'store']);
-Route::get('/tn/test',[TinNhanController::class,'makeGroup']);
+Route::post('/tn/create',[TinNhanController::class,'create']);
+Route::post('/tn/member',[TinNhanController::class,'addMember']);
+Route::post('/tn/test',[TinNhanController::class,'addGroup']);
+
+
+//Group route
+Route::get('/gr/index/{NguoiNhan}',[GroupController::class,'index']);
+Route::get('/gr/name/{id}',[GroupController::class,'getName']);
+Route::get('/gr/group/{id}',[GroupController::class,'getTN']);
+Route::get('/gr/all/{id}',[GroupController::class,'getAllTN']);
+Route::get('/gr/count/{id}',[GroupController::class,'countNotSeen']);
+Route::put('/gr',[GroupController::class,'setSeen']);
+Route::get('/gr/{id}',[GroupController::class,'getGroup']);
+Route::get('/gr',[GroupController::class,'getAllGroup']);
+Route::post('/gr/add',[GroupController::class,'store']);
+Route::post('/gr/create',[GroupController::class,'create']);
+Route::post('/gr/member',[GroupController::class,'addMember']);
+Route::post('/gr/test',[GroupController::class,'addGroup']);

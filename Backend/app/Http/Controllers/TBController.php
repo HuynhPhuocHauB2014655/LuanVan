@@ -54,7 +54,7 @@ class TBController extends Controller
     public function create(Request $rq)
     {
         $findHS = HocSinh::find($rq->NguoiNhan);
-        $findLop = Lop::find($rq->NguoiNhan);
+        $findLop = Lop::where("MaLop","=",$rq->NguoiNhan)->where("MaLop","!=","GV")->first();
         if(!$findHS && !$findLop && $rq->NguoiNhan != "TT" && $rq->NguoiNhan != "GV" && $rq->NguoiNhan != "HS"){
             return response()->json('Người nhận không tồn tại',404);
         }

@@ -515,7 +515,7 @@ class DiemController extends Controller
     }
     public function TongKetLop($MaNK)
     {
-        $lop = Lop::with(['giaoVien'])->where("MaNK",$MaNK)->get();
+        $lop = Lop::with(['giaoVien'])->where("MaNK",$MaNK)->where("MaLop","!=","GV")->get();
         $result = [];
         foreach($lop as $lop){
             $hs = HocLop::with("lop")->where("MaNK", $MaNK)->where("MaLop",$lop->MaLop)->get();

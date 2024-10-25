@@ -20,7 +20,7 @@ class LopController extends Controller
 {
     public function index()
     {
-        $lop = Lop::all();
+        $lop = Lop::where("MaLop","!=","GV")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexWithTKB($nk)
@@ -31,15 +31,15 @@ class LopController extends Controller
             'tkb.ngayTrongTuan',
             'nienKhoa'
         )
-        ->where('MaNK',$nk)->orderBy("TenLop")->get();
+        ->where('MaNK',$nk)->where("MaLop","!=","GV")->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexTN($MaNK){
-        $lop = Lop::where('MaLop','like','A%')->where('MaNK','=',$MaNK)->orderBy("TenLop")->get();
+        $lop = Lop::where('MaLop','like','A%')->where('MaNK','=',$MaNK)->where("MaLop","!=","GV")->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexXH($MaNK){
-        $lop = Lop::where('MaLop','like','C%')->where('MaNK','=',$MaNK)->orderBy("TenLop")->get();
+        $lop = Lop::where('MaLop','like','C%')->where('MaNK','=',$MaNK)->where("MaLop","!=","GV")->orderBy("TenLop")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexWithoutTKB()
@@ -49,23 +49,23 @@ class LopController extends Controller
             'phanCong.monHoc',
             'phanCong.lop',
             'nienKhoa')
-            ->doesntHave('tkb')->orderBy("TenLop")->get();
+            ->doesntHave('tkb')->orderBy("TenLop")->where("MaLop","!=","GV")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function indexWithStudent()
     {
-        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien'])->latest()->orderBy("MaLop","asc")->get();
+        $lops = Lop::with(['hocSinh', 'nienKhoa', 'giaoVien'])->where("MaLop","!=","GV")->latest()->orderBy("MaLop","asc")->get();
         return response()->json($lops, Response::HTTP_OK);
     }
 
     public function indexWithStudentNow($MaNK)
     {
-        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where('MaNK','=',$MaNK)->latest()->orderBy("MaLop","asc")->get();
+        $lop = Lop::with(['hocSinh','nienKhoa','giaoVien'])->where("MaLop","!=","GV")->where('MaNK','=',$MaNK)->latest()->orderBy("MaLop","asc")->get();
         return response()->json($lop, Response::HTTP_OK);
     }
     public function changeClass(Request $rq)
     {
-        $data = HocLop::where("MSHS",$rq->MSHS)->where("MaLop",$rq->oldClass)->where("MaNK",$rq->MaNK)->first();
+        $data = HocLop::where("MSHS",$rq->MSHS)->where("MaLop","!=","GV")->where("MaLop",$rq->oldClass)->where("MaNK",$rq->MaNK)->first();
         if($data){
             $count = HocLop::where("MaLop",$rq->oldClass)->where("MaNK",$rq->MaNK)->count();
             if($count <= 10){
@@ -120,7 +120,7 @@ class LopController extends Controller
             $check=null;
             do{
                 $gvcn = $gvTN->random();
-                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
+                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaLop","!=","GV")->where("MaNK",$request->MaNK)->first();
             }while($check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
@@ -174,7 +174,7 @@ class LopController extends Controller
         {
             $malop = "A".$nienkhoa."10%";
             for ($i=0; $i < $hocsinhTN->count(); $i++) { 
-                $randomClass = Lop::where('MaLop','like', $malop)->inRandomOrder()->limit(1)->pluck('MaLop')->first();
+                $randomClass = Lop::where('MaLop','like', $malop)->where("MaLop","!=","GV")->inRandomOrder()->limit(1)->pluck('MaLop')->first();
                 DB::table('HocLop')->insert(
                     [
                         'MaLop' => $randomClass,
@@ -205,7 +205,7 @@ class LopController extends Controller
             $check=null;
             do{
                 $gvcn = $gvXH->random();
-                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaNK",$request->MaNK)->first();
+                $check = Lop::where("MSGV",$gvcn->MSGV)->where("MaLop","!=","GV")->where("MaNK",$request->MaNK)->first();
             }while($check);
             $lop = new Lop();
             $lop->MaLop = $maLop;
@@ -259,7 +259,7 @@ class LopController extends Controller
         {
             $malop = "C".$nienkhoa."10%";
             for ($i=0; $i < $hocsinhXH->count(); $i++) { 
-                $randomClass = Lop::where('MaLop','like', $malop)->inRandomOrder()->limit(1)->pluck('MaLop')->first();
+                $randomClass = Lop::where('MaLop','like', $malop)->where("MaLop","!=","GV")->inRandomOrder()->limit(1)->pluck('MaLop')->first();
                 DB::table('HocLop')->insert(
                     [
                         'MaLop' => $randomClass,

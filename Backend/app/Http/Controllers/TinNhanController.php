@@ -38,7 +38,7 @@ class TinNhanController extends Controller
     }
     public function getAllGroup(){
         $nhom = NhomTinNhan::with(['thanhVien', 'tinNhan'])
-        ->select('NhomTinNhan.*')
+        ->select('NhomTinNhan.*')->where("id","!=",155)
         ->orderBy(
             \DB::raw('(SELECT MAX(created_at) FROM TinNhan WHERE TinNhan.Nhom_id = NhomTinNhan.id)'),
             'desc'
@@ -69,6 +69,21 @@ class TinNhanController extends Controller
         ->get();
         return response()->json($count,200);
     }
+    public function create(Request $rq){
+        $newG = NhomTinNhan::create($rq->all());
+        return response()->json($newG,200);
+    }
+    public function addMember(Request $rq){
+        $group = MhomTinNhan::find($rq->groupId);
+        if(!$group){
+            return response()->json('Group not found', 404);
+        }
+        $list = $rq->list;
+        foreach($list as $item){
+            $group->thanhVien()->attach($item);
+        }
+        return response()->json("Đã thêm thành viên thành công!",200);
+    }
     public function setSeen(Request $rq){
         $tn = TinNhan::where('NguoiNhan',$rq->NguoiNhan)->where("Nhom_id",$rq->Nhom_id)->where('TrangThai',0)->get();
         foreach($tn as $tn){
@@ -92,6 +107,14 @@ class TinNhanController extends Controller
             if(substr($tv->MaTV,0,2) == 'GV'){
                 $gv = GiaoVien::find($tv->MaTV);
                 $tinNhan->NguoiNhan = $gv->MSGV."-".$gv->TenGV;
+            }elseif($tv->MaTV == "nhansu"){
+                $tinNhan->NguoiNhan = $tv->MaTV."-Phòng Nhân Sự";
+            }
+            elseif($tv->MaTV == "admin"){
+                $tinNhan->NguoiNhan = $tv->MaTV."-Quản lí";
+            }
+            elseif($tv->MaTV == "daotao"){
+                $tinNhan->NguoiNhan = $tv->MaTV."-Phòng Đào Tạo";
             }elseif(substr($tv->MaTV,0,2) == 'PH'){
                 $ph = PhuHuynh::where("TaiKhoan",$tv->MaTV)->first();
                 $hocsinh = HocSinh::find($ph->MSHS);
@@ -145,5 +168,28 @@ class TinNhanController extends Controller
             $ten = "Phụ huynh ". $hs->HoTen;
             return response()->json($ten, Response::HTTP_OK);
         }
+    }
+    
+    public function addGroup(){
+        Lop::create([
+            "MaLop" => "GV",
+            "TenLop" => "Giáo viên",
+            "MaKhoi" => "10",
+            "MaNK" => "24-25",
+            "MSGV" => "GV001",
+            "TrangTHai"=> 0,
+        ]);
+        $newG = NhomTinNhan::create([
+            "TenNhom" => "Giáo Viên",
+            "MaLop" => "GV",
+        ]);
+        $gv = GiaoVien::all();
+        foreach ($gv as $gv){
+            $TV = new ThanhVienNhom();
+            $TV->MaTV = $gv->MSGV;
+            $TV->Nhom_id = $newG->id;
+            $TV->save();
+        }
+        return response()->json("OK");
     }
 }

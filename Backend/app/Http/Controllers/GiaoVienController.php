@@ -7,6 +7,8 @@ use App\Models\GiaoVien;
 use App\Models\PhanCong;
 use App\Models\TKB;
 use App\Models\TietHoc;
+use App\Models\NhomTinNhan;
+use App\Models\ThanhVienNhom;
 use App\Models\TKGiaoVien;
 use Illuminate\Http\Response;
 use App\Http\Controllers\TaiKhoanController;
@@ -39,6 +41,10 @@ class GiaoVienController extends Controller
 
             'MSGV' => $giaovien->MSGV,
             'MatKhau' => $giaovien->MSGV . "123",
+        ]);
+        ThanhVienNhom::create([
+            'MaTV' => $giaovien->MSGV,
+            'Nhom_id' => 155,
         ]);
         return response()->json($giaovien, Response::HTTP_CREATED);
     }
