@@ -18,8 +18,11 @@ export default function Result() {
     const [kqht, setKqht] = useState([]);
     const [kt, setKT] = useState([]);
     const [NK, setNK] = useState([]);
+    const [HK, setHK] = useState(1);
+    const [onMd, setOnMd] = useState(false);
     const [selectedClass, setSelectedClass] = useState('');
     const NKRef = useRef();
+    const HKRef = useRef();
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -40,7 +43,7 @@ export default function Result() {
                 console.log(_info.data);
                 _info.data.lop.forEach((lop) => {
                     const Nk = nk.data.find(item => item.MaNK === lop.MaNK);
-                    
+
                     if (Nk) {
                         listNK.push(Nk);
                     }
@@ -152,7 +155,21 @@ export default function Result() {
             }
         }
     }, [info, NK, NKRef.current?.value]);
-    console.log();
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setOnMd(true);
+            } else {
+                setOnMd(false);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    const getScore = () => {
+
+    }
     return (
         <div className="main-content">
             <Menu />
@@ -161,8 +178,8 @@ export default function Result() {
                     Thông tin Học sinh
                 </div>
                 <div className="max-w-[90%] mx-auto">
-                    <div className="mt-3 flex justify-between">
-                        <div className="grid grid-rows-1 grid-flow-col">
+                    <div className="mt-3 md:flex md:justify-between md:text-start text-center space-y-3">
+                        <div className="grid grid-rows-1 grid-flow-col text-sm md:text-base">
                             <button
                                 className={subView == 1 ?
                                     "border-x-2 rounded-s-md border-blue-400 px-3 py-2 border-y-2 bg-blue-400 text-white"
@@ -191,10 +208,10 @@ export default function Result() {
                                 Khen thưởng
                             </button>
                         </div>
-                        <div className="flex items-center text-3xl font-bold text-blue-500 text-center">
+                        <div className="text-3xl font-bold text-blue-500">
                             Lớp: {selectedClass || ''}
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 justify-center">
                             <div className="text-xl">Niên khóa:</div>
                             <select name="nienkhoa" ref={NKRef} onChange={selectedNK} className="rounded-md border-2 border-black px-3 py-2">
                                 <option value={nienKhoa.NienKhoa}>{NK.find(item => item.MaNK == nienKhoa.NienKhoa)?.TenNK}</option>
@@ -205,73 +222,171 @@ export default function Result() {
                         </div>
                     </div>
                     {subView == 1 &&
-                        <div className="mt-3">
-                            <div className="text-center font-bold text-blue-400 text-3xl relative py-2 my-2">
-                                Điểm chi tiết
-                                <span className="bottom-0 left-0 w-[30%] mx-auto bg-blue-200 h-1 block rounded-md"></span>
+                        (onMd ?
+                            <div className="my-3">
+                                {subjects.map((mh) => {
+                                    const txGrades1 = diemHK1.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
+                                    const txGrades2 = diemHK2.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
+                                    const GK1 = diemHK1.find((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck"));
+                                    const CK1 = diemHK1.find((item) => mh.MaMH === item.MaMH && (item.MaLoai === "gk"));
+                                    const GK2 = diemHK2.find((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck"));
+                                    const CK2 = diemHK2.find((item) => mh.MaMH === item.MaMH && (item.MaLoai === "gk"));
+                                    const TBHK1 = diemHK1.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk1");
+                                    const TBHK2 = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk2");
+                                    const TBCN = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'tbcn');
+                                    const RLH = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'rlh');
+                                    const countTX1 = txGrades1.length;
+                                    const countTX2 = txGrades2.length;
+                                    const emptyTXCellsCount1 = 4 - (countTX1 || 0);
+                                    const emptyTXCellsCount2 = 4 - (countTX2 || 0);
+                                    return (
+                                        <table key={mh.MaMH} className="w-full mt-2 text-center">
+                                            <thead>
+                                                <tr>
+                                                    <th colSpan={5} className="border border-black px-3 py-2">{mh.TenMH}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th className="border border-black px-3 py-2"></th>
+                                                    <th colSpan={4} className="border border-black px-3 py-2">Học kì 1</th>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá TX</td>
+                                                    {generateTXCells(txGrades1, emptyTXCellsCount1, mh)}
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá GK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {GK1 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? GK1.Diem == 0 ? "Chưa đạt" : "Đạt" : GK1.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá CK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {CK1 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? CK1.Diem == 0 ? "Chưa đạt" : "Đạt" : CK1.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">TBHK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {TBHK1 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? TBHK1.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th className="border border-black px-3 py-2"></th>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">Học kì 2</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá TX</td>
+                                                    {generateTXCells(txGrades2, emptyTXCellsCount2, mh)}
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá GK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {GK2 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? GK2.Diem == 0 ? "Chưa đạt" : "Đạt" : GK2.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">Đánh Giá CK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {CK2 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? CK2.Diem == 0 ? "Chưa đạt" : "Đạt" : CK2.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">TBHK</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {TBHK2 ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? TBHK2.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th colSpan={5} className="border border-black px-3 py-2">Cả năm</th>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">TBCN</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {TBCN ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? TBCN.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="border border-black px-3 py-2">RL Hè</td>
+                                                    <td colSpan={4} className="border border-black px-3 py-2">
+                                                        {RLH ? (mh.MaMH == 'CB4' || mh.MaMH == 'CB5' ? RLH.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem) : "-"}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    )
+                                })}
                             </div>
-                            <table className="text-center text-xl">
-                                <thead>
-                                    <tr>
-                                        <th className="border border-black px-2 py-1"></th>
-                                        <th className="border border-black px-2 py-1" colSpan={7}>Học kì I</th>
-                                        <th className="border border-black px-2 py-1" colSpan={7}>Học kì II</th>
-                                        <th className="border border-black px-2 py-1" colSpan={2}>Cả năm</th>
-                                    </tr>
-                                    <tr>
-                                        <th className="border border-black px-2 py-1">Tên môn</th>
-                                        <th className="border border-black px-2 py-1" colSpan={4}>Đánh giá thường xuyên</th>
-                                        <th className="border border-black px-2 py-1">Đánh giá giữa kì</th>
-                                        <th className="border border-black px-2 py-1">Đánh giá cuối kì</th>
-                                        <th className="border border-black px-2 py-1">Trung bình học kì 1</th>
-                                        <th className="border border-black px-2 py-1" colSpan={4}>Đánh giá thường xuyên</th>
-                                        <th className="border border-black px-2 py-1">Đánh giá giữa kì</th>
-                                        <th className="border border-black px-2 py-1">Đánh giá cuối kì</th>
-                                        <th className="border border-black px-2 py-1">Trung bình học kì 2</th>
-                                        <th className="border border-black px-2 py-1">Rèn luyện hè</th>
-                                        <th className="border border-black px-2 py-1">Trung bình cả năm</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {subjects.map((mh) => {
-                                        const txGrades1 = diemHK1.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
-                                        const txGrades2 = diemHK2.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
-                                        const otherGrades1 = diemHK1.filter((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck" || item.MaLoai === "gk"));
-                                        const otherGrades2 = diemHK2.filter((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck" || item.MaLoai === "gk"));
-                                        const TBHK1 = diemHK1.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk1");
-                                        const TBHK2 = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk2");
-                                        const TBCN = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'tbcn');
-                                        const RLH = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'rlh');
-                                        const countTX1 = txGrades1.length;
-                                        const countTX2 = txGrades2.length;
-                                        const emptyTXCellsCount1 = 4 - (countTX1 || 0);
-                                        const emptyTXCellsCount2 = 4 - (countTX2 || 0);
-                                        return (
-                                            <tr key={mh.MaMH}>
-                                                <td className="border border-black text-start px-2 py-1">{mh.TenMH}</td>
+                            :
+                            <div className="mt-3">
+                                <div className="text-center font-bold text-blue-400 text-3xl relative py-2 my-2">
+                                    Điểm chi tiết
+                                    <span className="bottom-0 left-0 w-[30%] mx-auto bg-blue-200 h-1 block rounded-md"></span>
+                                </div>
+                                <table className="text-center text-xl">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-black px-2 py-1"></th>
+                                            <th className="border border-black px-2 py-1" colSpan={7}>Học kì I</th>
+                                            <th className="border border-black px-2 py-1" colSpan={7}>Học kì II</th>
+                                            <th className="border border-black px-2 py-1" colSpan={2}>Cả năm</th>
+                                        </tr>
+                                        <tr>
+                                            <th className="border border-black px-2 py-1">Tên môn</th>
+                                            <th className="border border-black px-2 py-1" colSpan={4}>Đánh giá thường xuyên</th>
+                                            <th className="border border-black px-2 py-1">Đánh giá giữa kì</th>
+                                            <th className="border border-black px-2 py-1">Đánh giá cuối kì</th>
+                                            <th className="border border-black px-2 py-1">Trung bình học kì 1</th>
+                                            <th className="border border-black px-2 py-1" colSpan={4}>Đánh giá thường xuyên</th>
+                                            <th className="border border-black px-2 py-1">Đánh giá giữa kì</th>
+                                            <th className="border border-black px-2 py-1">Đánh giá cuối kì</th>
+                                            <th className="border border-black px-2 py-1">Trung bình học kì 2</th>
+                                            <th className="border border-black px-2 py-1">Rèn luyện hè</th>
+                                            <th className="border border-black px-2 py-1">Trung bình cả năm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {subjects.map((mh) => {
+                                            const txGrades1 = diemHK1.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
+                                            const txGrades2 = diemHK2.filter((item) => mh.MaMH === item.MaMH && item.MaLoai === "tx");
+                                            const otherGrades1 = diemHK1.filter((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck" || item.MaLoai === "gk"));
+                                            const otherGrades2 = diemHK2.filter((item) => mh.MaMH === item.MaMH && (item.MaLoai === "ck" || item.MaLoai === "gk"));
+                                            const TBHK1 = diemHK1.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk1");
+                                            const TBHK2 = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai === "tbhk2");
+                                            const TBCN = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'tbcn');
+                                            const RLH = diemHK2.find((item) => mh.MaMH === item.MaMH && item.MaLoai == 'rlh');
+                                            const countTX1 = txGrades1.length;
+                                            const countTX2 = txGrades2.length;
+                                            const emptyTXCellsCount1 = 4 - (countTX1 || 0);
+                                            const emptyTXCellsCount2 = 4 - (countTX2 || 0);
+                                            return (
+                                                <tr key={mh.MaMH}>
+                                                    <td className="border border-black text-start px-2 py-1">{mh.TenMH}</td>
 
-                                                {generateTXCells(txGrades1, emptyTXCellsCount1, mh)}
+                                                    {generateTXCells(txGrades1, emptyTXCellsCount1, mh)}
 
-                                                {generateOtherCells(otherGrades1, mh)}
+                                                    {generateOtherCells(otherGrades1, mh)}
 
-                                                <td className="border border-black px-2 py-1" key={mh.MaMH + "234"}>
-                                                    {TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}
-                                                </td>
+                                                    <td className="border border-black px-2 py-1" key={mh.MaMH + "234"}>
+                                                        {TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}
+                                                    </td>
 
-                                                {generateTXCells(txGrades2, emptyTXCellsCount2, mh)}
+                                                    {generateTXCells(txGrades2, emptyTXCellsCount2, mh)}
 
-                                                {generateOtherCells(otherGrades2, mh)}
+                                                    {generateOtherCells(otherGrades2, mh)}
 
 
-                                                <td className="border border-black px-2 py-1">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-                                                <td className="border border-black px-2 py-1">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
-                                                <td className="border border-black px-2 py-1">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
+                                                    <td className="border border-black px-2 py-1">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
+                                                    <td className="border border-black px-2 py-1">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                                    <td className="border border-black px-2 py-1">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>)
                     }
                     {subView == 2 &&
                         <div className="w-[90%] mx-auto mt-3">
@@ -279,55 +394,116 @@ export default function Result() {
                                 Kết quả Học tập và Rèn luyện
                                 <span className="bottom-0 left-0 w-[50%] mx-auto bg-blue-200 h-1 block rounded-md"></span>
                             </div>
-                            <div className="flex space-x-2">
-                                <table className="w-full text-2xl">
-                                    <tbody>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK1</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
-                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={7}></td>
-                                            <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK1</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k1.TenRL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK1</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k1.TenHL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK2</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKII || "-"}</td>
-                                            <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK2</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k2.TenRL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK2</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k2.TenHL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Trung bình Cả năm</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_CN || "-"}</td>
-                                            <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện Cả năm</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen.TenRL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Xếp loại Cả năm</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
-                                        </tr>
-                                        <tr>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
-                                            <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
-                                            <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaRLL > 0 ? kqht.ren_luyen_lai.TenRL : "-"}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border-2 border-black px-2 py-1 text-start font-bold text-red-500" colSpan={2}>Tổng kết:</td>
-                                            <td className="border-2 border-black px-2 py-1 text-center"></td>
-                                            <td className="border-2 border-black px-2 py-1 font-bold text-center" colSpan={3}>
-                                                {kqht.trang_thai.TenTT}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div className="">
+                                {onMd ?
+                                    <table className="w-full">
+                                        <tbody>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-center" colSpan={2}>Học tập</th>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">TBHK I</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK1</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k1.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">TBHK II</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKII || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK2</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k2.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Trung bình Cả năm</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_CN || "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại Cả năm</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-center" colSpan={2}>Rèn luyện</th>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện HK1</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.ren_luyen_h_k1.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện HK2</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.ren_luyen_h_k2.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện CN</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.ren_luyen.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-e-0 border-black px-2 py-1 text-center text-red-500">Tổng kết:</th>
+                                                <th className="border-2 border-s-0 border-black px-2 py-1 text-center text-red-500">{kqht.trang_thai.TenTT}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    :
+                                    <table className="w-full text-2xl">
+                                        <tbody>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-center" colSpan={2}>Học tập</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={8}></td>
+                                                <th className="border-2 border-black px-2 py-1 text-center" colSpan={2}>Rèn luyện</th>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK1</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKI || "-"}</td>
+                                                <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK1</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k1.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK1</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k1.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Trung bình HK2</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_HKII || "-"}</td>
+                                                <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện HK2</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen_h_k2.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại HK2</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc_h_k2.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Trung bình Cả năm</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.Diem_TB_CN || "-"}</td>
+                                                <th className="border-2 border-black px-2 py-1 text-start" rowSpan={2}>Rèn luyện Cả năm</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center" rowSpan={2}>{kqht.ren_luyen.TenRL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Xếp loại Cả năm</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.hoc_luc.TenHL}</td>
+                                            </tr>
+                                            <tr>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaHLL > 0 ? kqht.hoc_luc_lai.TenHL : "-"}</td>
+                                                <th className="border-2 border-black px-2 py-1 text-start">Rèn luyện lại sau hè</th>
+                                                <td className="border-2 border-black px-2 py-1 text-center">{kqht.MaRLL > 0 ? kqht.ren_luyen_lai.TenRL : "-"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="border-2 border-black px-2 py-1 text-start font-bold text-red-500" colSpan={2}>Tổng kết:</td>
+                                                <td className="border-2 border-black px-2 py-1 text-center"></td>
+                                                <td className="border-2 border-black px-2 py-1 font-bold text-center" colSpan={3}>
+                                                    {kqht.trang_thai.TenTT}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                }
                             </div>
                         </div>
                     }

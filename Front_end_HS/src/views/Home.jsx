@@ -48,9 +48,9 @@ export default function Home() {
     ];
     return (
         <div className="main-content">
-            <div className="w-full p-20 mx-auto">
+            <div className="w-full p-10 mx-auto">
                 <div className="text-center w-[60%] mx-auto">
-                    <p className="text-4xl font-extrabold text-blue-600">Chào mừng bạn đến với hệ thống quản lí Trường THPT Cần Thơ</p> <br/>
+                    <p className="md:text-4xl text-2xl font-extrabold text-blue-600">Chào mừng bạn đến với hệ thống quản lí Trường THPT Cần Thơ</p>
                 </div>
                 <p className="text-xl text-center mt-16 mb-10">Danh sách các chức năng</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-screen-lg mx-auto">
