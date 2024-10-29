@@ -105,7 +105,7 @@ export default function Info() {
                     }
                 </div>
                 <div className="text-xl flex justify-center mt-5">
-                    <table className="w-[70%] border-collapse">
+                    <table className="w-[70%] border-collapse md:text-base text-sm">
                         <tbody>
                             <tr className="border-b border-slate-400">
                                 <td className="py-2 font-semibold text-gray-700">Mã số học sinh</td>

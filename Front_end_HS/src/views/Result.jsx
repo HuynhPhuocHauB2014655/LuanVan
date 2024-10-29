@@ -175,7 +175,7 @@ export default function Result() {
             <Menu />
             <div className="right-part mb-2 relative">
                 <div className="page-name">
-                    Thông tin Học sinh
+                    Kết quả học tập
                 </div>
                 <div className="max-w-[90%] mx-auto">
                     <div className="mt-3 md:flex md:justify-between md:text-start text-center space-y-3">
@@ -240,7 +240,7 @@ export default function Result() {
                                     const emptyTXCellsCount1 = 4 - (countTX1 || 0);
                                     const emptyTXCellsCount2 = 4 - (countTX2 || 0);
                                     return (
-                                        <table key={mh.MaMH} className="w-full mt-2 text-center">
+                                        <table key={mh.MaMH} className="w-full table-auto mt-2 text-center">
                                             <thead>
                                                 <tr>
                                                     <th colSpan={5} className="border border-black px-3 py-2">{mh.TenMH}</th>

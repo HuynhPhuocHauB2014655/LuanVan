@@ -112,7 +112,21 @@ export default function Message() {
                 NguoiGui: `${userName}-${info.HoTen}`,
                 TinNhan: value
             };
-            setFakeMessage(payload.TinNhan);
+            await sendMessage(payload);
+        }
+    }
+    const clickSend = async () => {
+        if(value){
+            const payload = {
+                "Nhom_id": selectedGroup.id,
+                NguoiGui: `${userName}-${info.HoTen}`,
+                TinNhan: value
+            };
+            await sendMessage(payload);
+        }
+    }
+    const sendMessage = async (payload) => {
+        setFakeMessage(payload.TinNhan);
             setValue("");
             try {
                 const res = await axiosClient.post("tn/add", payload);
@@ -121,7 +135,6 @@ export default function Message() {
             } catch (error) {
                 console.log(error);
             }
-        }
     }
     useEffect(() => {
         if (fakeMessage || personalMessage().length > 0) {
@@ -247,7 +260,7 @@ export default function Message() {
                     }
                     <div
                         className={`
-                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
+                            md:w-[30%] w-full md:border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
                             ${(!isGroupListVisible && onMd) && 'hidden'}
                         `}>
                         {groups?.map((gr) => (
@@ -279,9 +292,9 @@ export default function Message() {
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
+                                    <div className="h-[76%] bg-slate-100 overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
                                         {personalMessage().map((tn) => (
-                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
+                                            <div key={tn.id} id={tn.id} className={`md:w-[50%] w-[80%] mx-2 ${tn.NguoiGui !== `${userName}-${info.HoTen}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
                                                     {tn.TinNhan}
@@ -290,7 +303,7 @@ export default function Message() {
                                             </div>
                                         ))}
                                         {fakeMessage &&
-                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
+                                            <div className={`md:w-[50%] w-[80%] mx-2 ml-auto text-end`}>
                                                 <div className="mx-2">{`${userName}-${info.HoTen}`}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
                                                     {fakeMessage}
@@ -299,22 +312,26 @@ export default function Message() {
                                             </div>
                                         }
                                         <div ref={messageEndRef} />
-                                    </div>
-                                    <div className="absolute bottom-0 w-full h-[10%]">
-                                        <textarea type="text" name="TinNhan"
-                                            placeholder="Nhập nội dung tin nhắn"
-                                            onKeyDown={pressKey}
-                                            onChange={handleChange}
-                                            value={value}
-                                            className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
                                         {showButton &&
                                             <button
-                                                className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
+                                                className="sticky h-6 bottom-0 left-full hover:text-blue-400"
                                                 onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
                                                     className="h-full" />
                                             </button>
                                         }
                                     </div>
+                                    <div className="absolute bottom-0 w-full h-[10%] flex">
+                                        <textarea type="text" name="TinNhan"
+                                            placeholder="Nhập nội dung tin nhắn"
+                                            onKeyDown={pressKey}
+                                            onChange={handleChange}
+                                            value={value}
+                                            className={`outline-none h-full ${value ? "w-[95%]" : "w-full"} px-2 border-y-2 py-3 resize-none`}
+                                        />
+                                        <button className="w-[5%] border-y-2 h-full" title="Gửi" onClick={clickSend}>
+                                            <FontAwesomeIcon icon={faCaretRight} className="h-8 text-blue-500 hover:bg-slate-200 p-1"/>
+                                        </button>
+                                    </div> 
                                 </div>
                                 {show &&
                                     <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">

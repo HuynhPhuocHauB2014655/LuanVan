@@ -317,7 +317,7 @@ export default function TKB() {
                                                         <td
                                                             className={`td ${(change1 && changeTKB == data.MaLop) && !(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1) ? "cursor-pointer hover:bg-slate-300" : ""} `}
                                                             key={j + 1}
-                                                            onClick={() => chooseEmptyCell(j + 2, i + 1,data.MaLop)}
+                                                            onClick={change1 ? () => chooseEmptyCell(j + 2, i + 1,data.MaLop) : undefined}
                                                         >
                                                             {(change2?.MaNgay == j + 2 && change2?.TietDay == i + 1 && changeTKB == data.MaLop) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                         </td>
@@ -347,7 +347,7 @@ export default function TKB() {
                                                             <td
                                                                 className={`td ${(change1 && changeTKB == data.MaLop) && !(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1) ? "cursor-pointer hover:bg-slate-300" : ""} `}
                                                                 key={j + 1}
-                                                                onClick={() => chooseEmptyCell(j + 2, currentIndex + 1)}
+                                                                onClick={change1 ? () => chooseEmptyCell(j + 2, currentIndex + 1): undefined}
                                                             >
                                                                 {(change2?.MaNgay == j + 2 && change2?.TietDay == currentIndex + 1 && changeTKB == data.MaLop) && <p className="font-bold text-red-400">Đã chọn</p>}
                                                             </td>

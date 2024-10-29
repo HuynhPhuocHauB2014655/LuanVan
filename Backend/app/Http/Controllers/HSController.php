@@ -56,9 +56,19 @@ class HSController extends Controller
     }
     public function show($mshs)
     {
-        $hocsinh = HocSinh::with(['ban','phuHuynh','taiKhoan','lop.nienKhoa' => function ($query) {
-            $query->latest()->get();
-        }])->find($mshs);
+        $hocsinh = HocSinh::with([
+            'ban',
+            'phuHuynh',
+            'taiKhoan',
+            'lop' => function ($query) {
+                $query->with(['nienKhoa'])->orderBy("created_at","desc");
+            }
+        ])->find($mshs);
+
+        if (!$hocsinh) {
+            return response()->json(['message' => 'Học sinh không tìm thấy'], Response::HTTP_NOT_FOUND);
+        }
+
         return response()->json($hocsinh, Response::HTTP_OK);
     }
     public function showPH($mshs)

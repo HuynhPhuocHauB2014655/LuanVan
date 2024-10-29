@@ -22,14 +22,14 @@ export default function Student() {
     const [endPage, setEndPage] = useState(0);
     const [showConfirm, setShowConfirm] = useState(0);
     const formRef = useRef();
-    const {setError} = useStateContext();
-    const {userName} = useUserContext();
-    useEffect(()=>{
-        if(userName == "daotao"){
+    const { setError } = useStateContext();
+    const { userName } = useUserContext();
+    useEffect(() => {
+        if (userName == "daotao") {
             setError("Bạn không có quyền truy cập trang này");
             navigate('/');
         }
-    },[userName]);
+    }, [userName]);
     const fetchData = async (page) => {
         try {
             const response = await axiosClient.get(`/hs/all?page=${page}`);
@@ -192,9 +192,9 @@ export default function Student() {
             <Menu />
             <div className="right-part relative">
                 {showForm != 0 &&
-                    <div className="absolute z-10 w-[70%] left-[15%] top-40 bg-sky-300 p-5">
-                        <button className="absolute top-0 right-0 me-2 text-red-700 border px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
-                        <h1 className="text-center mb-3 text-2xl font-semibold">{showForm == 1 ? "Thêm học sinh" : "Sửa học sinh"}</h1>
+                    <div className="absolute z-10 w-[70%] left-[15%] top-20 bg-white p-5 border-2 border-cyan-400">
+                        <button className="absolute top-0 right-0 me-2 text-red-700 border-2 px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
+                        <h1 className="text-center mb-3 text-2xl font-semibold bg-slate-400 mt-5 py-2 rounded">{showForm == 1 ? "Thêm học sinh" : "Sửa học sinh"}</h1>
                         <Formik
                             initialValues={{
                                 MaNK: '',
@@ -223,48 +223,70 @@ export default function Student() {
                                 return (
                                     <Form className="relative" ref={formRef}>
                                         <div className="grid grid-cols-2 grid-flow-row gap-2">
-                                            <Field type="text" name="MaNK" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Mã niên khóa" />
-                                            <ErrorMessage className="text-red-700" name="MaNK" component="div" />
+                                            <div>
+                                                <Field type="text" name="MaNK" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Mã niên khóa" />
+                                                <ErrorMessage className="text-red-700" name="MaNK" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="HoTen" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Họ và tên" />
-                                            <ErrorMessage className="text-red-700" name="HoTen" component="div" />
+                                            <div>
+                                                <Field type="text" name="HoTen" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Họ và tên" />
+                                                <ErrorMessage className="text-red-700" name="HoTen" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="NgaySinh" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Ngày sinh" />
-                                            <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
+                                            <div>
+                                                <Field type="text" name="NgaySinh" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Ngày sinh" />
+                                                <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="GioiTinh" className="border-2 border-black p-2 w-full mb-1 rounded">
-                                                <option value="Nam" defaultChecked>Nam</option>
-                                                <option value="Nữ">Nữ</option>
-                                            </Field>
-                                            <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
+                                            <div>
+                                                <Field as="select" name="GioiTinh" className="rounded border-2 border-black p-2 mb-1 w-full">
+                                                    <option value="Nam" defaultChecked>Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                </Field>
+                                                <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="QueQuan" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Quê quán" />
-                                            <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
+                                            <div>
+                                                <Field type="text" name="QueQuan" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Quê quán" />
+                                                <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="DanToc" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Dân Tộc" />
-                                            <ErrorMessage className="text-red-700" name="DanToc" component="div" />
+                                            <div>
+                                                <Field type="text" name="DanToc" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Dân Tộc" />
+                                                <ErrorMessage className="text-red-700" name="DanToc" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="TonGiao" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Tôn Giáo" />
-                                            <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
+                                            <div>
+                                                <Field type="text" name="TonGiao" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Tôn Giáo" />
+                                                <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="DiaChi" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Địa chỉ" />
-                                            <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
+                                            <div>
+                                                <Field type="text" name="DiaChi" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Địa chỉ" />
+                                                <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
+                                            </div>
 
-                                            <Field type="text" name="SDT" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Số điện thoại" />
-                                            <ErrorMessage className="text-red-700" name="SDT" component="div" />
+                                            <div>
+                                                <Field type="text" name="SDT" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Số điện thoại" />
+                                                <ErrorMessage className="text-red-700" name="SDT" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="MaBan" className="border-2 border-black p-2 w-full mb-1 rounded">
-                                                <option value="TN">Tự nhiên</option>
-                                                <option value="XH">Xã hội</option>
-                                            </Field>
-                                            <ErrorMessage className="text-red-700" name="ban" component="div" />
+                                            <div>
+                                                <Field as="select" name="MaBan" className="rounded border-2 border-black p-2 mb-1 w-full">
+                                                    <option value="TN">Tự nhiên</option>
+                                                    <option value="XH">Xã hội</option>
+                                                </Field>
+                                                <ErrorMessage className="text-red-700" name="MaBan" component="div" />
+                                            </div>
 
-                                            <Field as="select" name="TrangThai" className="border-2 border-black p-2 w-full rounded">
-                                                <option value={0}>Đang học</option>
-                                                <option value={1}>Đã thôi học</option>
-                                                <option value={2}>Đã tốt nghiệp</option>
-                                            </Field>
-                                            <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
+                                            <div>
+                                                <Field as="select" name="TrangThai" className="rounded border-2 border-black p-2 mb-1 w-full">
+                                                    <option value={0}>Đang học</option>
+                                                    <option value={1}>Đã thôi học</option>
+                                                    <option value={2}>Đã tốt nghiệp</option>
+                                                </Field>
+                                                <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
+                                            </div>
                                         </div>
 
                                         {showForm === 1 ?
@@ -351,7 +373,7 @@ export default function Student() {
                     </thead>
                     <tbody>
                         {datas.map((data, index) => (
-                            <tr key={index} className="cursor-pointer hover:bg-slate-100" onClick={()=>toStudentInfo(data.MSHS)}>
+                            <tr key={index} className="cursor-pointer hover:bg-slate-100" onClick={() => toStudentInfo(data.MSHS)}>
                                 <td className="td py-1 px-2" >{(currentPage - 1) * 10 + index + 1}</td>
                                 <td className="td py-1 px-2" >{data.MSHS}</td>
                                 <td className="td py-1 px-2" >{data.HoTen}</td>

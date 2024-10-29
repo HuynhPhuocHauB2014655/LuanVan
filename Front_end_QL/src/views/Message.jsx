@@ -141,15 +141,28 @@ export default function Message() {
                 NguoiGui: `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`,
                 TinNhan: value
             };
-            setFakeMessage(payload.TinNhan);
-            setValue("");
-            try {
-                const res = await axiosClient.post("tn/add", payload);
-                setMessages(prevMessages => [...prevMessages, res.data]);
-                setFakeMessage("");
-            } catch (error) {
-                console.log(error);
-            }
+            await seenMessage(payload);
+        }
+    }
+    const clickSend = async () => {
+        if (value) {
+            const payload = {
+                "Nhom_id": selectedGroup.id,
+                NguoiGui: `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`,
+                TinNhan: value
+            };
+            await seenMessage(payload);
+        }
+    }
+    const seenMessage = async (payload) => {
+        setFakeMessage(payload.TinNhan);
+        setValue("");
+        try {
+            const res = await axiosClient.post("tn/add", payload);
+            setMessages(prevMessages => [...prevMessages, res.data]);
+            setFakeMessage("");
+        } catch (error) {
+            console.log(error);
         }
     }
     useEffect(() => {
@@ -277,11 +290,11 @@ export default function Message() {
                     }
                     <div
                         className={`
-                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
+                            md:w-[30%] w-full h-full md:border-e-2 border-slate-300 overflow-y-auto relative
                             ${(!isGroupListVisible && onMd) && 'hidden'}
                         `}>
                         {groups?.map((gr) => (
-                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
+                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
                                     <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
@@ -292,7 +305,7 @@ export default function Message() {
                             </div>
                         ))}
                         {userName == "admin" && allGroups?.map((gr) => (
-                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => selectAll(gr)}>
+                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:overflow-auto hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => selectAll(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
                                     <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>
@@ -317,9 +330,9 @@ export default function Message() {
                                             <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
                                         </div>
                                     </div>
-                                    <div className={`h-[${selectedGroup.id == 155 ? "76%" : "86%"}] overflow-y-scroll w-full space-y-7 py-2`} ref={messageRef} onScroll={checkBottom}>
+                                    <div className={`h-[76%] bg-slate-100 overflow-y-scroll w-full space-y-7 py-2 relative`} ref={messageRef} onScroll={checkBottom}>
                                         {messages?.map((tn) => (
-                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` ? '' : 'ml-auto text-end'}`}>
+                                            <div key={tn.id} id={tn.id} className={`md:w-[50%] w-[80%] mx-2 ${tn.NguoiGui !== `${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}` ? '' : 'ml-auto text-end'}`}>
                                                 <div className="mx-2">{tn.NguoiGui}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
                                                     {tn.TinNhan}
@@ -328,7 +341,7 @@ export default function Message() {
                                             </div>
                                         ))}
                                         {fakeMessage &&
-                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
+                                            <div className={`md:w-[50%] w-[80%] mx-2 ml-auto text-end`}>
                                                 <div className="mx-2">{`${userName}-${userName == "admin" ? "Quản lí" : userName == 'nhansu' ? "Phòng Nhân Sự" : "Phòng Đào Tạo"}`}</div>
                                                 <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5`}>
                                                     {fakeMessage}
@@ -337,22 +350,26 @@ export default function Message() {
                                             </div>
                                         }
                                         <div ref={messageEndRef} />
+                                        {showButton &&
+                                            <button
+                                                className="sticky h-6 bottom-0 left-full hover:text-blue-400"
+                                                onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
+                                                    className="h-full" />
+                                            </button>
+                                        }
                                     </div>
                                     {selectedGroup.id == 155 &&
-                                        <div className="absolute bottom-0 w-full h-[10%]">
+                                        <div className="absolute bottom-0 w-full h-[10%] flex">
                                             <textarea type="text" name="TinNhan"
                                                 placeholder="Nhập nội dung tin nhắn"
                                                 onKeyDown={pressKey}
                                                 onChange={handleChange}
                                                 value={value}
-                                                className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
-                                            {showButton &&
-                                                <button
-                                                    className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
-                                                    onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
-                                                        className="h-full" />
-                                                </button>
-                                            }
+                                                className={`outline-none h-full ${value ? "w-[95%]" : "w-full"} px-2 border-y-2 py-3 resize-none`}
+                                            />
+                                            <button className="w-[5%] border-y-2 h-full" title="Gửi" onClick={clickSend}>
+                                                <FontAwesomeIcon icon={faCaretRight} className="h-8 text-blue-500 hover:bg-slate-200 p-1" />
+                                            </button>
                                         </div>
                                     }
                                 </div>
