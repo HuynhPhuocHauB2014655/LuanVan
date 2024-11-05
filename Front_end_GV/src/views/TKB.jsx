@@ -14,7 +14,7 @@ export default function TKB() {
     const [matrixClass, setMatrixClass] = useState();
     const [date, setDate] = useState([]);
     const [view, setView] = useState(0);
-    const [classes, setClass] = useState();
+    const [classes, setClass] = useState([]);
     const [week, setWeek] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState();
@@ -100,13 +100,14 @@ export default function TKB() {
     const changeView = async () => {
         if (view == 0) {
             setWeek(thisWeek());
-            setView(1);
             const payload = {
                 MaNK: nienKhoa.NienKhoa,
                 MSGV: userName,
             }
             const res = await axiosClient.post("/gv/class", payload);
             setClass(res.data);
+            console.log(res.data);
+            setView(1);
         } else {
             setTkbClass(null);
             setMatrixClass(null);
@@ -295,7 +296,7 @@ export default function TKB() {
         }
         setShowConfirm(0);
     }
-    console.log();
+    
     return (
         <div className="main-content">
             <Menu />

@@ -167,9 +167,6 @@ export default function Result() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    const getScore = () => {
-
-    }
     return (
         <div className="main-content">
             <Menu />

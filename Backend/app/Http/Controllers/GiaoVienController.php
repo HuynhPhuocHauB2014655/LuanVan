@@ -52,8 +52,8 @@ class GiaoVienController extends Controller
         $data = TKB::with('lop')
             ->where("MaNK", $rq->MaNK)
             ->where("MSGV", $rq->MSGV)
-            ->get(['MaLop','MaMH'])
-            ->unique('MaLop');
+            ->distinct()
+            ->get(['MaLop','MaMH']);
         return response()->json($data, Response::HTTP_OK);
     }
     public function show($MSGV)

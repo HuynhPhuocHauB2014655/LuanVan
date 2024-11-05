@@ -200,7 +200,7 @@ export default function Account() {
                                         </div>
                                         <button
                                             className={`p-2 border rounded border-red-500 mt-2 ${item.time > 30 && "hover:bg-red-500 hover:text-white"}`}
-                                            // disabled={item.time<=30}
+                                            disabled={item.time<=30}
                                             onClick={showForm == item.userName ? () => setShowForm("") : () => setShowForm(item.userName)}
                                         >
                                             {showForm === item.userName ? "Hủy" : "Đổi mật khẩu"}
