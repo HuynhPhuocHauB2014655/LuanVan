@@ -5,6 +5,7 @@ import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import { useLocation, useNavigate } from "react-router-dom";
 import AlterConfirm from "../components/Confirm";
+import Header from "../components/Header";
 export default function StudentResult() {
     const location = useLocation();
     const { studentData } = location.state || {};
@@ -153,69 +154,14 @@ export default function StudentResult() {
     }, [studentData, NK, NKRef.current?.value]);
     console.log();
     return (
-        <div className="main-content">
-            <Menu />
-            <div className="right-part mb-2 relative">
-                <div className="page-name">
-                    Thông tin Học sinh
-                </div>
-                <div className="mt-2 grid gird-rows-1 grid-flow-col">
-                    <button className={view == 1 ? "class-info-head-active border-x-2 rounded-s-md" : "class-info-head border-x-2 rounded-s-md"} onClick={firstView}>Thông tin cá nhân</button>
-                    <button className={view == 2 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={secondView}>Kết quả học tập</button>
-                </div>
-                {view == 1 &&
-                    <div className="max-w-[90%] mx-auto mt-3">
-                        <table className="table w-full border-2 border-black border-collapse text-xl" >
-                            <tbody>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Mã số học sinh</th>
-                                    <td className="border-2 border-black p-2">{studentData.MSHS}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Tên học sinh</th>
-                                    <td className="border-2 border-black p-2">{studentData.HoTen}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Ngày sinh</th>
-                                    <td className="border-2 border-black p-2">{studentData.NgaySinh}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Giới tính</th>
-                                    <td className="border-2 border-black p-2">{studentData.GioiTinh}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Tôn giáo</th>
-                                    <td className="border-2 border-black p-2">{studentData.TonGiao}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Quê quán</th>
-                                    <td className="border-2 border-black p-2">{studentData.QueQuan}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Địa chỉ</th>
-                                    <td className="border-2 border-black p-2">{studentData.DiaChi}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Số điện thoại</th>
-                                    <td className="border-2 border-black p-2">{studentData.SDT}</td>
-                                </tr>
-                                <tr>
-                                    <th className="border-2 border-black p-2">Lịch sử học tập</th>
-                                    <td className="border-2 border-black p-2">
-                                        <div>
-                                            {studentData.lop.map((lop) => (
-                                                <div key={lop.MaLop}>
-                                                    {lop.MaNK} - {lop.TenLop}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div>
+            <Header />
+            <div className="main-content">
+                <Menu />
+                <div className="right-part mb-2 relative">
+                    <div className="page-name">
+                        Kết quả học tập
                     </div>
-                }
-                {view == 2 &&
                     <div className="max-w-[90%] mx-auto">
                         <div className="mt-3 flex justify-between">
                             <div className="grid grid-rows-1 grid-flow-col">
@@ -252,7 +198,7 @@ export default function StudentResult() {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="text-xl">Niên khóa:</div>
-                                <select name="nienkhoa" ref={NKRef} defaultValue={defaultNK} onChange={selectedNK} className="rounded-md border-2 p-2">
+                                <select name="nienkhoa" ref={NKRef} defaultValue={defaultNK} onChange={selectedNK} className="rounded-md border-2 p-2 border-slate-500">
                                     {NK.map((nk) => (
                                         <option key={nk.MaNK} value={nk.MaNK}>{nk.TenNK}</option>
                                     ))}
@@ -416,7 +362,7 @@ export default function StudentResult() {
                             </div>
                         }
                     </div>
-                }
+                </div>
             </div>
         </div>
     )

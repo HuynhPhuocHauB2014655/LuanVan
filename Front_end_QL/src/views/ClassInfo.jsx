@@ -7,13 +7,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import HocSinhTable from "../components/HocSinhTable";
 import BangDiem from "../components/BangDiem";
 import AlterConfirm from "../components/Confirm";
+import Header from "../components/Header";
 export default function ClassInfo() {
     const location = useLocation();
     const { classData } = location.state || {};
     const [view, setView] = useState(1);
     const [loaiDiem, setLoaiDiem] = useState([]);
     const [diem, setDiem] = useState([]);
-    const { nienKhoa, setMessage,setError } = useStateContext();
+    const { nienKhoa, setMessage, setError } = useStateContext();
     const [diemHK1, setDiemHK1] = useState([]);
     const [diemHK2, setDiemHK2] = useState([]);
     const [subjects, setSubjects] = useState([]);
@@ -21,13 +22,13 @@ export default function ClassInfo() {
     const [dsKhenThuong, setDsKhenThuong] = useState([]);
     const navigate = useNavigate();
     const [showConfirm, setShowConfirm] = useState(0);
-    const {userName} = useUserContext();
-    useEffect(()=>{
-        if(userName == "nhansu"){
+    const { userName } = useUserContext();
+    useEffect(() => {
+        if (userName == "nhansu") {
             setError("Bạn không có quyền truy cập trang này");
             navigate('/');
         }
-    },[userName]);
+    }, [userName]);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -117,189 +118,192 @@ export default function ClassInfo() {
     }
     console.log()
     return (
-        <div className="main-content relative">
-            {showConfirm === 1 &&
-                <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={duyetKQ} onCancel={onCancel} />
-            }
-            <Menu />
-            <div className="right-part mb-2 relative">
+        <div>
+            <Header />
+            <div className="main-content relative">
+                {showConfirm === 1 &&
+                    <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={duyetKQ} onCancel={onCancel} />
+                }
+                <Menu />
+                <div className="right-part mb-2 relative">
 
-                <div className="border-b-2 border-cyan-400 py-3 flex justify-between">
-                    <button onClick={() => navigate(-1)} className="button border-blue-500 hover:bg-blue-500 hover:text-white">Trở về</button>
-                    <h1 className="text-2xl font-bold text-center">Kết quả học tập</h1>
-                    {classData.TrangThai == 2 ?
-                        <div className="text-xl text-green-400">Đã duyệt</div>
-                        : classData.TrangThai == 1 ?
-                            <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={() => setShowConfirm(1)}>Duyệt kết quả</button>
-                            :
-                            <div className="text-xl text-red-400">Chưa báo cáo</div>
+                    <div className="border-b-2 border-cyan-400 py-3 flex justify-between">
+                        <button onClick={() => navigate(-1)} className="button border-blue-500 hover:bg-blue-500 hover:text-white">Trở về</button>
+                        <h1 className="text-2xl font-bold text-center">Kết quả học tập</h1>
+                        {classData.TrangThai == 2 ?
+                            <div className="text-xl text-green-400">Đã duyệt</div>
+                            : classData.TrangThai == 1 ?
+                                <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={() => setShowConfirm(1)}>Duyệt kết quả</button>
+                                :
+                                <div className="text-xl text-red-400">Chưa báo cáo</div>
+                        }
+                    </div>
+                    <div className="mt-2 grid gird-rows-1 grid-flow-col">
+                        <button className={view == 1 ? "class-info-head-active border-x-2 rounded-s-md" : "class-info-head border-x-2 rounded-s-md"} onClick={firstView}>Danh sách lớp</button>
+                        <button className={view == 2 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={secondView}>Điểm chi tiết</button>
+                        <button className={view == 3 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={thirdView}>Kết quả học tập</button>
+                        <button className={view == 4 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fourthView}>Kết quả rèn luyện</button>
+                        <button className={view == 5 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fiftthView}>Xét lên lớp</button>
+                        <button className={view == 6 ? "class-info-head-active border-x-2 rounded-e-md" : "class-info-head border-x-2 rounded-e-md"} onClick={sixthView}>Khen Thưởng</button>
+                    </div>
+                    {view == 1 &&
+                        <div className="mt-3 max-w-[90%] mx-auto">
+                            <HocSinhTable datas={classData.hoc_sinh} />
+                        </div>
                     }
-                </div>
-                <div className="mt-2 grid gird-rows-1 grid-flow-col">
-                    <button className={view == 1 ? "class-info-head-active border-x-2 rounded-s-md" : "class-info-head border-x-2 rounded-s-md"} onClick={firstView}>Danh sách lớp</button>
-                    <button className={view == 2 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={secondView}>Điểm chi tiết</button>
-                    <button className={view == 3 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={thirdView}>Kết quả học tập</button>
-                    <button className={view == 4 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fourthView}>Kết quả rèn luyện</button>
-                    <button className={view == 5 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fiftthView}>Xét lên lớp</button>
-                    <button className={view == 6 ? "class-info-head-active border-x-2 rounded-e-md" : "class-info-head border-x-2 rounded-e-md"} onClick={sixthView}>Khen Thưởng</button>
-                </div>
-                {view == 1 &&
-                    <div className="mt-3 max-w-[90%] mx-auto">
-                        <HocSinhTable datas={classData.hoc_sinh} />
-                    </div>
-                }
-                {view == 2 &&
-                    <div className="max-w-[90%] mx-auto">
-                        {subjects.map((mh) => (
-                            <div key={mh.MaMH} className="my-2">
-                                <h3 className="text-2xl font-bold text-center">Tên môn: {mh.TenMH}</h3>
-                                <BangDiem
-                                    hocSinh={classData?.hoc_sinh}
-                                    loaiDiem={loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai))}
-                                    diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
-                                    diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                }
-                {view == 3 &&
-                    <div className="mt-3">
-                        <table className="table-auto text-center w-[90%] mx-auto">
-                            <thead>
-                                <tr>
-                                    <th className="border border-black">Mã số học sinh</th>
-                                    <th className="border border-black">Tên học sinh</th>
-                                    <th className="border border-black">Điểm trung bình HK1</th>
-                                    <th className="border border-black">Xếp loại HK1</th>
-                                    <th className="border border-black">Điểm trung bình HK2</th>
-                                    <th className="border border-black">Xếp loại HK2</th>
-                                    <th className="border border-black">Điểm trung bình cả năm</th>
-                                    <th className="border border-black">Xếp loại cả năm</th>
-                                    <th className="border border-black">Xếp loại sau rèn luyện hè</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {classData.hoc_sinh.map((hs) => {
-                                    const data = kqht.find((diem) => diem.MSHS == hs.MSHS);
-                                    return (
-                                        <tr key={hs.MSHS}>
-                                            <td className="border border-black">{hs.MSHS}</td>
-                                            <td className="border border-black text-left">{hs.HoTen}</td>
-                                            <td className="border border-black">{data?.Diem_TB_HKI || "-"}</td>
-                                            <td className="border border-black">{data?.hoc_luc_h_k1.TenHL}</td>
-                                            <td className="border border-black">{data?.Diem_TB_HKII || "-"}</td>
-                                            <td className="border border-black">{data?.hoc_luc_h_k2.TenHL}</td>
-                                            <td className="border border-black">{data?.Diem_TB_CN || "-"}</td>
-                                            <td className="border border-black">{data?.hoc_luc.TenHL}</td>
-                                            <td className="border border-black">{data?.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                {view == 4 &&
-                    <div className="mt-3">
-                        <table className="table-auto text-center w-[90%] mx-auto">
-                            <thead>
-                                <tr>
-                                    <th className="border border-black">Mã số học sinh</th>
-                                    <th className="border border-black">Tên học sinh</th>
-                                    <th className="border border-black">Rèn luyện HK1</th>
-                                    <th className="border border-black">Rèn luyện HK2</th>
-                                    <th className="border border-black">Rèn luyện cả năm</th>
-                                    <th className="border border-black">Rèn luyện lại trong hè</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {classData.hoc_sinh.map((hs) => {
-                                    const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
-                                    if (data) {
-                                        return (
-                                            <tr key={hs.MSHS}>
-                                                <td className="border border-black">{hs.MSHS}</td>
-                                                <td className="border border-black text-left">{hs.HoTen}</td>
-                                                <td className="border border-black">{data.ren_luyen_h_k1.TenRL}</td>
-                                                <td className="border border-black">{data.ren_luyen_h_k2.TenRL}</td>
-                                                <td className="border border-black">{data.ren_luyen.TenRL}</td>
-                                                <td className="border border-black">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
-                                            </tr>
-                                        )
-                                    }
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                {view == 5 &&
-                    <div className="max-w-[90%] mx-auto mt-3">
-                        <table className="table-auto text-center w-full">
-                            <thead>
-                                <tr>
-                                    <th className="border border-black">Mã số học sinh</th>
-                                    <th className="border border-black">Tên học sinh</th>
-                                    <th className="border border-black">Xếp loại cả năm</th>
-                                    <th className="border border-black">Rèn luyện hè</th>
-                                    <th className="border border-black">Rèn luyện cả năm</th>
-                                    <th className="border border-black">Rèn luyện hè</th>
-                                    <th className="border border-black">Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {classData.hoc_sinh.map((hs) => {
-                                    const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
-                                    if (data) {
-                                        return (
-                                            <tr key={hs.MSHS}>
-                                                <td className="border border-black">{hs.MSHS}</td>
-                                                <td className="border border-black text-left">{hs.HoTen}</td>
-                                                <td className="border border-black">{data.hoc_luc.TenHL}</td>
-                                                <td className="border border-black">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
-                                                <td className="border border-black">{data.ren_luyen.TenRL}</td>
-                                                <td className="border border-black">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
-                                                <td className="border border-black">{data.trang_thai.TenTT}</td>
-                                            </tr>
-                                        )
-                                    }
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                {view == 6 &&
-                    <div className=" w-[90%] mx-auto mt-10">
-                        {dsKhenThuong.length > 0 ?
-                            <table className="table w-full text-xl">
+                    {view == 2 &&
+                        <div className="max-w-[90%] mx-auto">
+                            {subjects.map((mh) => (
+                                <div key={mh.MaMH} className="my-2">
+                                    <h3 className="text-2xl font-bold text-center">Tên môn: {mh.TenMH}</h3>
+                                    <BangDiem
+                                        hocSinh={classData?.hoc_sinh}
+                                        loaiDiem={loaiDiem.filter(item => ['tx', 'gk', 'ck'].includes(item.MaLoai))}
+                                        diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
+                                        diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    }
+                    {view == 3 &&
+                        <div className="mt-3">
+                            <table className="table-auto text-center w-[90%] mx-auto">
                                 <thead>
                                     <tr>
-                                        <th className="border border-black px-2">Mã số học sinh</th>
-                                        <th className="border border-black px-2">Tên học sinh</th>
-                                        <th className="border border-black px-2">Đề xuất khen thưởng</th>
-                                        <th className="border border-black px-2">Trạng thái</th>
+                                        <th className="border border-black py-3 px-2">Mã số học sinh</th>
+                                        <th className="border border-black py-3 px-2">Tên học sinh</th>
+                                        <th className="border border-black py-3 px-2">Điểm trung bình HK1</th>
+                                        <th className="border border-black py-3 px-2">Xếp loại HK1</th>
+                                        <th className="border border-black py-3 px-2">Điểm trung bình HK2</th>
+                                        <th className="border border-black py-3 px-2">Xếp loại HK2</th>
+                                        <th className="border border-black py-3 px-2">Điểm trung bình cả năm</th>
+                                        <th className="border border-black py-3 px-2">Xếp loại cả năm</th>
+                                        <th className="border border-black py-3 px-2">Xếp loại sau rèn luyện hè</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dsKhenThuong?.map((item) => (
-                                        <tr key={item.MSHS}>
-                                            <td className="border border-black px-2">{item.MSHS}</td>
-                                            <td className="border border-black px-2">{item.hoc_sinh[0].HoTen}</td>
-                                            <td className="border border-black px-2">{item.KhenThuong}</td>
-                                            {item.TrangThai == 0 ?
-                                                <td className="border border-black px-2 py-1 text-center text-red-500">Chưa duyệt</td>
-                                                :
-                                                <td className="border border-black px-2 py-1 text-center text-green-500">Đã duyệt</td>
-                                            }
-                                        </tr>
-                                    ))}
+                                    {classData.hoc_sinh.map((hs) => {
+                                        const data = kqht.find((diem) => diem.MSHS == hs.MSHS);
+                                        return (
+                                            <tr key={hs.MSHS}>
+                                                <td className="border border-black py-3 px-2">{hs.MSHS}</td>
+                                                <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
+                                                <td className="border border-black py-3 px-2">{data?.Diem_TB_HKI || "-"}</td>
+                                                <td className="border border-black py-3 px-2">{data?.hoc_luc_h_k1.TenHL}</td>
+                                                <td className="border border-black py-3 px-2">{data?.Diem_TB_HKII || "-"}</td>
+                                                <td className="border border-black py-3 px-2">{data?.hoc_luc_h_k2.TenHL}</td>
+                                                <td className="border border-black py-3 px-2">{data?.Diem_TB_CN || "-"}</td>
+                                                <td className="border border-black py-3 px-2">{data?.hoc_luc.TenHL}</td>
+                                                <td className="border border-black py-3 px-2">{data?.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
-                            :
-                            <div className="text-center text-2xl text-red-500 mt-10">Không có đề xuất khen thưởng</div>
-                        }
-                    </div>
-                }
+                        </div>
+                    }
+                    {view == 4 &&
+                        <div className="mt-3">
+                            <table className="table-auto text-center w-[90%] mx-auto">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-black py-3 px-2">Mã số học sinh</th>
+                                        <th className="border border-black py-3 px-2">Tên học sinh</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện HK1</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện HK2</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện cả năm</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện lại trong hè</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {classData.hoc_sinh.map((hs) => {
+                                        const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
+                                        if (data) {
+                                            return (
+                                                <tr key={hs.MSHS}>
+                                                    <td className="border border-black py-3 px-2">{hs.MSHS}</td>
+                                                    <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
+                                                    <td className="border border-black py-3 px-2">{data.ren_luyen_h_k1.TenRL}</td>
+                                                    <td className="border border-black py-3 px-2">{data.ren_luyen_h_k2.TenRL}</td>
+                                                    <td className="border border-black py-3 px-2">{data.ren_luyen.TenRL}</td>
+                                                    <td className="border border-black py-3 px-2">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                </tr>
+                                            )
+                                        }
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    {view == 5 &&
+                        <div className="max-w-[90%] mx-auto mt-3">
+                            <table className="table-auto text-center w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-black py-3 px-2">Mã số học sinh</th>
+                                        <th className="border border-black py-3 px-2">Tên học sinh</th>
+                                        <th className="border border-black py-3 px-2">Xếp loại cả năm</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện hè</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện cả năm</th>
+                                        <th className="border border-black py-3 px-2">Rèn luyện hè</th>
+                                        <th className="border border-black py-3 px-2">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {classData.hoc_sinh.map((hs) => {
+                                        const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
+                                        if (data) {
+                                            return (
+                                                <tr key={hs.MSHS}>
+                                                    <td className="border border-black py-3 px-2">{hs.MSHS}</td>
+                                                    <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
+                                                    <td className="border border-black py-3 px-2">{data.hoc_luc.TenHL}</td>
+                                                    <td className="border border-black py-3 px-2">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
+                                                    <td className="border border-black py-3 px-2">{data.ren_luyen.TenRL}</td>
+                                                    <td className="border border-black py-3 px-2">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                    <td className="border border-black py-3 px-2">{data.trang_thai.TenTT}</td>
+                                                </tr>
+                                            )
+                                        }
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    {view == 6 &&
+                        <div className=" w-[90%] mx-auto mt-10">
+                            {dsKhenThuong.length > 0 ?
+                                <table className="table w-full text-xl">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-black py-3 px-2">Mã số học sinh</th>
+                                            <th className="border border-black py-3 px-2">Tên học sinh</th>
+                                            <th className="border border-black py-3 px-2">Đề xuất khen thưởng</th>
+                                            <th className="border border-black py-3 px-2">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {dsKhenThuong?.map((item) => (
+                                            <tr key={item.MSHS}>
+                                                <td className="border border-black py-3 px-2">{item.MSHS}</td>
+                                                <td className="border border-black py-3 px-2">{item.hoc_sinh[0].HoTen}</td>
+                                                <td className="border border-black py-3 px-2">{item.KhenThuong}</td>
+                                                {item.TrangThai == 0 ?
+                                                    <td className="border border-black px-2 py-3 text-center text-red-500">Chưa duyệt</td>
+                                                    :
+                                                    <td className="border border-black px-2 py-3 text-center text-green-500">Đã duyệt</td>
+                                                }
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                :
+                                <div className="text-center text-2xl text-red-500 mt-10">Không có đề xuất khen thưởng</div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     );

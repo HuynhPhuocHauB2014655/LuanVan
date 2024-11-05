@@ -12,6 +12,7 @@ import { useRef } from "react";
 import pusher from "../pusher";
 import moment from 'moment';
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 export default function Message() {
     const { userName } = useUserContext();
     const [messages, setMessages] = useState([]);
@@ -294,7 +295,7 @@ export default function Message() {
                             ${(!isGroupListVisible && onMd) && 'hidden'}
                         `}>
                         {groups?.map((gr) => (
-                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
+                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:bg-slate-200 hover:cursor-pointer flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
                                 <div>
                                     <div className="text-lg">{gr.TenNhom}</div>
                                     <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0]?.NguoiGui}: ${gr.tin_nhan[0]?.TinNhan.length > 10 ? `${gr.tin_nhan[0]?.TinNhan.substring(0, 10)}...` : gr.tin_nhan[0]?.TinNhan}`}</div>

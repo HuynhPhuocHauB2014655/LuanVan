@@ -9,6 +9,7 @@ import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
+import Header from "../components/Header";
 export default function Student() {
     const [datas, setDatas] = useState([]);
     const navigate = useNavigate();
@@ -188,203 +189,206 @@ export default function Student() {
         navigate('/student-info', { state: { Mshs: mshs } });
     }
     return (
-        <div className="main-content ">
-            <Menu />
-            <div className="right-part relative">
-                {showForm != 0 &&
-                    <div className="absolute z-10 w-[70%] left-[15%] top-20 bg-white p-5 border-2 border-cyan-400">
-                        <button className="absolute top-0 right-0 me-2 text-red-700 border-2 px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
-                        <h1 className="text-center mb-3 text-2xl font-semibold bg-slate-400 mt-5 py-2 rounded">{showForm == 1 ? "Thêm học sinh" : "Sửa học sinh"}</h1>
-                        <Formik
-                            initialValues={{
-                                MaNK: '',
-                                HoTen: '',
-                                NgaySinh: '',
-                                GioiTinh: "Nam",
-                                QueQuan: '',
-                                DanToc: '',
-                                TonGiao: '',
-                                DiaChi: '',
-                                SDT: '',
-                                MaBan: 'TN',
-                                TrangThai: 0
-                            }}
-                            validationSchema={validationSchema}
-                            onSubmit={handleSubmit}
-                            enableReinitialize={true}
-                            innerRef={formRef}
-                        >
-                            {({ setValues }) => {
-                                useEffect(() => {
-                                    if (Object.keys(studentForm).length > 0) {
-                                        setValues(studentForm);
-                                    }
-                                }, [studentForm, setValues]);
-                                return (
-                                    <Form className="relative" ref={formRef}>
-                                        <div className="grid grid-cols-2 grid-flow-row gap-2">
-                                            <div>
-                                                <Field type="text" name="MaNK" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Mã niên khóa" />
-                                                <ErrorMessage className="text-red-700" name="MaNK" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="HoTen" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Họ và tên" />
-                                                <ErrorMessage className="text-red-700" name="HoTen" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="NgaySinh" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Ngày sinh" />
-                                                <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field as="select" name="GioiTinh" className="rounded border-2 border-black p-2 mb-1 w-full">
-                                                    <option value="Nam" defaultChecked>Nam</option>
-                                                    <option value="Nữ">Nữ</option>
-                                                </Field>
-                                                <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="QueQuan" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Quê quán" />
-                                                <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="DanToc" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Dân Tộc" />
-                                                <ErrorMessage className="text-red-700" name="DanToc" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="TonGiao" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Tôn Giáo" />
-                                                <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="DiaChi" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Địa chỉ" />
-                                                <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field type="text" name="SDT" className="rounded border-2 border-black p-2 mb-1 w-full" placeholder="Số điện thoại" />
-                                                <ErrorMessage className="text-red-700" name="SDT" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field as="select" name="MaBan" className="rounded border-2 border-black p-2 mb-1 w-full">
-                                                    <option value="TN">Tự nhiên</option>
-                                                    <option value="XH">Xã hội</option>
-                                                </Field>
-                                                <ErrorMessage className="text-red-700" name="MaBan" component="div" />
-                                            </div>
-
-                                            <div>
-                                                <Field as="select" name="TrangThai" className="rounded border-2 border-black p-2 mb-1 w-full">
-                                                    <option value={0}>Đang học</option>
-                                                    <option value={1}>Đã thôi học</option>
-                                                    <option value={2}>Đã tốt nghiệp</option>
-                                                </Field>
-                                                <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
-                                            </div>
-                                        </div>
-
-                                        {showForm === 1 ?
-                                            <div className="flex justify-center">
-                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300">
-                                                    Thêm
-                                                </button>
-                                            </div>
-                                            :
-                                            <div className="flex justify-center">
-                                                <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400">
-                                                    Sửa
-                                                </button>
-                                            </div>
+        <div>
+            <Header />
+            <div className="main-content ">
+                <Menu />
+                <div className="right-part relative">
+                    {showForm != 0 &&
+                        <div className="absolute z-10 w-[70%] left-[15%] top-20 bg-white p-5 border-2 border-cyan-400">
+                            <button className="absolute top-0 right-0 me-2 text-red-700 border-2 px-2 mt-2 hover:border-red-600" onClick={() => showFormStudent(0)}>X</button>
+                            <h1 className="text-center mb-3 text-2xl font-semibold bg-slate-400 mt-5 py-2 rounded">{showForm == 1 ? "Thêm học sinh" : "Sửa học sinh"}</h1>
+                            <Formik
+                                initialValues={{
+                                    MaNK: '',
+                                    HoTen: '',
+                                    NgaySinh: '',
+                                    GioiTinh: "Nam",
+                                    QueQuan: '',
+                                    DanToc: '',
+                                    TonGiao: '',
+                                    DiaChi: '',
+                                    SDT: '',
+                                    MaBan: 'TN',
+                                    TrangThai: 0
+                                }}
+                                validationSchema={validationSchema}
+                                onSubmit={handleSubmit}
+                                enableReinitialize={true}
+                                innerRef={formRef}
+                            >
+                                {({ setValues }) => {
+                                    useEffect(() => {
+                                        if (Object.keys(studentForm).length > 0) {
+                                            setValues(studentForm);
                                         }
-                                        {showConfirm === 1 &&
-                                            <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
-                                        }
-                                    </Form>
-                                );
-                            }}
-                        </Formik>
-                    </div>}
-                <h2 className="page-name">Quản lí học sinh</h2>
-                <div className="mt-2 flex justify-between">
-                    <div>
-                        <button className="px-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2 button-animation" onClick={() => fetchData(1)}>Tất cả</button>
-                        <button className="px-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400 button-animation" onClick={() => showFormStudent(1)}>Thêm học sinh</button>
+                                    }, [studentForm, setValues]);
+                                    return (
+                                        <Form className="relative" ref={formRef}>
+                                            <div className="grid grid-cols-2 grid-flow-row gap-2">
+                                                <div>
+                                                    <Field type="text" name="MaNK" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Mã niên khóa" />
+                                                    <ErrorMessage className="text-red-700" name="MaNK" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="HoTen" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Họ và tên" />
+                                                    <ErrorMessage className="text-red-700" name="HoTen" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="NgaySinh" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Ngày sinh" />
+                                                    <ErrorMessage className="text-red-700" name="NgaySinh" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field as="select" name="GioiTinh" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full">
+                                                        <option value="Nam" defaultChecked>Nam</option>
+                                                        <option value="Nữ">Nữ</option>
+                                                    </Field>
+                                                    <ErrorMessage className="text-red-700" name="GioiTinh" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="QueQuan" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Quê quán" />
+                                                    <ErrorMessage className="text-red-700" name="QueQuan" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="DanToc" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Dân Tộc" />
+                                                    <ErrorMessage className="text-red-700" name="DanToc" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="TonGiao" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Tôn Giáo" />
+                                                    <ErrorMessage className="text-red-700" name="TonGiao" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="DiaChi" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Địa chỉ" />
+                                                    <ErrorMessage className="text-red-700" name="DiaChi" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field type="text" name="SDT" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full" placeholder="Số điện thoại" />
+                                                    <ErrorMessage className="text-red-700" name="SDT" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field as="select" name="MaBan" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full">
+                                                        <option value="TN">Tự nhiên</option>
+                                                        <option value="XH">Xã hội</option>
+                                                    </Field>
+                                                    <ErrorMessage className="text-red-700" name="MaBan" component="div" />
+                                                </div>
+
+                                                <div>
+                                                    <Field as="select" name="TrangThai" className="border-none py-3 ring-2 rounded ring-slate-500 focus:ring-0 outline-2 outline-cyan-300 p-2 mb-1 w-full">
+                                                        <option value={0}>Đang học</option>
+                                                        <option value={1}>Đã thôi học</option>
+                                                        <option value={2}>Đã tốt nghiệp</option>
+                                                    </Field>
+                                                    <ErrorMessage className="text-red-700" name="TrangThai" component="div" />
+                                                </div>
+                                            </div>
+
+                                            {showForm === 1 ?
+                                                <div className="flex justify-center">
+                                                    <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-300">
+                                                        Thêm
+                                                    </button>
+                                                </div>
+                                                :
+                                                <div className="flex justify-center">
+                                                    <button type="button" onClick={() => triggerConfirm(1)} className="w-1/3 mt-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-400">
+                                                        Sửa
+                                                    </button>
+                                                </div>
+                                            }
+                                            {showConfirm === 1 &&
+                                                <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
+                                            }
+                                        </Form>
+                                    );
+                                }}
+                            </Formik>
+                        </div>}
+                    <h2 className="page-name">Quản lí học sinh</h2>
+                    <div className="mt-2 flex justify-between">
+                        <div>
+                            <button className="px-3 py-2 border-2 border-green-400 rounded bg-white hover:bg-green-400 me-2 button-animation" onClick={() => fetchData(1)}><FontAwesomeIcon icon="fa-solid fa-list" title="Tất cả"/></button>
+                            <button className="px-3 py-2 border-2 border-blue-400 rounded bg-white hover:bg-blue-400 button-animation" onClick={() => showFormStudent(1)}><FontAwesomeIcon icon="fa-solid fa-plus" title="Thêm học sinh"/></button>
+                        </div>
+                        <div className="me-3 flex w-[25%]">
+                            <input type="text" id="search" className="rounded w-full border-2 border-black px-2" placeholder="Tìm tên hoặc mã số học sinh" />
+                            <button onClick={search} className="p-2 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
+                        </div>
                     </div>
-                    <div className="me-3 flex w-[25%]">
-                        <input type="text" id="search" className="rounded w-full border-2 border-black px-2" placeholder="Tìm tên hoặc mã số học sinh" />
-                        <button onClick={search} className="p-2 border-2 rounded bg-white border-black ms-1 hover:border-blue-500"><FontAwesomeIcon icon={faSearch} color="blue" /></button>
-                    </div>
-                </div>
-                <div className="my-1 flex justify-center">
-                    <button
-                        onClick={() => handlePageChange(1)}
-                        className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
-                    >
-                        <FontAwesomeIcon icon={faAngleDoubleLeft} />
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
-                        disabled={currentPage - 1 === 0}
-                    >
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                    </button>
-                    {pages.map((page) => (
+                    <div className="my-1 flex justify-center">
                         <button
-                            key={page}
-                            onClick={() => handlePageChange(page)}
-                            disabled={page === currentPage}
-                            className={page === currentPage ?
-                                "me-1 px-3 py-1 border-2 border-black bg-slate-200 rounded"
-                                : "me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"}
+                            onClick={() => handlePageChange(1)}
+                            className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
                         >
-                            {page}
+                            <FontAwesomeIcon icon={faAngleDoubleLeft} />
                         </button>
-                    ))}
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
-                        disabled={currentPage + 1 > totalPages}
-                    >
-                        <FontAwesomeIcon icon={faChevronRight} />
-                    </button>
-                    <button
-                        onClick={() => handlePageChange(totalPages)}
-                        className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
-                    >
-                        <FontAwesomeIcon icon={faAngleDoubleRight} />
-                    </button>
-                </div>
-                <table className="table-auto w-[80%] mx-auto text-xl">
-                    <thead>
-                        <tr>
-                            <th className="td py-1 px-2" >STT</th>
-                            <th className="td py-1 px-2" >MSHS</th>
-                            <th className="td py-1 px-2" >Tên học sinh</th>
-                            <th className="td py-1 px-2" >Lớp</th>
-                            <th className="td py-1 px-2" >Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {datas.map((data, index) => (
-                            <tr key={index} className="cursor-pointer hover:bg-slate-100" onClick={() => toStudentInfo(data.MSHS)}>
-                                <td className="td py-1 px-2" >{(currentPage - 1) * 10 + index + 1}</td>
-                                <td className="td py-1 px-2" >{data.MSHS}</td>
-                                <td className="td py-1 px-2" >{data.HoTen}</td>
-                                {data.lop[0]?.TenLop ?
-                                    <td className="td py-1 px-2">{data.lop[0].TenLop}</td> :
-                                    <td className="td py-1 px-2">Chưa xếp</td>}
-                                <td className="td py-1 px-2">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
-                            </tr>
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                            disabled={currentPage - 1 === 0}
+                        >
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </button>
+                        {pages.map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                disabled={page === currentPage}
+                                className={page === currentPage ?
+                                    "me-1 px-3 py-1 border-2 border-black bg-slate-200 rounded"
+                                    : "me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"}
+                            >
+                                {page}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            className="me-1 px-3 py-1 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                            disabled={currentPage + 1 > totalPages}
+                        >
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(totalPages)}
+                            className="me-1 p-2 border-2 border-transparent hover:border-black hover:text-white hover:bg-black rounded"
+                        >
+                            <FontAwesomeIcon icon={faAngleDoubleRight} />
+                        </button>
+                    </div>
+                    <table className="table-auto w-[90%] mx-auto text-xl">
+                        <thead>
+                            <tr className="bg-slate-500 text-white">
+                                <th className="px-3 py-4 text-start" >STT</th>
+                                <th className="px-3 py-4 text-start" >MSHS</th>
+                                <th className="px-3 py-4 text-start" >Tên học sinh</th>
+                                <th className="px-3 py-4 text-start" >Lớp</th>
+                                <th className="px-3 py-4 text-start" >Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {datas.map((data, index) => (
+                                <tr key={index} className={`${index % 2 == 0 && "bg-slate-200"} cursor-pointer hover:bg-slate-300`} onClick={() => toStudentInfo(data.MSHS)}>
+                                    <td className="px-3 py-4" >{(currentPage - 1) * 10 + index + 1}</td>
+                                    <td className="px-3 py-4" >{data.MSHS}</td>
+                                    <td className="px-3 py-4" >{data.HoTen}</td>
+                                    {data.lop[0]?.TenLop ?
+                                        <td className="px-3 py-4">{data.lop[0].TenLop}</td> :
+                                        <td className="px-3 py-4">Chưa xếp</td>}
+                                    <td className="px-3 py-4">{data.TrangThai == 0 ? "Đang học" : data.TrangThai == 1 ? "Đã thôi học" : "Đã tốt nghiệp"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

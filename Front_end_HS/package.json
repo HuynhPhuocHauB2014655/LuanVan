@@ -23,6 +23,7 @@
     "moment-timezone": "^0.5.46",
     "pusher-js": "^8.4.0-rc2",
     "react": "^18.2.0",
+    "react-calendar": "^5.1.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-router-dom": "^6.25.1",

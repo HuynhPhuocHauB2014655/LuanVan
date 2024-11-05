@@ -6,10 +6,11 @@ import axiosClient from "../axios-client";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faX } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight, faScrewdriverWrench, faX } from "@fortawesome/free-solid-svg-icons";
 import { useRef } from "react";
 import AlterConfirm from "../components/Confirm";
 import { useUserContext } from "../context/userContext";
+import Header from "../components/Header";
 export default function StudentInfo() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function StudentInfo() {
     const [showConfirm, setShowConfirm] = useState(0);
     const [initialValues, setInitialValues] = useState({});
     const formRef = useRef();
-    const {userName} = useUserContext();
+    const { userName } = useUserContext();
     const fetchData = async () => {
         const res = await axiosClient.get(`hs/show/${Mshs}`);
         setInfo(res.data);
@@ -96,75 +97,75 @@ export default function StudentInfo() {
             <div className="right-part relative">
                 <h1 className="page-name">Thông tin học sinh</h1>
                 {info &&
-                    <div className="w-[90%] mx-auto">
+                    <div className="w-[95%] mx-auto">
                         <div className="mt-2 flex justify-between">
-                            <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => navigate(-1)}>Trở về</button>
                             <div>
-                                <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => showForm(3)}>Sửa thông tin</button>
-                                <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={()=>navigate('/student-result', { state: { studentData: info } })}>Thành tích học tập</button>
+                                <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => navigate(-1)}><FontAwesomeIcon icon={faChevronLeft} /></button>
+                                <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => showForm(3)}><FontAwesomeIcon icon={faScrewdriverWrench} title="Sửa thông tin " /></button>
                             </div>
+                            <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => navigate('/student-result', { state: { studentData: info } })}>Thành tích học tập <FontAwesomeIcon icon={faChevronRight} /></button>
                         </div>
-                        <div className="text-2xl font-semibold my-2 text-center">Học sinh</div>
+                        <div className="text-2xl font-semibold my-2 text-center bg-slate-300 py-5 mt-10">Học sinh</div>
                         <table className="table-fixed text-left text-xl w-full">
                             <tbody>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Mã số học sinh</th>
-                                    <td className="border border-gray-400 p-2">{info.MSHS}</td>
+                                    <th className="p-4 bg-slate-200">Mã số học sinh</th>
+                                    <td className="p-4 bg-slate-200">{info.MSHS}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Tên học sinh</th>
-                                    <td className="border border-gray-400 p-2">{info.HoTen}</td>
+                                    <th className="p-4">Tên học sinh</th>
+                                    <td className="p-4">{info.HoTen}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Giới tính</th>
-                                    <td className="border border-gray-400 p-2">{info.GioiTinh}</td>
+                                    <th className="p-4 bg-slate-200">Giới tính</th>
+                                    <td className="p-4 bg-slate-200">{info.GioiTinh}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Ngày sinh</th>
-                                    <td className="border border-gray-400 p-2">{info.NgaySinh}</td>
+                                    <th className="p-4">Ngày sinh</th>
+                                    <td className="p-4">{info.NgaySinh}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Quê quán</th>
-                                    <td className="border border-gray-400 p-2">{info.QueQuan}</td>
+                                    <th className="p-4 bg-slate-200">Quê quán</th>
+                                    <td className="p-4 bg-slate-200">{info.QueQuan}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Dân tộc</th>
-                                    <td className="border border-gray-400 p-2">{info.DanToc}</td>
+                                    <th className="p-4">Dân tộc</th>
+                                    <td className="p-4">{info.DanToc}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Tôn giáo</th>
-                                    <td className="border border-gray-400 p-2">{info.TonGiao}</td>
+                                    <th className="p-4 bg-slate-200">Tôn giáo</th>
+                                    <td className="p-4 bg-slate-200">{info.TonGiao}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Địa chỉ</th>
-                                    <td className="border border-gray-400 p-2">{info.DiaChi}</td>
+                                    <th className="p-4">Địa chỉ</th>
+                                    <td className="p-4">{info.DiaChi}</td>
                                 </tr>
                                 <tr>
-                                    <th className="border border-gray-400 p-2">Số điện thoại</th>
-                                    <td className="border border-gray-400 p-2">{info.SDT}</td>
+                                    <th className="p-4 bg-slate-200">Số điện thoại</th>
+                                    <td className="p-4 bg-slate-200">{info.SDT}</td>
                                 </tr>
                             </tbody>
                         </table>
                         <div>
-                            <div className="text-2xl font-semibold my-2 text-center">Quá trình học tập</div>
+                            <div className="text-2xl font-semibold my-2 text-center bg-slate-300 py-5 mt-10">Quá trình học tập</div>
                             <table className="table-fixed text-left text-xl w-full">
                                 <tbody>
-                                    {info.lop?.map((data) => (
+                                    {info.lop?.map((data,index) => (
                                         <tr key={data.MaLop}>
-                                            <th className="border border-gray-400 p-2">{data.MaNK}</th>
-                                            <td className="border border-gray-400 p-2">{data.TenLop}</td>
+                                            <th className={`p-4 ${index % 2 == 0 && "bg-slate-200"}`}>{data.nien_khoa.TenNK}</th>
+                                            <td className={`p-4 ${index % 2 == 0 && "bg-slate-200"}`}>{data.TenLop}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                         <div className="relative mt-3">
-                            <div className="text-2xl font-semibold my-2 text-center">Phụ Huynh</div>
-                            <div className="absolute left-0 top-0">
+                            <div className="text-2xl font-semibold my-2 text-center bg-slate-300 py-5 mt-10">Phụ Huynh</div>
+                            <div className="absolute left-1 top-5">
                                 {info.phu_huynh ?
-                                    <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => showForm(2)}>Sửa Phụ huynh</button>
+                                    <button className="button border-blue-500 hover:bg-blue-500 hover:text-white bg-white" onClick={() => showForm(2)}>Sửa Phụ huynh</button>
                                     :
-                                    <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => showForm(1)}>Thêm Phụ huynh</button>
+                                    <button className="button border-blue-500 hover:bg-blue-500 hover:text-white bg-white" onClick={() => showForm(1)}>Thêm Phụ huynh</button>
                                 }
                             </div>
                         </div>
@@ -172,20 +173,20 @@ export default function StudentInfo() {
                             <table className="table-fixed text-left text-xl w-full">
                                 <tbody>
                                     <tr>
-                                        <th className="border border-gray-400 p-2">Họ tên Cha:</th>
-                                        <td className="border border-gray-400 p-2">{info.phu_huynh.TenCha}</td>
+                                        <th className="p-4 bg-slate-200">Họ tên Cha:</th>
+                                        <td className="p-4 bg-slate-200">{info.phu_huynh.TenCha}</td>
                                     </tr>
                                     <tr>
-                                        <th className="border border-gray-400 p-2">Số điện thoại Cha:</th>
-                                        <td className="border border-gray-400 p-2">{info.phu_huynh.SDTCha}</td>
+                                        <th className="p-4">Số điện thoại Cha:</th>
+                                        <td className="p-4">{info.phu_huynh.SDTCha}</td>
                                     </tr>
                                     <tr>
-                                        <th className="border border-gray-400 p-2">Họ tên Mẹ:</th>
-                                        <td className="border border-gray-400 p-2">{info.phu_huynh.TenMe}</td>
+                                        <th className="p-4 bg-slate-200">Họ tên Mẹ:</th>
+                                        <td className="p-4 bg-slate-200">{info.phu_huynh.TenMe}</td>
                                     </tr>
                                     <tr>
-                                        <th className="border border-gray-400 p-2">Số điện thoại Mẹ:</th>
-                                        <td className="border border-gray-400 p-2">{info.phu_huynh.SDTMe}</td>
+                                        <th className="p-4">Số điện thoại Mẹ:</th>
+                                        <td className="p-4">{info.phu_huynh.SDTMe}</td>
                                     </tr>
                                 </tbody>
                             </table>

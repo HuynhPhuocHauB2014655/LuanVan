@@ -5,8 +5,9 @@
   min-height: 10vh;
 }
 .main-content{
-  display: flex;
+  @apply md:flex gap-6;
   min-height: 80vh;
+  @apply space-x-2 p-5
 }
 .footer{
   min-height: 10vh;
@@ -39,7 +40,7 @@ input {
  @apply text-2xl font-bold text-center border-b-2 border-cyan-400 py-3
 }
 .right-part{
-  @apply md:w-[85%] w-full mx-2 mb-2 md:text-base text-sm
+  @apply md:w-[85%] w-full md:text-base text-sm bg-white md:border-2 md:p-2
 }
 .button-animation {
   @apply shadow-md transition duration-300 ease-in-out transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg
@@ -105,8 +106,51 @@ input {
 }
 
 .class-info-head{
-  @apply hover:bg-white py-3 border-y-2 border-cyan-300 text-lg
+  @apply hover:bg-slate-400 py-3 border-y-2 border-blue-300 text-lg
 }
 .class-info-head-active{
-  @apply bg-white py-3 border-y-2 border-cyan-300 text-lg
+  @apply bg-slate-400 py-3 border-y-2 border-blue-300 text-lg text-white
+}
+
+
+
+.calendar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  width: 100%;
+  @apply bg-white min-h-[80vh] rounded;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content:space-between;
+  width: 100%;
+  @apply px-10 py-5 md:text-2xl items-center;
+}
+
+.calendar-grid {
+  width: 100%;
+  height: 100%;
+  @apply grid grid-cols-7 grid-flow-row;
+}
+
+.calendar-cell {
+  cursor: pointer;
+  @apply border m-1;
+}
+
+.calendar-cell.header {
+  font-weight: bold;
+  background-color: #f4f4f4;
+}
+
+.calendar-cell:hover {
+  background-color: #e0e0e0;
+}
+
+button {
+  padding: 5px 10px;
+  cursor: pointer;
 }

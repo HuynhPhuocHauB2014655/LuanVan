@@ -39,8 +39,4 @@ class HocSinh extends Model
     public function phuHuynh():HasOne{
         return $this->hasOne(PhuHuynh::class,'MSHS','MSHS');
     }
-    public function thanhVien():HasMany
-    {
-        return $this->hasMany(ThanhVien::class, 'MaTV', 'MSHS');
-    }
 }

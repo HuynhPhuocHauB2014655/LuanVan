@@ -17,6 +17,7 @@ use App\Http\Controllers\KhenThuongController;
 use App\Http\Controllers\TBController;
 use App\Http\Controllers\TinNhanController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\NoteController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -204,17 +205,22 @@ Route::post('/tn/create',[TinNhanController::class,'create']);
 Route::post('/tn/member',[TinNhanController::class,'addMember']);
 Route::post('/tn/test',[TinNhanController::class,'addGroup']);
 
+//Note route
+Route::get('/note/show/{uerName}',[NoteController::class,'show']);
+Route::post('/note/create/',[NoteController::class,'create']);
+Route::put('/note/update/',[NoteController::class,'update']);
+Route::delete('/note/delete/{id}',[NoteController::class,'delete']);
 
 //Group route
-Route::get('/gr/index/{NguoiNhan}',[GroupController::class,'index']);
-Route::get('/gr/name/{id}',[GroupController::class,'getName']);
-Route::get('/gr/group/{id}',[GroupController::class,'getTN']);
-Route::get('/gr/all/{id}',[GroupController::class,'getAllTN']);
-Route::get('/gr/count/{id}',[GroupController::class,'countNotSeen']);
-Route::put('/gr',[GroupController::class,'setSeen']);
-Route::get('/gr/{id}',[GroupController::class,'getGroup']);
-Route::get('/gr',[GroupController::class,'getAllGroup']);
-Route::post('/gr/add',[GroupController::class,'store']);
-Route::post('/gr/create',[GroupController::class,'create']);
-Route::post('/gr/member',[GroupController::class,'addMember']);
-Route::post('/gr/test',[GroupController::class,'addGroup']);
+// Route::get('/gr/index/{NguoiNhan}',[GroupController::class,'index']);
+// Route::get('/gr/name/{id}',[GroupController::class,'getName']);
+// Route::get('/gr/group/{id}',[GroupController::class,'getTN']);
+// Route::get('/gr/all/{id}',[GroupController::class,'getAllTN']);
+// Route::get('/gr/count/{id}',[GroupController::class,'countNotSeen']);
+// Route::put('/gr',[GroupController::class,'setSeen']);
+// Route::get('/gr/{id}',[GroupController::class,'getGroup']);
+// Route::get('/gr',[GroupController::class,'getAllGroup']);
+// Route::post('/gr/add',[GroupController::class,'store']);
+// Route::post('/gr/create',[GroupController::class,'create']);
+// Route::post('/gr/member',[GroupController::class,'addMember']);
+// Route::post('/gr/test',[GroupController::class,'addGroup']);

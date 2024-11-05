@@ -7,6 +7,7 @@ import Menu from "../components/Menu";
 import AlterConfirm from "../components/Confirm";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
+import Header from "../components/Header";
 export default function TKB() {
     const [classes, setClasses] = useState([]);
     const [subjectTN, setSubjectTN] = useState([]);
@@ -252,7 +253,9 @@ export default function TKB() {
         }
     }
     return (
-        <div className="main-content">
+        <div>
+            <Header/>
+            <div className="main-content">
             <Menu />
             <div className="right-part relative">
                 {showConfirm &&
@@ -290,7 +293,7 @@ export default function TKB() {
                                         <button className="border-2 rounded-lg px-2 py-1 text-sm border-blue-500 hover:text-blue-500 hover:bg-white hover:shadow-md" onClick={() => activeChangeTKB(data.MaLop)}>Sửa</button>
                                     }
                                 </div>
-                                <table className={changeTKB === data.MaLop ? "border-2 border-red-400 border-collapse text-center w-full table-fixed bg-white" : "border-2 border-black border-collapse text-center w-full table-fixed"}>
+                                <table className={changeTKB === data.MaLop ? "border-2 border-red-400 border-collapse text-center w-full table-fixed bg-white" : "border-2 border-black border-collapse text-center w-full table-fixed bg-slate-50"}>
                                     <thead>
                                         <tr>
                                             <th className="td"></th>
@@ -435,6 +438,7 @@ export default function TKB() {
                     </div>
                 }
             </div>
+        </div>
         </div>
     )
 }

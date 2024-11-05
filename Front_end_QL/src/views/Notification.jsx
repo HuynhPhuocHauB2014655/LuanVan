@@ -7,7 +7,7 @@ import { faPlus, faPlusCircle, faPlusSquare } from "@fortawesome/free-solid-svg-
 import NoitifyForm from "../components/NoitifyForm";
 import { useStateContext } from "../context/Context";
 import moment from 'moment-timezone';
-
+import Header from "../components/Header";
 export default function Notification() {
     const { userName } = useUserContext();
     const {setMessage, setError} = useStateContext();

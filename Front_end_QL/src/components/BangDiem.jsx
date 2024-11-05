@@ -97,43 +97,43 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
             <table className="w-full text-center table-auto border border-black border-collapse">
                 <thead>
                     <tr>
-                        <th className="border border-black"></th>
-                        <th className="border border-black"></th>
-                        <th className="border border-black"></th>
-                        <th className="border border-black" colSpan={7}>Học kì I</th>
-                        <th className="border border-black" colSpan={7}>Học kì II</th>
-                        <th className="border border-black" colSpan={2}>Cả năm</th>
+                        <th className="border border-black p-2"></th>
+                        <th className="border border-black p-2"></th>
+                        <th className="border border-black p-2"></th>
+                        <th className="border border-black p-2" colSpan={7}>Học kì I</th>
+                        <th className="border border-black p-2" colSpan={7}>Học kì II</th>
+                        <th className="border border-black p-2" colSpan={2}>Cả năm</th>
                     </tr>
                     <tr>
-                        <th className="border border-black">STT</th>
-                        <th className="border border-black">Mã số học sinh</th>
-                        <th className="border border-black">Tên học sinh</th>
+                        <th className="border border-black p-2">STT</th>
+                        <th className="border border-black p-2">Mã số học sinh</th>
+                        <th className="border border-black p-2">Tên học sinh</th>
                         {loaiDiem.map((data) => (
                             data.MaLoai != "rlh" &&
                             (data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black" colSpan={4}>
+                                <th key={data.MaLoai} className="border border-black p-2" colSpan={4}>
                                     {data.TenLoai}
                                 </th>
                                 :
-                                <th key={data.MaLoai} className="border border-black">
+                                <th key={data.MaLoai} className="border border-black p-2">
                                     {data.TenLoai}
                                 </th>)
                         ))}
-                        <th className="border border-black">Trung bình học kì 1</th>
+                        <th className="border border-black p-2">Trung bình học kì 1</th>
                         {loaiDiem.map((data) => (
                             data.MaLoai != "rlh" &&
                             (data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black" colSpan={4}>
+                                <th key={data.MaLoai} className="border border-black p-2" colSpan={4}>
                                     {data.TenLoai}
                                 </th>
                                 :
-                                <th key={data.MaLoai} className="border border-black">
+                                <th key={data.MaLoai} className="border border-black p-2">
                                     {data.TenLoai}
                                 </th>)
                         ))}
-                        <th className="border border-black">Trung bình học kì 2</th>
-                        <th className="border border-black">Rèn luyện hè</th>
-                        <th className="border border-black">Trung bình cả năm</th>
+                        <th className="border border-black p-2">Trung bình học kì 2</th>
+                        <th className="border border-black p-2">Rèn luyện hè</th>
+                        <th className="border border-black p-2">Trung bình cả năm</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -150,26 +150,26 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
                         const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
                         return (
                             <tr key={student.MSHS}>
-                                <td className="border border-black">{index + 1}</td>
+                                <td className="border border-black p-2">{index + 1}</td>
 
-                                <td className="border border-black">{student.MSHS}</td>
+                                <td className="border border-black p-2">{student.MSHS}</td>
 
-                                <td className="border border-black text-start">{student.HoTen}</td>
+                                <td className="border border-black p-2 text-start">{student.HoTen}</td>
 
                                 {generateTXCells(txGrades1, emptyTXCellsCount1, student)}
 
                                 {generateOtherCells(otherGrades1, student,)}
 
-                                <td className="border border-black">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
+                                <td className="border border-black p-2">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
 
                                 {generateTXCells(txGrades2, emptyTXCellsCount2, student)}
 
                                 {generateOtherCells(otherGrades2, student)}
 
                                 
-                                <td className="border border-black">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-                                <td className="border border-black">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
-                                <td className="border border-black">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
+                                <td className="border border-black p-2">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
+                                <td className="border border-black p-2">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                <td className="border border-black p-2">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>
                         );
                     })}

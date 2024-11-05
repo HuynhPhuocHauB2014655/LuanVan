@@ -318,7 +318,7 @@ export default function Message() {
                                                 </div>
                                             </div>
                                         }
-                                        <div ref={messageEndRef} />
+                                        <div ref={messageEndRef} /> 
                                         {showButton &&
                                             <button
                                                 className="sticky h-6 bottom-0 left-full hover:text-blue-400"
