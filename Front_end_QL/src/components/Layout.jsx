@@ -55,7 +55,7 @@ export default function Layout() {
         <div className="relative">
             {message && <div className="fixed bg-blue-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{message}</div>}
             {error && <div className="fixed bg-red-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{error}</div>}
-            <div className=" bg-[#eceff8]">
+            <div className="bg-[#eceff8]">
                 <Outlet />
             </div>
             <footer className="footer rounded bg-white border-t-2 flex px-4 items-center">

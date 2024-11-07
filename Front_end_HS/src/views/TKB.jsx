@@ -4,6 +4,7 @@ import { useStateContext } from "../context/Context";
 import { useUserContext } from "../context/userContext";
 import axiosClient from "../axios-client";
 import moment from 'moment';
+import Header from "../components/Header";
 export default function TKB() {
     const { nienKhoa } = useStateContext();
     const { userName } = useUserContext();
@@ -158,102 +159,83 @@ export default function TKB() {
     };
     console.log()
     return (
-        <div className="main-content">
-            <Menu />
-            <div className="right-part">
-                <div className="w-[80%] mx-auto">
-                    <div className="flex items-center space-x-2 mb-1">
-                        <div className="text-lg">Tuần: </div>
-                        <div className="relative">
-                            <button
-                                onClick={toggleDropdown}
-                                className="block w-full px-5 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
-                            >
-                                {week}
-                            </button>
-                            {isOpen && (
-                                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                                    {[...Array(thisWeek() + 1)].map((_, i) => (
-                                        <li
-                                            key={i} id={i + 1}
-                                            className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${week == i + 1 && "bg-slate-300"}`}
-                                            onClick={() => handleOptionClick(2, i + 1)}
-                                        >
-                                            {i + 1}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
-                    {onMd ?
-                        <div className="space-y-2">
-                            {[...Array(6)].map((_, i) => (
-                                matrix &&
-                                <table key={i} className="border-2 border-collapse border-black w-full table-auto">
-                                    <thead>
-                                        <tr>
-                                            <th className="border-2 border-black p-2" colSpan={2}>Thứ {i + 2}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {[...Array(8)].map((_, j) => (
-                                            <tr key={j}>
-                                                <td className="border-2 border-black p-2">Tiết: {j+1}</td>
-                                                {matrix && matrix[i][j] ?
-                                                    <td className="border-2 border-black p-2" key={j + 1}>
-                                                        {matrix[i][j].TenMon} <br /> {matrix[i][j].TenGV}
-                                                    </td>
-                                                    :
-                                                    <td className="border-2 border-black p-2 invisible" key={j + 1}>
-                                                        N/A <br /> N/A
-                                                    </td>}
-                                            </tr>
+        <div>
+            <Header />
+            <div className="main-content">
+                <Menu />
+                <div className="right-part">
+                    <h1 className="page-name">Thời khóa biểu</h1>
+                    <div className="md:w-[80%] mt-3 mx-auto">
+                        <div className="flex justify-center items-center space-x-2 mb-1">
+                            <div className="text-lg">Tuần: </div>
+                            <div className="relative">
+                                <button
+                                    onClick={toggleDropdown}
+                                    className="block w-full px-5 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                                >
+                                    {week}
+                                </button>
+                                {isOpen && (
+                                    <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                        {[...Array(thisWeek() + 1)].map((_, i) => (
+                                            <li
+                                                key={i} id={i + 1}
+                                                className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${week == i + 1 && "bg-slate-300"}`}
+                                                onClick={() => handleOptionClick(2, i + 1)}
+                                            >
+                                                {i + 1}
+                                            </li>
                                         ))}
-                                    </tbody>
-                                </table>
-                            ))}
+                                    </ul>
+                                )}
+                            </div>
                         </div>
-                        :
-                        <table className="border-2 table-auto border-black border-collapse text-center w-full ">
-                            <thead>
-                                <tr>
-                                    <th className="td"></th>
-                                    {date.map((date) => (
-                                        <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {[...Array(4)].map((_, i) => (
-                                    <tr key={i + 1}>
-                                        <td className="td px-3">{i + 1}</td>
-                                        {[...Array(6)].map((_, j) => (
-                                            matrix && matrix[j][i] ?
-                                                <td className="td" key={j + 1}>
-                                                    {matrix[j][i].TenMon} <br /> {matrix[j][i].TenGV}
-                                                </td>
-                                                :
-                                                <td className="td invisible" key={j + 1}>
-                                                    N/A <br /> N/A
-                                                </td>
+                        {onMd ?
+                            <div className="space-y-2">
+                                {[...Array(6)].map((_, i) => (
+                                    matrix &&
+                                    <table key={i} className="border-2 border-collapse border-black w-full table-auto">
+                                        <thead>
+                                            <tr>
+                                                <th className="border-2 border-black p-2" colSpan={2}>Thứ {i + 2}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[...Array(8)].map((_, j) => (
+                                                <tr key={j}>
+                                                    <td className="border-2 border-black p-2">Tiết: {j + 1}</td>
+                                                    {matrix && matrix[i][j] ?
+                                                        <td className="border-2 border-black p-2" key={j + 1}>
+                                                            {matrix[i][j].TenMon} <br /> {matrix[i][j].TenGV}
+                                                        </td>
+                                                        :
+                                                        <td className="border-2 border-black p-2 invisible" key={j + 1}>
+                                                            N/A <br /> N/A
+                                                        </td>}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ))}
+                            </div>
+                            :
+                            <table className="border-2 table-auto border-black border-collapse text-center w-full ">
+                                <thead>
+                                    <tr>
+                                        <th className="td"></th>
+                                        {date.map((date) => (
+                                            <th className="td" key={date.MaNgay}>{date.TenNgay}</th>
                                         ))}
                                     </tr>
-                                ))}
-                                <tr className="">
-                                    <td colSpan="6" className="h-10"></td>
-                                </tr>
-                                {[...Array(4)].map((_, i) => {
-                                    const startIndex = 4; // Start value for i
-                                    const currentIndex = i + startIndex;
-
-                                    return (
-                                        <tr key={currentIndex}>
-                                            <td className="td">{currentIndex + 1}</td>
+                                </thead>
+                                <tbody>
+                                    {[...Array(4)].map((_, i) => (
+                                        <tr key={i + 1}>
+                                            <td className="td px-3">{i + 1}</td>
                                             {[...Array(6)].map((_, j) => (
-                                                matrix && matrix[j][currentIndex] ?
+                                                matrix && matrix[j][i] ?
                                                     <td className="td" key={j + 1}>
-                                                        {matrix[j][currentIndex].TenMon} <br /> {matrix[j][currentIndex].TenGV}
+                                                        {matrix[j][i].TenMon} <br /> {matrix[j][i].TenGV}
                                                     </td>
                                                     :
                                                     <td className="td invisible" key={j + 1}>
@@ -261,11 +243,34 @@ export default function TKB() {
                                                     </td>
                                             ))}
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    }
+                                    ))}
+                                    <tr className="">
+                                        <td colSpan="6" className="h-10"></td>
+                                    </tr>
+                                    {[...Array(4)].map((_, i) => {
+                                        const startIndex = 4; // Start value for i
+                                        const currentIndex = i + startIndex;
+
+                                        return (
+                                            <tr key={currentIndex}>
+                                                <td className="td">{currentIndex + 1}</td>
+                                                {[...Array(6)].map((_, j) => (
+                                                    matrix && matrix[j][currentIndex] ?
+                                                        <td className="td" key={j + 1}>
+                                                            {matrix[j][currentIndex].TenMon} <br /> {matrix[j][currentIndex].TenGV}
+                                                        </td>
+                                                        :
+                                                        <td className="td invisible" key={j + 1}>
+                                                            N/A <br /> N/A
+                                                        </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
