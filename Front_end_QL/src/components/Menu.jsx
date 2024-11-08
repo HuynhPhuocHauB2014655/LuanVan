@@ -45,7 +45,7 @@ export default function Menu({ update }) {
         }
         if (userName == "daotao") {
             const menu_items = [
-                { id: 1, route: "/", label: 'Trang chủ', icon:<FontAwesomeIcon icon="fa-solid fa-house" className="text-xl"/> },
+                { id: 1, route: "/", label: 'Trang chủ', icon:<FontAwesomeIcon icon="fa-solid fa-house"/> },
                 { id: 2, route: "/subject", label: 'Môn học',icon: <FontAwesomeIcon icon="fa-solid fa-book" className="text-xl" /> },
                 { id: 3, route: "/rs", label: 'Kết quả học tập',icon: <FontAwesomeIcon icon="fa-solid fa-book-open-reader" className="text-xl" /> },
                 { id: 5, route: "/class", label: 'Lớp Học', icon: <FontAwesomeIcon icon="fa-solid fa-book-open" className="text-xl" /> },
@@ -93,7 +93,7 @@ export default function Menu({ update }) {
                         className={classNames('menu-item', { 'bg-slate-100 border-b-2 border-cyan-200': active === item.id })}
                     >
                         <Link
-                            className="py-2 ps-2 block border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100 relative flex space-x-3"
+                            className="py-2 ps-2 border-2 border-transparent hover:border-b-cyan-200 hover:bg-slate-100 relative flex space-x-3"
                             to={item.route} onClick={() => activeItem(item.id)}
                         >
                             <p>{item.icon}</p>

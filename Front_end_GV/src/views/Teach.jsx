@@ -10,6 +10,7 @@ import moment from 'moment';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import AlterConfirm from "../components/Confirm";
+import Header from "../components/Header";
 export default function Teaching() {
     const { userName } = useUserContext();
     const { nienKhoa, setMessage } = useStateContext();
@@ -83,7 +84,7 @@ export default function Teaching() {
                 console.log(error);
             }
             setView(view);
-        } else if(view == 3 && data){
+        } else if (view == 3 && data) {
             setOnView(`id${data.id}`);
             setState(data);
             console.log(data);
@@ -201,164 +202,167 @@ export default function Teaching() {
     };
     console.log();
     return (
-        <div className="main-content">
-            <Menu />
-            <div className="right-part relative">
-                {showConfirm == 1 &&
-                    <AlterConfirm message={"Bạn có chắc với hành động này không"} onCancel={onCancel} onConfirm={onConfirm} />
-                }
-                <div className="page-name">Quản lí dạy học</div>
-                <div className="flex w-full">
-                    <button
-                        className={`w-1/2 text-xl border-y-2 border-s-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 1 ? 'bg-slate-200' : 'bg-slate-300'}`}
-                        onClick={() => changePage(1)}
-                    >
-                        Hôm nay
-                    </button>
-                    <button
-                        className={`w-1/2 text-xl border-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 2 ? 'bg-slate-200' : 'bg-slate-300'}`}
-                        onClick={() => changePage(2)}
-                    >
-                        Theo Tuần
-                    </button>
-                </div>
-                {data.length == 0 && dayBu.length == 0 ?
-                    <div className="mt-10 text-center text-2xl text-green-500">Bạn không có tiết dạy nào hôm nay</div>
-                    :
-                    <div>
-                        <div className="text-2xl text-center text-blue-400 font-bold mt-5">Danh sách các tiết dạy {page == 1 ? "hôm nay" : "Trong tuần"}</div>
-                        <div className="text-center text-green-400 font-bold mb-5">
-                            {page == 1 ? getToDay() : `Từ: ${getDate(getThisWeek().start)} Đến: ${getDate(getThisWeek().end)}`}
-                        </div>
-                        {page == 2 &&
-                            <div className="flex items-center space-x-2 text-lg w-[80%] mx-auto mb-1">
-                                <div className="flex items-center space-x-2">
-                                    <div>Tuần: </div>
-                                    <div className="relative">
-                                        <button
-                                            onClick={toggleDropdown}
-                                            className="block w-full px-10 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
-                                        >
-                                            {week || thisWeek()}
-                                        </button>
-                                        {isOpen && (
-                                            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                                                {[...Array(thisWeek())].map((_, i) => (
-                                                    <li
-                                                        key={i}
-                                                        className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                                                        onClick={() => handleOptionClick(i + 1)}
-                                                    >
-                                                        {i + 1}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        <table className="table-fixed w-[80%] mx-auto border-2 border-blue-400 bg-white border-collapse shadow-lg">
-                            <thead>
-                                <tr>
-                                    {page == 2 && <th className="border border-gray-400 p-2">Thứ</th>}
-                                    <th className="border border-gray-400 p-2">Tiết</th>
-                                    <th className="border border-gray-400 p-2">Môn học</th>
-                                    <th className="border border-gray-400 p-2">Lớp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((d) => (
-                                    <tr key={d.id} className={`cursor-pointer hover:bg-gray-200 ${onView == d.id && "bg-gray-200"}`} onClick={() => changeView(2, d)}>
-                                        {page == 2 && <td className="border border-gray-400 p-2">{d.MaNgay}</td>}
-                                        <td className="border border-gray-400 p-2">{d.TietDay}</td>
-                                        <td className="border border-gray-400 p-2">{d.mon_hoc.TenMH}</td>
-                                        <td className="border border-gray-400 p-2">{d.lop.TenLop}</td>
-                                    </tr>
-                                ))}
-                                <tr>
-                                    <td className="text-xl text-center py-2 font-bold" colSpan={page == 2 ? 4 : 3}>Dạy bù</td>
-                                </tr>
-                                {dayBu.length == 0 ?
-                                    <tr>
-                                        <td className="text-center" colSpan={page == 2 ? 4 : 3}>Không có dữ liệu</td>
-                                    </tr>
-                                    :
-                                    dayBu.map((d) => (
-                                        <tr key={d.id} className={`cursor-pointer hover:bg-gray-200 ${onView == `id${d.id}` && "bg-gray-200"}`} onClick={() => changeView(3, d)}>
-                                            {page == 2 && <td className="border border-gray-400 p-2">{d.MaNgay}</td>}
-                                            <td className="border border-gray-400 p-2">{d.TietDay}</td>
-                                            <td className="border border-gray-400 p-2">{d.mon_hoc.TenMH}</td>
-                                            <td className="border border-gray-400 p-2">{d.lop.TenLop}</td>
-                                        </tr>
-                                    ))
-                                }
-                            </tbody>
-                        </table>
-                    </div>}
-                {view === 2 &&
-                    (Object.keys(state).length > 0 ?
-                        <div className="bg-white border-2 border-blue-500 mt-5 w-full relative">
-                            <button className="absolute right-1 top-0 hover:text-red-400" onClick={() => setView(1)}><FontAwesomeIcon icon={faMinus} /> </button>
-                            <div className="my-2 text-center text-xl text-blue-400 font-bold">
-                                Chi tiết Tiết dạy
-                            </div>
-                            <form className="w-full p-3" onSubmit={saveChange}>
-                                <div className="my-3 text-lg flex justify-between border-b-2 pb-3 items-center border-cyan-500">
-                                    <div>
-                                        Tiết: {state.TietDay} Thứ: {state.MaNgay}, Ngày: {getDate(state.Ngay)}
-                                    </div>
-                                    <button type="button" onClick={triggerConfirm} className="button border-cyan-400 hover:text-white hover:bg-cyan-300">Lưu</button>
-                                </div>
-                                <div className="w-full columns-2">
-                                    <div>
-                                        <label className="block">Nội dung dạy:</label>
-                                        <textarea name="NoiDung" defaultValue={state.NoiDung || ""} className="resize-none outline-none border-2 rounded-md border-gray-400 p-2 h-28 w-full focus:border-cyan-300" placeholder="Nội dung tiết học" />
-                                    </div>
-                                    <div>
-                                        <label className="block">Đánh giá lớp học:</label>
-                                        <textarea name="DanhGia" defaultValue={state.DanhGia || ""} className="resize-none outline-none border-2 rounded-md border-gray-400 p-2 h-28 w-full focus:border-cyan-300" placeholder="Nội dung đánh giá cho lớp học" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-lg font-bold text-center my-2">Điểm danh</div>
-                                    <table className="border-2 border-cyan-300 border-collapse w-full shadow-lg shadow-cyan-200">
-                                        <thead>
-                                            <tr>
-                                                <th rowSpan={2} className="border border-slate-400 p-2">STT</th>
-                                                <th rowSpan={2} className="border border-slate-400 p-2">Họ tên học sinh</th>
-                                                <th colSpan={3} className="border border-slate-400 p-2">Trạng thái</th>
-                                            </tr>
-                                            <tr>
-                                                <th className="border border-slate-400 p-2">Có mặt</th>
-                                                <th className="border border-slate-400 p-2">Vắng CP</th>
-                                                <th className="border border-slate-400 p-2">Vắng KP</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {state.diem_danh.map((hs, index) => (
-                                                <tr key={hs.id} className="border border-slate-400 p-2">
-                                                    <td className="border border-slate-400 p-2">{index + 1}</td>
-                                                    <td className="border border-slate-400 p-2">{hs.hoc_sinh.HoTen}</td>
-                                                    <td className="border border-slate-400 p-2">
-                                                        <input type="radio" name={hs.MSHS} id="" value={1} defaultChecked={hs.TrangThai === 1} />
-                                                    </td>
-                                                    <td className="border border-slate-400 p-2">
-                                                        <input type="radio" name={hs.MSHS} id="" value={2} defaultChecked={hs.TrangThai === 2} />
-                                                    </td>
-                                                    <td className="border border-slate-400 p-2">
-                                                        <input type="radio" name={hs.MSHS} id="" value={3} defaultChecked={hs.TrangThai === 3} />
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </form>
-                        </div>
+        <div>
+            <Header />
+            <div className="main-content">
+                <Menu />
+                <div className="right-part relative">
+                    {showConfirm == 1 &&
+                        <AlterConfirm message={"Bạn có chắc với hành động này không"} onCancel={onCancel} onConfirm={onConfirm} />
+                    }
+                    <div className="page-name">Quản lí dạy học</div>
+                    <div className="flex w-full">
+                        <button
+                            className={`w-1/2 text-xl border-y-2 border-s-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 1 ? 'bg-slate-200' : 'bg-slate-300'}`}
+                            onClick={() => changePage(1)}
+                        >
+                            Hôm nay
+                        </button>
+                        <button
+                            className={`w-1/2 text-xl border-2 mt-1 border-cyan-500 py-2 hover:bg-slate-200 ${page == 2 ? 'bg-slate-200' : 'bg-slate-300'}`}
+                            onClick={() => changePage(2)}
+                        >
+                            Theo Tuần
+                        </button>
+                    </div>
+                    {data.length == 0 && dayBu.length == 0 ?
+                        <div className="mt-10 text-center text-2xl text-green-500">Bạn không có tiết dạy nào hôm nay</div>
                         :
-                        <div className="text-center text-2xl mt-20 text-red-500 ">Không có dữ liệu</div>)
-                }
+                        <div>
+                            <div className="text-2xl text-center text-blue-400 font-bold mt-5">Danh sách các tiết dạy {page == 1 ? "hôm nay" : "Trong tuần"}</div>
+                            <div className="text-center text-green-400 font-bold mb-5">
+                                {page == 1 ? getToDay() : `Từ: ${getDate(getThisWeek().start)} Đến: ${getDate(getThisWeek().end)}`}
+                            </div>
+                            {page == 2 &&
+                                <div className="flex items-center space-x-2 text-lg w-[80%] mx-auto mb-1">
+                                    <div className="flex items-center space-x-2">
+                                        <div>Tuần: </div>
+                                        <div className="relative">
+                                            <button
+                                                onClick={toggleDropdown}
+                                                className="block w-full px-10 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                                            >
+                                                {week || thisWeek()}
+                                            </button>
+                                            {isOpen && (
+                                                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                                    {[...Array(thisWeek())].map((_, i) => (
+                                                        <li
+                                                            key={i}
+                                                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                                            onClick={() => handleOptionClick(i + 1)}
+                                                        >
+                                                            {i + 1}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <table className="table-fixed w-[80%] mx-auto shadow-lg">
+                                <thead>
+                                    <tr className="bg-slate-400">
+                                        {page == 2 && <th className="px-2 py-3">Thứ</th>}
+                                        <th className="px-2 py-3">Tiết</th>
+                                        <th className="px-2 py-3">Môn học</th>
+                                        <th className="px-2 py-3">Lớp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data.map((d,index) => (
+                                        <tr key={d.id} className={`cursor-pointer hover:bg-cyan-300 ${onView == d.id && "bg-cyan-200 border-2 border-cyan-300"} ${index % 2 == 0 && "bg-slate-300"}`} onClick={() => changeView(2, d)}>
+                                            {page == 2 && <td className="px-2 py-3">{d.MaNgay}</td>}
+                                            <td className="px-2 py-3">{d.TietDay}</td>
+                                            <td className="px-2 py-3">{d.mon_hoc.TenMH}</td>
+                                            <td className="px-2 py-3">{d.lop.TenLop}</td>
+                                        </tr>
+                                    ))}
+                                    <tr>
+                                        <td className="text-xl text-center py-2 font-bold" colSpan={page == 2 ? 4 : 3}>Dạy bù</td>
+                                    </tr>
+                                    {dayBu.length == 0 ?
+                                        <tr>
+                                            <td className="text-center" colSpan={page == 2 ? 4 : 3}>Không có dữ liệu</td>
+                                        </tr>
+                                        :
+                                        dayBu.map((d,index) => (
+                                            <tr key={d.id} className={`cursor-pointer hover:bg-cyan-300 ${onView == d.id && "bg-cyan-200 border-2 border-cyan-300"} ${index % 2 == 0 && "bg-slate-300"}`} onClick={() => changeView(3, d)}>
+                                                {page == 2 && <td className="px-2 py-3">{d.MaNgay}</td>}
+                                                <td className="px-2 py-3">{d.TietDay}</td>
+                                                <td className="px-2 py-3">{d.mon_hoc.TenMH}</td>
+                                                <td className="px-2 py-3">{d.lop.TenLop}</td>
+                                            </tr>
+                                        ))
+                                    }
+                                </tbody>
+                            </table>
+                        </div>}
+                    {view === 2 &&
+                        (Object.keys(state).length > 0 ?
+                            <div className="bg-white border-2 border-blue-500 mt-5 w-full relative">
+                                <button className="absolute right-1 top-0 hover:text-red-400" onClick={() => setView(1)}><FontAwesomeIcon icon={faMinus} /> </button>
+                                <div className="my-2 text-center text-xl text-blue-400 font-bold">
+                                    Chi tiết Tiết dạy
+                                </div>
+                                <form className="w-full p-3" onSubmit={saveChange}>
+                                    <div className="my-3 text-lg flex justify-between border-b-2 pb-3 items-center border-cyan-500">
+                                        <div>
+                                            Tiết: {state.TietDay} Thứ: {state.MaNgay}, Ngày: {getDate(state.Ngay)}
+                                        </div>
+                                        <button type="button" onClick={triggerConfirm} className="button border-cyan-400 hover:text-white hover:bg-cyan-300">Lưu</button>
+                                    </div>
+                                    <div className="w-full columns-2">
+                                        <div>
+                                            <label className="block">Nội dung dạy:</label>
+                                            <textarea name="NoiDung" defaultValue={state.NoiDung || ""} className="resize-none outline-none border-2 rounded-md border-gray-400 p-2 h-28 w-full focus:border-cyan-300" placeholder="Nội dung tiết học" />
+                                        </div>
+                                        <div>
+                                            <label className="block">Đánh giá lớp học:</label>
+                                            <textarea name="DanhGia" defaultValue={state.DanhGia || ""} className="resize-none outline-none border-2 rounded-md border-gray-400 p-2 h-28 w-full focus:border-cyan-300" placeholder="Nội dung đánh giá cho lớp học" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-lg font-bold text-center my-2">Điểm danh</div>
+                                        <table className="border-2 border-cyan-300 border-collapse w-full shadow-lg shadow-cyan-200">
+                                            <thead>
+                                                <tr>
+                                                    <th rowSpan={2} className="border border-slate-400 p-2">STT</th>
+                                                    <th rowSpan={2} className="border border-slate-400 p-2">Họ tên học sinh</th>
+                                                    <th colSpan={3} className="border border-slate-400 p-2">Trạng thái</th>
+                                                </tr>
+                                                <tr>
+                                                    <th className="border border-slate-400 p-2">Có mặt</th>
+                                                    <th className="border border-slate-400 p-2">Vắng CP</th>
+                                                    <th className="border border-slate-400 p-2">Vắng KP</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {state.diem_danh.map((hs, index) => (
+                                                    <tr key={hs.id} className="border border-slate-400 p-2">
+                                                        <td className="border border-slate-400 p-2">{index + 1}</td>
+                                                        <td className="border border-slate-400 p-2">{hs.hoc_sinh.HoTen}</td>
+                                                        <td className="border border-slate-400 p-2">
+                                                            <input type="radio" name={hs.MSHS} id="" value={1} defaultChecked={hs.TrangThai === 1} />
+                                                        </td>
+                                                        <td className="border border-slate-400 p-2">
+                                                            <input type="radio" name={hs.MSHS} id="" value={2} defaultChecked={hs.TrangThai === 2} />
+                                                        </td>
+                                                        <td className="border border-slate-400 p-2">
+                                                            <input type="radio" name={hs.MSHS} id="" value={3} defaultChecked={hs.TrangThai === 3} />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+                            </div>
+                            :
+                            <div className="text-center text-2xl mt-20 text-red-500 ">Không có dữ liệu</div>)
+                    }
+                </div>
             </div>
         </div>
     )

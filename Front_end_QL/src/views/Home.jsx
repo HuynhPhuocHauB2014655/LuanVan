@@ -11,24 +11,8 @@ import Calendar from "../components/Calender";
 export default function Home() {
     const { userName } = useUserContext();
     const [menu, setMenu] = useState([]);
-    const [date, setDate] = useState(new Date());
 
-    const handleDateChange = (newDate) => {
-        setDate(newDate);
-    };
     library.add(fas);
-    useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
-
-        channel.bind('App\\Events\\sendMessage', (data) => {
-            fetchTN();
-        });
-
-        return () => {
-            channel.unbind_all();
-            channel.unsubscribe();
-        };
-    }, [userName]);
     useEffect(() => {
         let menu_items = [];
         if (userName === "admin") {

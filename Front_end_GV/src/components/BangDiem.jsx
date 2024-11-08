@@ -105,46 +105,30 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
     }
     return (
         <div>
-            <table className="w-full text-center table-auto border border-black border-collapse">
+            <table className="w-full text-center table-auto border-collapse">
                 <thead>
-                    <tr>
-                        <th className="border border-black"></th>
-                        <th className="border border-black"></th>
-                        <th className="border border-black"></th>
-                        <th className="border border-black" colSpan={7}>Học kì I</th>
-                        <th className="border border-black" colSpan={7}>Học kì II</th>
-                        <th className="border border-black" colSpan={2}>Cả năm</th>
+                    <tr className='bg-slate-200'>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black" colSpan={7}>Học kì I</th>
+                        <th className="py-3 px-2 border border-black" colSpan={7}>Học kì II</th>
+                        <th className="py-3 px-2 border border-black" colSpan={2}>Cả năm</th>
                     </tr>
-                    <tr>
-                        <th className="border border-black">STT</th>
-                        <th className="border border-black">Mã số học sinh</th>
-                        <th className="border border-black">Tên học sinh</th>
-                        {loaiDiem.map((data) => (
-                            data.MaLoai != "rlh" &&
-                                (data.MaLoai === 'tx' ?
-                                    <th key={data.MaLoai} className="border border-black" colSpan={4}>
-                                        {data.TenLoai}
-                                    </th>
-                                    :
-                                    <th key={data.MaLoai} className="border border-black">
-                                        {data.TenLoai}
-                                    </th>)
-                        ))}
-                        <th className="border border-black">Trung bình học kì 1</th>
-                        {loaiDiem.map((data) => (
-                            data.MaLoai != "rlh" &&
-                                (data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black" colSpan={4}>
-                                    {data.TenLoai}
-                                </th>
-                                :
-                                <th key={data.MaLoai} className="border border-black">
-                                    {data.TenLoai}
-                                </th>)
-                        ))}
-                        <th className="border border-black">Trung bình học kì 2</th>
-                        <th className="border border-black">Rèn luyện hè</th>
-                        <th className="border border-black">Trung bình cả năm</th>
+                    <tr className='bg-slate-200'>
+                        <th className="py-3 px-2 border border-black">STT</th>
+                        <th className="py-3 px-2 border border-black text-start">Mã số học sinh</th>
+                        <th className="py-3 px-2 border border-black text-start">Tên học sinh</th>
+                        <th className="py-3 px-2 border border-black" colSpan={4}>Thường xuyên</th>
+                        <th className="py-3 px-2 border border-black">Giữa kì</th>
+                        <th className="py-3 px-2 border border-black">Cuối kì</th>
+                        <th className="py-3 px-2 border border-black">TBHK1</th>
+                        <th className="py-3 px-2 border border-black" colSpan={4}>Thường xuyên</th>
+                        <th className="py-3 px-2 border border-black">Giữa kì</th>
+                        <th className="py-3 px-2 border border-black">Cuối kì</th>
+                        <th className="py-3 px-2 border border-black">TBHK2</th>
+                        <th className="py-3 px-2 border border-black">Rèn luyện hè</th>
+                        <th className="py-3 px-2 border border-black">TBCN</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -160,10 +144,10 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         const emptyTXCellsCount1 = 4 - (countTX1[student.MSHS] || 0);
                         const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
                         return (
-                            <tr key={student.MSHS}>
+                            <tr key={student.MSHS} className="bg-slate-50">
                                 <td className="bd-td-normal">{index + 1}</td>
 
-                                <td className="bd-td-normal">{student.MSHS}</td>
+                                <td className="bd-td-normal text-start">{student.MSHS}</td>
 
                                 <td className="bd-td-normal text-start">{student.HoTen}</td>
 
@@ -178,7 +162,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                 {generateOtherCells(otherGrades2, student)}
 
                                 <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-                                {show == 2 ? 
+                                {(show == 2 && RLH?.Diem) ? 
                                     <td onClick={() => showEdit(RLH)} className="bd-td-edit">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
                                     :
                                     <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>

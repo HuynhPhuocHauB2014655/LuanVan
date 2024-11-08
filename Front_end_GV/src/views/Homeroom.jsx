@@ -15,6 +15,7 @@ import NotifyForm from "../components/NoitifyForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import moment from 'moment';
+import Header from "../components/Header";
 
 export default function Homeroom() {
     const { userName } = useUserContext();
@@ -149,7 +150,7 @@ export default function Homeroom() {
                     checkBC = true;
                 }
             })
-            if(array.length > 0){
+            if (array.length > 0) {
                 checkBC = true;
             }
             setDisableBC(checkBC);
@@ -200,7 +201,7 @@ export default function Homeroom() {
             })
             setDXKhenThuong(array);
             const ds = await fetchKhenThuong();
-            if(ds.length> 0){
+            if (ds.length > 0) {
                 return [];
             }
             return array;
@@ -219,7 +220,7 @@ export default function Homeroom() {
         if (view >= 3 && diemTB.length == 0) {
             fetchDiemTB();
         }
-        if(view == 5) {
+        if (view == 5) {
             checkBCButton();
         }
         if (view == 6) {
@@ -478,195 +479,311 @@ export default function Homeroom() {
         }
     }
     return (
-        <div className="main-content">
-            <Menu />
-            <div className="right-part relative">
-                {showConfirm === 1 &&
-                    <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
-                }
-                {showForm == 3 &&
-                    <NotifyForm MaLop={classInfo.MaLop} handleSubmit={sendTB} close={() => setShowForm(0)} />
-                }
-                <div className="page-name relative">
-                    Quản lí lớp chủ nhiệm
-                    <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
-                </div>
-                <div>
-                    {Object.keys(datas).length > 0 ?
-                        <div className="mt-2">
-                            <div className="my-2 flex">
-                                <button className={`teacher-head ${state == 1 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(1)}>Danh sách lớp</button>
-                                <button className={`teacher-head ${state == 2 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(2)}>Xem điểm</button>
-                                <button className={`teacher-head ${state == 3 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(3)}>Quá trình học</button>
-                            </div>
-                            <div className="flex justify-between w-[90%] mx-auto">
-                                <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {classInfo.MaLop} - {classInfo.TenLop}</p>
-                                <p className="text-2xl font-bold">Sỉ số: {count.Siso}</p>
-                                <p className="text-2xl font-bold">Nam: {count.Nam}</p>
-                                <p className="text-2xl font-bold">Nữ: {count.Nu}</p>
-                            </div>
-                            {state == 1 &&
-                                <HocSinhTable datas={classInfo?.hoc_sinh} />
-                            }
-                            {state == 2 &&
-                                <div className="">
-                                    <div className="w-full mx-auto grid grid-rows-1 grid-flow-col mt-2">
-                                        <button
-                                            className={subState == 1 ? "sub-head-active rounded-s-md" : "sub-head rounded-s-md"}
-                                            onClick={() => handleSubState(1)}>Điểm chi tiết
-                                        </button>
-                                        <button
-                                            className={subState == 2 ? "sub-head-active" : "sub-head"}
-                                            onClick={() => handleSubState(2)}>Điểm trung bình môn
-                                        </button>
-                                        <button
-                                            className={subState == 3 ? "sub-head-active" : "sub-head"}
-                                            onClick={() => handleSubState(3)}>Điểm trung bình
-                                        </button>
-                                        <button
-                                            className={subState == 4 ? "sub-head-active" : "sub-head"}
-                                            onClick={() => handleSubState(4)}>Rèn luyện
-                                        </button>
-                                        <button
-                                            className={subState == 5 ? "sub-head-active" : "sub-head"}
-                                            onClick={() => handleSubState(5)}>Xét lên lớp
-                                        </button>
-                                        <button
-                                            className={subState == 6 ? "sub-head-active" : "sub-head"}
-                                            onClick={() => handleSubState(6)}>Rèn luyện hè
-                                        </button>
-                                        <button
-                                            className={subState == 7 ? "sub-head-active rounded-e-md" : "sub-head rounded-e-md"}
-                                            onClick={() => handleSubState(7)}>Khen thưởng
-                                        </button>
-                                    </div>
-                                    {subState == 1 &&
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm các môn học</h2>
-                                            {subjects.map((mh) => (
-                                                <div key={mh.MaMH} className="my-2">
-                                                    <h3 className="text-2xl font-bold">Tên môn: {mh.TenMH}</h3>
-                                                    <BangDiem
-                                                        hocSinh={classInfo?.hoc_sinh}
-                                                        loaiDiem={loaiDiemHK}
-                                                        diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
-                                                        diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}
-                                                        diemCN={diemCN.filter(item => item.MaMH === mh.MaMH)}
-                                                        show={0}
-                                                    />
-                                                </div>
-                                            ))}
+        <div>
+            <Header />
+            <div className="main-content">
+                <Menu />
+                <div className="right-part relative">
+                    {showConfirm === 1 &&
+                        <AlterConfirm message={'Bạn có chắc chắn với hành động này không?'} onConfirm={onConfirm} onCancel={onCancel} />
+                    }
+                    {showForm == 3 &&
+                        <NotifyForm MaLop={classInfo.MaLop} handleSubmit={sendTB} close={() => setShowForm(0)} />
+                    }
+                    <div className="page-name relative">
+                        Quản lí lớp chủ nhiệm
+                        <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
+                    </div>
+                    <div>
+                        {Object.keys(datas).length > 0 ?
+                            <div className="mt-2">
+                                <div className="my-2 flex">
+                                    <button className={`teacher-head ${state == 1 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(1)}>Danh sách lớp</button>
+                                    <button className={`teacher-head ${state == 2 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(2)}>Xem điểm</button>
+                                    <button className={`teacher-head ${state == 3 ? "bg-cyan-300" : "bg-slate-200"}`} onClick={() => handleState(3)}>Quá trình học</button>
+                                </div>
+                                <div className="flex justify-between w-[90%] mx-auto">
+                                    <p className="text-2xl font-bold">Lớp chủ nhiệm hiện tại: {classInfo.MaLop} - {classInfo.TenLop}</p>
+                                    <p className="text-2xl font-bold">Sỉ số: {count.Siso}</p>
+                                    <p className="text-2xl font-bold">Nam: {count.Nam}</p>
+                                    <p className="text-2xl font-bold">Nữ: {count.Nu}</p>
+                                </div>
+                                {state == 1 &&
+                                    <HocSinhTable datas={classInfo?.hoc_sinh} />
+                                }
+                                {state == 2 &&
+                                    <div className="">
+                                        <div className="w-full mx-auto grid grid-rows-1 grid-flow-col mt-2">
+                                            <button
+                                                className={subState == 1 ? "sub-head-active rounded-s-md" : "sub-head rounded-s-md"}
+                                                onClick={() => handleSubState(1)}>Điểm chi tiết
+                                            </button>
+                                            <button
+                                                className={subState == 2 ? "sub-head-active" : "sub-head"}
+                                                onClick={() => handleSubState(2)}>Điểm trung bình môn
+                                            </button>
+                                            <button
+                                                className={subState == 3 ? "sub-head-active" : "sub-head"}
+                                                onClick={() => handleSubState(3)}>Điểm trung bình
+                                            </button>
+                                            <button
+                                                className={subState == 4 ? "sub-head-active" : "sub-head"}
+                                                onClick={() => handleSubState(4)}>Rèn luyện
+                                            </button>
+                                            <button
+                                                className={subState == 5 ? "sub-head-active" : "sub-head"}
+                                                onClick={() => handleSubState(5)}>Xét lên lớp
+                                            </button>
+                                            <button
+                                                className={subState == 6 ? "sub-head-active" : "sub-head"}
+                                                onClick={() => handleSubState(6)}>Rèn luyện hè
+                                            </button>
+                                            <button
+                                                className={subState == 7 ? "sub-head-active rounded-e-md" : "sub-head rounded-e-md"}
+                                                onClick={() => handleSubState(7)}>Khen thưởng
+                                            </button>
                                         </div>
-                                    }
-                                    {subState == 2 &&
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình môn</h2>
-                                            <div className="space-y-3">
-                                                {subjects.map((item) => (
-                                                    <div className="text-center" key={item.MaMH}>
-                                                        <h3 className="text-2xl font-bold">Tên môn: {item.TenMH}</h3>
-                                                        <table className="border table-auto border-black border-collapse mx-auto">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th className="border border-black">Mã số học sinh</th>
-                                                                    <th className="border border-black">Tên học sinh</th>
-                                                                    <th className="border border-black">Điểm trung bình HK1</th>
-                                                                    <th className="border border-black">Điểm trung bình HK2</th>
-                                                                    <th className="border border-black">Điểm trung bình cả năm</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {classInfo?.hoc_sinh.map((hs) => {
-                                                                    const tbhk1 = diemHK1?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk1" && diem.MSHS === hs.MSHS);
-                                                                    const tbhk2 = diemHK2?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk2" && diem.MSHS === hs.MSHS);
-                                                                    const tbcn = diemCN?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbcn" && diem.MSHS === hs.MSHS);
-                                                                    let diemhk1, diemhk2, diemcn;
-                                                                    if (item.MaMH === "CB4" || item.MaMH === "CB5") {
-                                                                        diemhk1 = tbhk1?.Diem == 0 ? "Chưa đạt" : tbhk1?.Diem == 1 ? "Đạt" : "-";
-                                                                        diemhk2 = tbhk2?.Diem == 0 ? "Chưa đạt" : tbhk2?.Diem == 1 ? "Đạt" : "-";
-                                                                        diemcn = tbcn?.Diem == 0 ? "Chưa đạt" : tbcn?.Diem == 1 ? "Đạt" : "-";
-                                                                    } else {
-                                                                        diemhk1 = tbhk1?.Diem ?? "-";
-                                                                        diemhk2 = tbhk2?.Diem ?? "-";
-                                                                        diemcn = tbcn?.Diem ?? "-";
-                                                                    }
-
-                                                                    return (
-                                                                        <tr key={hs.MSHS}>
-                                                                            <td className="border border-black">{hs.MSHS}</td>
-                                                                            <td className="border border-black">{hs.HoTen}</td>
-                                                                            <td className="border border-black max-w-[50px]">{diemhk1}</td>
-                                                                            <td className="border border-black max-w-[50px]">{diemhk2}</td>
-                                                                            <td className="border border-black max-w-[50px]">{diemcn}</td>
-                                                                        </tr>
-                                                                    );
-                                                                })}
-                                                            </tbody>
-
-                                                        </table>
+                                        {subState == 1 &&
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm các môn học</h2>
+                                                {subjects.map((mh) => (
+                                                    <div key={mh.MaMH} className="my-2">
+                                                        <h3 className="text-2xl font-bold bg-slate-400 text-center mx-10 my-2 p-2 text-white rounded">Tên môn: {mh.TenMH}</h3>
+                                                        <BangDiem
+                                                            hocSinh={classInfo?.hoc_sinh}
+                                                            loaiDiem={loaiDiemHK}
+                                                            diemHK1={diemHK1.filter(item => item.MaMH === mh.MaMH)}
+                                                            diemHK2={diemHK2.filter(item => item.MaMH === mh.MaMH)}
+                                                            diemCN={diemCN.filter(item => item.MaMH === mh.MaMH)}
+                                                            show={0}
+                                                        />
                                                     </div>
                                                 ))}
                                             </div>
-                                        </div>
-                                    }
-                                    {subState == 3 &&
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình</h2>
-                                            <div className="w-[90%] mx-auto">
-                                                {classInfo?.TrangThai == 0 ? <div className="flex justify-end w-full space-x-2 mb-1">
-                                                    {showButton &&
-                                                        <div className="flex text-sm space-x-1">
-                                                            <button
-                                                                className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                disabled={disableHK1}
-                                                                onClick={() => TinhDiemTBHK(1)}>HK1</button>
-                                                            <button
-                                                                className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                disabled={disableHK2}
-                                                                onClick={() => TinhDiemTBHK(2)}>HK2</button>
-                                                            <button
-                                                                className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                disabled={disableCN}
-                                                                onClick={() => TinhDiemTBCN()}>Cả năm</button>
+                                        }
+                                        {subState == 2 &&
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình môn</h2>
+                                                <div>
+                                                    {subjects.map((item) => (
+                                                        <div className="" key={item.MaMH}>
+                                                            <h3 className="text-2xl text-center font-bold bg-slate-500 text-white mt-7 p-2 rounded mb-2 w-2/3 mx-auto">Tên môn: {item.TenMH}</h3>
+                                                            <table className="table-auto mx-auto w-[90%] text-center">
+                                                                <thead>
+                                                                    <tr className="bg-slate-400">
+                                                                        <th className="p-3 text-start">Mã số học sinh</th>
+                                                                        <th className="p-3 text-start">Tên học sinh</th>
+                                                                        <th className="p-3">Điểm TBHK1</th>
+                                                                        <th className="p-3">Điểm TBHK2</th>
+                                                                        <th className="p-3">Điểm TBCN</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {classInfo?.hoc_sinh.map((hs,index) => {
+                                                                        const tbhk1 = diemHK1?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk1" && diem.MSHS === hs.MSHS);
+                                                                        const tbhk2 = diemHK2?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk2" && diem.MSHS === hs.MSHS);
+                                                                        const tbcn = diemCN?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbcn" && diem.MSHS === hs.MSHS);
+                                                                        let diemhk1, diemhk2, diemcn;
+                                                                        if (item.MaMH === "CB4" || item.MaMH === "CB5") {
+                                                                            diemhk1 = tbhk1?.Diem == 0 ? "Chưa đạt" : tbhk1?.Diem == 1 ? "Đạt" : "-";
+                                                                            diemhk2 = tbhk2?.Diem == 0 ? "Chưa đạt" : tbhk2?.Diem == 1 ? "Đạt" : "-";
+                                                                            diemcn = tbcn?.Diem == 0 ? "Chưa đạt" : tbcn?.Diem == 1 ? "Đạt" : "-";
+                                                                        } else {
+                                                                            diemhk1 = tbhk1?.Diem ?? "-";
+                                                                            diemhk2 = tbhk2?.Diem ?? "-";
+                                                                            diemcn = tbcn?.Diem ?? "-";
+                                                                        }
+
+                                                                        return (
+                                                                            <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-300"}`}>
+                                                                                <td className="p-3 text-start">{hs.MSHS}</td>
+                                                                                <td className="p-3 text-start">{hs.HoTen}</td>
+                                                                                <td className="p-3">{diemhk1}</td>
+                                                                                <td className="p-3">{diemhk2}</td>
+                                                                                <td className="p-3">{diemcn}</td>
+                                                                            </tr>
+                                                                        );
+                                                                    })}
+                                                                </tbody>
+
+                                                            </table>
                                                         </div>
-                                                    }
-                                                    <button
-                                                        className=" bg-blue-400 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                                                        onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
-                                                    </button>
+                                                    ))}
                                                 </div>
+                                            </div>
+                                        }
+                                        {subState == 3 &&
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình</h2>
+                                                <div className="w-[97 text-start%] mx-auto">
+                                                    {classInfo?.TrangThai == 0 ? <div className="flex justify-end w-full space-x-2 mb-1">
+                                                        {showButton &&
+                                                            <div className="flex text-sm space-x-1">
+                                                                <button
+                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                    disabled={disableHK1}
+                                                                    onClick={() => TinhDiemTBHK(1)}>HK1</button>
+                                                                <button
+                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                    disabled={disableHK2}
+                                                                    onClick={() => TinhDiemTBHK(2)}>HK2</button>
+                                                                <button
+                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                    disabled={disableCN}
+                                                                    onClick={() => TinhDiemTBCN()}>Cả năm</button>
+                                                            </div>
+                                                        }
+                                                        <button
+                                                            className=" bg-blue-400 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                                                            onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
+                                                        </button>
+                                                    </div>
+                                                        :
+                                                        <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
+                                                    }
+                                                    <table className="table-auto text-center w-full">
+                                                        <thead>
+                                                            <tr className="bg-slate-400">
+                                                                <th className="p-3 text-start">Mã số học sinh</th>
+                                                                <th className="p-3 text-start">Tên học sinh</th>
+                                                                <th className="p-3">TB HK1</th>
+                                                                <th className="p-3">XL HK1</th>
+                                                                <th className="p-3">TB HK2</th>
+                                                                <th className="p-3">XL HK2</th>
+                                                                <th className="p-3">TB cả năm</th>
+                                                                <th className="p-3">XL cả năm</th>
+                                                                <th className="p-3">XL sau RLH</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {classInfo?.hoc_sinh.map((hs,index) => {
+                                                                const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
+                                                                if (data) {
+                                                                    return (
+                                                                        <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-200"}`}>
+                                                                            <td className="p-3 text-start">{hs.MSHS}</td>
+                                                                            <td className="p-3 text-start">{hs.HoTen}</td>
+                                                                            <td className="p-3">{data.Diem_TB_HKI || "-"}</td>
+                                                                            <td className="p-3">{data.hoc_luc_h_k1.TenHL}</td>
+                                                                            <td className="p-3">{data.Diem_TB_HKII || "-"}</td>
+                                                                            <td className="p-3">{data.hoc_luc_h_k2.TenHL}</td>
+                                                                            <td className="p-3">{data.Diem_TB_CN || "-"}</td>
+                                                                            <td className="p-3">{data.hoc_luc.TenHL}</td>
+                                                                            <td className="p-3">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
+                                                                        </tr>
+                                                                    )
+                                                                }
+                                                            })}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        }
+                                        {subState == 4 &&
+                                            <div className="relative">
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Đánh giá rèn luyện</h2>
+                                                {hanSuaDiem && classInfo?.TrangThai == 0 ?
+                                                    <div className="flex justify-between my-2">
+                                                        <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" disabled={disableRL} onClick={danhGiaRLCN}>Xét rèn luyện cả năm</button>
+                                                        <div className="flex">
+                                                            {change && <div className="text-red-400 text-xl me-2 mt-2">Nhấp vào mục tiêu cần sửa</div>}
+                                                            <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetChange(!change)}>{change ? <p className="text-red-500">Hủy</p> : <p>Sửa rèn luyện</p>}</button>
+                                                            <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetShowForm(1)}>Xét rèn luyện</button>
+                                                        </div>
+                                                    </div>
                                                     :
-                                                    <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
+                                                    !hanSuaDiem ? <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                                                        : <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
                                                 }
                                                 <table className="table-auto text-center w-full">
                                                     <thead>
-                                                        <tr>
-                                                            <th className="border border-black">Mã số học sinh</th>
-                                                            <th className="border border-black">Tên học sinh</th>
-                                                            <th className="border border-black">Điểm trung bình HK1</th>
-                                                            <th className="border border-black">Xếp loại HK1</th>
-                                                            <th className="border border-black">Điểm trung bình HK2</th>
-                                                            <th className="border border-black">Xếp loại HK2</th>
-                                                            <th className="border border-black">Điểm trung bình cả năm</th>
-                                                            <th className="border border-black">Xếp loại cả năm</th>
-                                                            <th className="border border-black">Xếp loại sau rèn luyện hè</th>
+                                                        <tr className="bg-slate-400">
+                                                            <th className="p-3 text-start">Mã số học sinh</th>
+                                                            <th className="p-3 text-start">Tên học sinh</th>
+                                                            <th className="p-3">Rèn luyện HK1</th>
+                                                            <th className="p-3">Rèn luyện HK2</th>
+                                                            <th className="p-3">Rèn luyện cả năm</th>
+                                                            <th className="p-3">Rèn luyện lại trong hè</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {classInfo?.hoc_sinh.map((hs) => {
+                                                        {classInfo?.hoc_sinh.map((hs,index) => {
                                                             const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                             if (data) {
                                                                 return (
-                                                                    <tr key={hs.MSHS}>
-                                                                        <td className="border border-black">{hs.MSHS}</td>
-                                                                        <td className="border border-black">{hs.HoTen}</td>
-                                                                        <td className="border border-black">{data.Diem_TB_HKI || "-"}</td>
-                                                                        <td className="border border-black">{data.hoc_luc_h_k1.TenHL}</td>
-                                                                        <td className="border border-black">{data.Diem_TB_HKII || "-"}</td>
-                                                                        <td className="border border-black">{data.hoc_luc_h_k2.TenHL}</td>
-                                                                        <td className="border border-black">{data.Diem_TB_CN || "-"}</td>
-                                                                        <td className="border border-black">{data.hoc_luc.TenHL}</td>
-                                                                        <td className="border border-black">{data.MaHLL > 0 ? data.hoc_luc_lai.TenHL : "-"}</td>
+                                                                    <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-200"}`}>
+                                                                        <td className="p-3 text-start">{hs.MSHS}</td>
+                                                                        <td className="p-3 text-start">{hs.HoTen}</td>
+                                                                        {change && data.ren_luyen_h_k1.MaRL > 0 ?
+                                                                            <td className="p-3 text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 1)}>{data.ren_luyen_h_k1.TenRL}</td>
+                                                                            :
+                                                                            <td className="p-3">{data.ren_luyen_h_k1.TenRL}</td>
+                                                                        }
+                                                                        {change && data.ren_luyen_h_k2.MaRL > 0 ?
+                                                                            <td className="p-3 text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.ren_luyen_h_k2.TenRL}</td>
+                                                                            :
+                                                                            <td className="p-3">{data.ren_luyen_h_k2.TenRL}</td>
+                                                                        }
+                                                                        <td className="p-3">{data.ren_luyen.TenRL}</td>
+                                                                        {change && data.ren_luyen_h_k2.MaRL > 0 ?
+                                                                            <td className="p-3 text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                                            :
+                                                                            <td className="p-3">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
+                                                                        }
+                                                                    </tr>
+                                                                )
+                                                            }
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                                {showForm == 1 &&
+                                                    <Draggable nodeRef={dragRef} handle=".drag-handle">
+                                                        <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
+                                                            <RenLuyenForm initialValues={initialValues} handler={handleSubmit} showForm={setShowForm} disable={false} />
+                                                        </div>
+                                                    </Draggable>
+                                                }
+                                                {showForm == 2 &&
+                                                    <Draggable nodeRef={dragRef} handle=".drag-handle">
+                                                        <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
+                                                            <RenLuyenForm initialValues={initialValues} handler={handelUpdateRL} showForm={setShowForm} disable={true} />
+                                                        </div>
+                                                    </Draggable>
+                                                }
+                                            </div>
+                                        }
+                                        {subState == 5 &&
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Xét lên lớp</h2>
+                                                {classInfo.TrangThai == 1 ?
+                                                    <div className="text-green-500 font-bold ">Đã nộp báo cáo</div>
+                                                    :
+                                                    <div className="my-2 flex justify-between">
+                                                        <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
+                                                        <button className="button border-blue-500 hover:bg-blue-400 hover:text-white" disabled={disableBC} onClick={() => setShowConfirm(1)}>Nộp báo cáo</button>
+                                                    </div>
+                                                }
+                                                <table className="table-auto text-center w-full">
+                                                    <thead>
+                                                        <tr className="bg-slate-400">
+                                                            <th className="p-3 text-start">Mã số học sinh</th>
+                                                            <th className="p-3 text-start">Tên học sinh</th>
+                                                            <th className="p-3">Xếp loại cả năm</th>
+                                                            <th className="p-3">Rèn luyện cả năm</th>
+                                                            <th className="p-3">Trạng thái</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {classInfo?.hoc_sinh.map((hs,index) => {
+                                                            const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
+                                                            if (data) {
+                                                                return (
+                                                                    <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-300"}`}>
+                                                                        <td className="p-3 text-start">{hs.MSHS}</td>
+                                                                        <td className="p-3 text-start">{hs.HoTen}</td>
+                                                                        <td className="p-3">{data.hoc_luc.TenHL}</td>
+                                                                        <td className="p-3">{data.ren_luyen.TenRL}</td>
+                                                                        <td className="p-3">{data.trang_thai.TenTT}</td>
                                                                     </tr>
                                                                 )
                                                             }
@@ -674,323 +791,210 @@ export default function Homeroom() {
                                                     </tbody>
                                                 </table>
                                             </div>
-                                        </div>
-                                    }
-                                    {subState == 4 &&
-                                        <div className="relative">
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Đánh giá rèn luyện</h2>
-                                            {hanSuaDiem && classInfo?.TrangThai == 0 ?
-                                                <div className="flex justify-between my-2">
-                                                    <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" disabled={disableRL} onClick={danhGiaRLCN}>Xét rèn luyện cả năm</button>
-                                                    <div className="flex">
-                                                        {change && <div className="text-red-400 text-xl me-2 mt-2">Nhấp vào mục tiêu cần sửa</div>}
-                                                        <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetChange(!change)}>{change ? <p className="text-red-500">Hủy</p> : <p>Sửa rèn luyện</p>}</button>
-                                                        <button className="button border-blue-500 hover:bg-blue-300 hover:text-white" onClick={() => SetShowForm(1)}>Xét rèn luyện</button>
-                                                    </div>
-                                                </div>
-                                                :
-                                                !hanSuaDiem ? <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
-                                                    : <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
-                                            }
-                                            <table className="table-auto text-center w-full">
-                                                <thead>
-                                                    <tr>
-                                                        <th className="border border-black">Mã số học sinh</th>
-                                                        <th className="border border-black">Tên học sinh</th>
-                                                        <th className="border border-black">Rèn luyện HK1</th>
-                                                        <th className="border border-black">Rèn luyện HK2</th>
-                                                        <th className="border border-black">Rèn luyện cả năm</th>
-                                                        <th className="border border-black">Rèn luyện lại trong hè</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {classInfo?.hoc_sinh.map((hs) => {
-                                                        const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
-                                                        if (data) {
-                                                            return (
-                                                                <tr key={hs.MSHS}>
-                                                                    <td className="border border-black">{hs.MSHS}</td>
-                                                                    <td className="border border-black">{hs.HoTen}</td>
-                                                                    {change && data.ren_luyen_h_k1.MaRL > 0 ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 1)}>{data.ren_luyen_h_k1.TenRL}</td>
-                                                                        :
-                                                                        <td className="border border-black">{data.ren_luyen_h_k1.TenRL}</td>
-                                                                    }
-                                                                    {change && data.ren_luyen_h_k2.MaRL > 0 ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.ren_luyen_h_k2.TenRL}</td>
-                                                                        :
-                                                                        <td className="border border-black">{data.ren_luyen_h_k2.TenRL}</td>
-                                                                    }
-                                                                    <td className="border border-black">{data.ren_luyen.TenRL}</td>
-                                                                    {change && data.ren_luyen_h_k2.MaRL > 0 ?
-                                                                        <td className="border border-black text-red-500 cursor-pointer" onClick={() => showUpdateRL(data, 2)}>{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
-                                                                        :
-                                                                        <td className="border border-black">{data.MaRLL > 0 ? data.ren_luyen_lai.TenRL : "-"}</td>
-                                                                    }
-                                                                </tr>
-                                                            )
+                                        }
+                                        {subState == 6 &&
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Rèn luyện hè</h2>
+                                                {renLuyenHeHT.length > 0 || renLuyenHeRL.length > 0 ?
+                                                    <div>
+                                                        <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện kết quả học tập trong hè</h1>
+                                                        {renLuyenHeHT.length > 0 &&
+                                                            <div>
+                                                                <table className="table-auto w-[70%]">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th className="p-3 border border-slate-300">Mã số học sinh</th>
+                                                                            <th className="p-3 border border-slate-300">Tên học sinh</th>
+                                                                            <th className="p-3 border border-slate-300">Môn học cần rèn luyện lại</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {renLuyenHeHT?.map((hs) => {
+                                                                            const data = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && diem.MaMH != "CB4" && diem.MaMH != "CB5");
+                                                                            const data1 = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && (diem.MaMH == "CB4" || diem.MaMH == "CB5") && diem.Diem == 0);
+                                                                            if (data) {
+                                                                                return (
+                                                                                    <tr key={hs.MSHS}>
+                                                                                        <td className="p-3 border border-slate-300">{hs?.hoc_sinh.MSHS}</td>
+                                                                                        <td className="p-3 border border-slate-300">{hs?.hoc_sinh.HoTen}</td>
+                                                                                        <td className="p-3 border border-slate-300">
+                                                                                            <div className=" space-x-2">
+                                                                                                {data.map((item, index) => (
+                                                                                                    <span key={index}>{item?.mon_hoc.TenMH}</span>
+                                                                                                ))}
+                                                                                                {data1.map((item, index) => (
+                                                                                                    <span key={index}>{item?.mon_hoc.TenMH}</span>
+                                                                                                ))}
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                )
+                                                                            }
+                                                                        })}
+                                                                    </tbody>
+                                                                </table>
+                                                                <h1 className="text-2xl my-2 font-semibold">Kết quả rèn luyện hè</h1>
+                                                                <div className="grid grid-cols-4 grid-flow-row space-x-1 space-y-1 mx-3">
+                                                                    {renLuyenHeHT.map((hs) => (
+                                                                        <div key={hs.MSHS} style={{ margin: 0 }} className="space-x-1 space-y-1">
+                                                                            <h1 className="text-lg my-2">{hs.hoc_sinh.HoTen}</h1>
+                                                                            <table className="table-fixed" style={{ margin: 0 }}>
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th className="p-3 ">Tên môn</th>
+                                                                                        <th className="p-3 ">Điểm rèn luyện lại</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data) => (
+                                                                                        <tr key={data.MaMH}>
+                                                                                            <td className="p-3 ">{data?.mon_hoc.TenMH}</td>
+                                                                                            <td className="p-3  text-center">{diemRLH.find(item => item.MaMH == data.MaMH)?.Diem || "-"}</td>
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    ))}
+
+
+                                                                </div>
+                                                            </div>
                                                         }
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            {showForm == 1 &&
-                                                <Draggable nodeRef={dragRef} handle=".drag-handle">
-                                                    <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
-                                                        <RenLuyenForm initialValues={initialValues} handler={handleSubmit} showForm={setShowForm} disable={false} />
-                                                    </div>
-                                                </Draggable>
-                                            }
-                                            {showForm == 2 &&
-                                                <Draggable nodeRef={dragRef} handle=".drag-handle">
-                                                    <div ref={dragRef} className="z-10 absolute w-1/2 top-16 left-1/4">
-                                                        <RenLuyenForm initialValues={initialValues} handler={handelUpdateRL} showForm={setShowForm} disable={true} />
-                                                    </div>
-                                                </Draggable>
-                                            }
-                                        </div>
-                                    }
-                                    {subState == 5 &&
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Xét lên lớp</h2>
-                                            {classInfo.TrangThai == 1 ?
-                                                <div className="text-green-500 font-bold ">Đã nộp báo cáo</div>
-                                                :
-                                                <div className="my-2 flex justify-between">
-                                                    <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
-                                                    <button className="button border-blue-500 hover:bg-blue-400 hover:text-white" disabled={disableBC} onClick={() => setShowConfirm(1)}>Nộp báo cáo</button>
-                                                </div>
-                                            }
-                                            <table className="table-auto text-center w-full">
-                                                <thead>
-                                                    <tr>
-                                                        <th className="border border-black">Mã số học sinh</th>
-                                                        <th className="border border-black">Tên học sinh</th>
-                                                        <th className="border border-black">Xếp loại cả năm</th>
-                                                        <th className="border border-black">Rèn luyện cả năm</th>
-                                                        <th className="border border-black">Trạng thái</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {classInfo?.hoc_sinh.map((hs) => {
-                                                        const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
-                                                        if (data) {
-                                                            return (
-                                                                <tr key={hs.MSHS}>
-                                                                    <td className="border border-black">{hs.MSHS}</td>
-                                                                    <td className="border border-black">{hs.HoTen}</td>
-                                                                    <td className="border border-black">{data.hoc_luc.TenHL}</td>
-                                                                    <td className="border border-black">{data.ren_luyen.TenRL}</td>
-                                                                    <td className="border border-black">{data.trang_thai.TenTT}</td>
-                                                                </tr>
-                                                            )
-                                                        }
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    }
-                                    {subState == 6 &&
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Rèn luyện hè</h2>
-                                            {renLuyenHeHT.length > 0 || renLuyenHeRL.length > 0 ?
-                                                <div>
-                                                    <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện kết quả học tập trong hè</h1>
-                                                    {renLuyenHeHT.length > 0 &&
-                                                        <div>
-                                                            <table className="table-auto w-[70%]">
+                                                        <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện lại điểm rèn luyện trong hè</h1>
+                                                        {renLuyenHeRL.length > 0 &&
+                                                            <table className="table-auto text-center  w-[70%]">
                                                                 <thead>
                                                                     <tr>
                                                                         <th className="border border-black">Mã số học sinh</th>
                                                                         <th className="border border-black">Tên học sinh</th>
-                                                                        <th className="border border-black">Môn học cần rèn luyện lại</th>
+                                                                        <th className="border border-black">Xét rèn luyện lại</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    {renLuyenHeHT?.map((hs) => {
-                                                                        const data = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && diem.MaMH != "CB4" && diem.MaMH != "CB5");
-                                                                        const data1 = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && (diem.MaMH == "CB4" || diem.MaMH == "CB5") && diem.Diem == 0);
-                                                                        if (data) {
-                                                                            return (
-                                                                                <tr key={hs.MSHS}>
-                                                                                    <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
-                                                                                    <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
-                                                                                    <td className="border border-black">
-                                                                                        <div className=" space-x-2">
-                                                                                            {data.map((item, index) => (
-                                                                                                <span key={index}>{item?.mon_hoc.TenMH}</span>
-                                                                                            ))}
-                                                                                            {data1.map((item, index) => (
-                                                                                                <span key={index}>{item?.mon_hoc.TenMH}</span>
-                                                                                            ))}
-                                                                                        </div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            )
-                                                                        }
+                                                                    {renLuyenHeRL?.map((hs) => {
+                                                                        return (
+                                                                            <tr key={hs.MSHS}>
+                                                                                <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
+                                                                                <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
+                                                                                <td className="border border-black">{hs?.ren_luyen_lai.TenRL}</td>
+                                                                            </tr>
+                                                                        )
                                                                     })}
                                                                 </tbody>
                                                             </table>
-                                                            <h1 className="text-2xl my-2 font-semibold">Kết quả rèn luyện hè</h1>
-                                                            <div className="grid grid-cols-4 grid-flow-row space-x-1 space-y-1 mx-3">
-                                                                {renLuyenHeHT.map((hs) => (
-                                                                    <div key={hs.MSHS} style={{ margin: 0 }} className="space-x-1 space-y-1">
-                                                                        <h1 className="text-lg my-2">{hs.hoc_sinh.HoTen}</h1>
-                                                                        <table className="table-fixed" style={{ margin: 0 }}>
-                                                                            <thead>
-                                                                                <tr>
-                                                                                    <th className="border border-black px-2">Tên môn</th>
-                                                                                    <th className="border border-black px-2">Điểm rèn luyện lại</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data) => (
-                                                                                    <tr key={data.MaMH}>
-                                                                                        <td className="border border-black px-2">{data?.mon_hoc.TenMH}</td>
-                                                                                        <td className="border border-black px-2 text-center">{diemRLH.find(item => item.MaMH == data.MaMH)?.Diem || "-"}</td>
-                                                                                    </tr>
-                                                                                ))}
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                ))}
-
-
-                                                            </div>
+                                                        }
+                                                    </div>
+                                                    :
+                                                    <div className="text-2xl text-green-300 font-bold text-center">Không có học sinh phải rèn luyện thêm trong hè</div>
+                                                }
+                                            </div>
+                                        }
+                                        {subState == 7 &&
+                                            <div className="relative">
+                                                <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
+                                                <h1 className="text-center font-bold text-2xl mt-3">Danh sách đề xuất khen thưởng</h1>
+                                                <div className="w-[70%] mx-auto">
+                                                    {dxKhenThuong.length > 0 ?
+                                                        <div>
+                                                            {dsKhenThuong?.length > 0 ?
+                                                                <div className="text-xl font-bold text-green-500">Đã đề xuất khen thưởng</div>
+                                                                :
+                                                                <div>
+                                                                    <button onClick={deXuatKT} className="button border-blue-400">Đề xuất</button>
+                                                                </div>
+                                                            }
+                                                            <table className="table w-full text-xl">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th className="border border-black px-2">Mã số học sinh</th>
+                                                                        <th className="border border-black px-2">Tên học sinh</th>
+                                                                        <th className="border border-black px-2">Đề xuất khen thưởng</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {dxKhenThuong?.map((item) => (
+                                                                        <tr key={item.MSHS}>
+                                                                            <td className="border border-black px-2">{item.MSHS}</td>
+                                                                            <td className="border border-black px-2">{item.HoTen}</td>
+                                                                            <td className="border border-black px-2">{item.KhenThuong}</td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
                                                         </div>
+                                                        :
+                                                        <div className="text-red-500 text-xl text-center">Không có đề xuất khen thưởng</div>
                                                     }
-                                                    <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện lại điểm rèn luyện trong hè</h1>
-                                                    {renLuyenHeRL.length > 0 &&
-                                                        <table className="table-auto text-center  w-[70%]">
+                                                </div>
+                                            </div>
+
+                                        }
+
+                                    </div>
+                                }
+                                {state == 3 &&
+                                    <div>
+                                        <div className="relative mt-3 flex text-xl justify-between px-10 border-b-2 pb-2 border-cyan-300 items-center">
+                                            <div className="flex">
+                                                Tuần:
+                                                <select className="px-2 border-2 border-gray-200 rounded-md mx-2 text-lg outline-none focus:border-cyan-200" defaultValue={thisWeek()} onChange={selectWeek}>
+                                                    {[...Array(thisWeek())].map((_, i) => (
+                                                        <option key={i} value={i + 1}>{i + 1}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div>Từ ngày: {getDate(dayOfWeek(week || thisWeek()).start)} - Đến ngày: {getDate(dayOfWeek(week || thisWeek()).end)}</div>
+                                        </div>
+                                        {weeks.length == 0 ?
+                                            <div className="text-2xl text-center text-red-500 mt-10 font-bold">Không có dữ liệu</div>
+                                            :
+                                            <div className="p-3">
+                                                {[...Array(6)].map((_, i) => (
+                                                    <div key={i}>
+                                                        <div className="text-xl font-bold">
+                                                            Thứ: {i + 2}
+                                                        </div>
+                                                        <table className="table-auto w-full border-2 border-collapse border-cyan-300">
                                                             <thead>
                                                                 <tr>
-                                                                    <th className="border border-black">Mã số học sinh</th>
-                                                                    <th className="border border-black">Tên học sinh</th>
-                                                                    <th className="border border-black">Xét rèn luyện lại</th>
+                                                                    <th className="p-2 border border-slate-300">Tiết</th>
+                                                                    <th className="p-2 border border-slate-300">Môn học</th>
+                                                                    <th className="p-2 border border-slate-300">Giáo viên</th>
+                                                                    <th className="p-2 border border-slate-300">Nội dung</th>
+                                                                    <th className="p-2 border border-slate-300">Đánh giá</th>
+                                                                    <th className="p-2 border border-slate-300">Vắng</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {renLuyenHeRL?.map((hs) => {
+                                                                {[...Array(4)].map((_, j) => {
+                                                                    const data = weeks.find(item => item.MaNgay == (i + 2) && item.TietDay == (j + 1));
+                                                                    const vangCP = data?.diem_danh.filter(item => item.TrangThai == 2);
+                                                                    const vangKP = data?.diem_danh.filter(item => item.TrangThai == 3);
                                                                     return (
-                                                                        <tr key={hs.MSHS}>
-                                                                            <td className="border border-black">{hs?.hoc_sinh.MSHS}</td>
-                                                                            <td className="border border-black">{hs?.hoc_sinh.HoTen}</td>
-                                                                            <td className="border border-black">{hs?.ren_luyen_lai.TenRL}</td>
+                                                                        <tr key={j}>
+                                                                            <td className="p-2 border border-slate-300">{j + 1}</td>
+                                                                            <td className="p-2 border border-slate-300">{data ? data.mon_hoc.TenMH : ""}</td>
+                                                                            <td className="p-2 border border-slate-300">{data ? data.giao_vien.TenGV : ""}</td>
+                                                                            <td className="p-2 border border-slate-300">{data ? data.NoiDung : ""}</td>
+                                                                            <td className="p-2 border border-slate-300">{data ? data.DanhGia : ""}</td>
+                                                                            <td className="p-2 border border-slate-300">{data ? `(${vangCP.length + vangKP.length}) ${vangCP.map((cp) => (`${cp.hoc_sinh.HoTen}(CP)`))} ${vangKP.map((kp) => (`${kp.hoc_sinh.HoTen}(KP)`))}` : ""}</td>
                                                                         </tr>
                                                                     )
                                                                 })}
                                                             </tbody>
                                                         </table>
-                                                    }
-                                                </div>
-                                                :
-                                                <div className="text-2xl text-green-300 font-bold text-center">Không có học sinh phải rèn luyện thêm trong hè</div>
-                                            }
-                                        </div>
-                                    }
-                                    {subState == 7 &&
-                                        <div className="relative">
-                                            <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Khen thưởng</h2>
-                                            <h1 className="text-center font-bold text-2xl mt-3">Danh sách đề xuất khen thưởng</h1>
-                                            <div className="w-[70%] mx-auto">
-                                                {dxKhenThuong.length > 0 ?
-                                                    <div>
-                                                        {dsKhenThuong?.length > 0 ?
-                                                            <div className="text-xl font-bold text-green-500">Đã đề xuất khen thưởng</div>
-                                                            :
-                                                            <div>
-                                                                <button onClick={deXuatKT} className="button border-blue-400">Đề xuất</button>
-                                                            </div>
-                                                        }
-                                                        <table className="table w-full text-xl">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th className="border border-black px-2">Mã số học sinh</th>
-                                                                    <th className="border border-black px-2">Tên học sinh</th>
-                                                                    <th className="border border-black px-2">Đề xuất khen thưởng</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {dxKhenThuong?.map((item) => (
-                                                                    <tr key={item.MSHS}>
-                                                                        <td className="border border-black px-2">{item.MSHS}</td>
-                                                                        <td className="border border-black px-2">{item.HoTen}</td>
-                                                                        <td className="border border-black px-2">{item.KhenThuong}</td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
                                                     </div>
-                                                    :
-                                                    <div className="text-red-500 text-xl text-center">Không có đề xuất khen thưởng</div>
-                                                }
-                                            </div>
-                                        </div>
-
-                                    }
-
-                                </div>
-                            }
-                            {state == 3 &&
-                                <div>
-                                    <div className="relative mt-3 flex text-xl justify-between px-10 border-b-2 pb-2 border-cyan-300 items-center">
-                                        <div className="flex">
-                                            Tuần:
-                                            <select className="px-2 border-2 border-gray-200 rounded-md mx-2 text-lg outline-none focus:border-cyan-200" defaultValue={thisWeek()} onChange={selectWeek}>
-                                                {[...Array(thisWeek())].map((_, i) => (
-                                                    <option key={i} value={i + 1}>{i + 1}</option>
                                                 ))}
-                                            </select>
-                                        </div>
-                                        <div>Từ ngày: {getDate(dayOfWeek(week || thisWeek()).start)} - Đến ngày: {getDate(dayOfWeek(week || thisWeek()).end)}</div>
+                                            </div>
+                                        }
                                     </div>
-                                    {weeks.length == 0 ?
-                                        <div className="text-2xl text-center text-red-500 mt-10 font-bold">Không có dữ liệu</div>
-                                        :
-                                        <div className="p-3">
-                                            {[...Array(6)].map((_, i) => (
-                                                <div key={i}>
-                                                    <div className="text-xl font-bold">
-                                                        Thứ: {i + 2}
-                                                    </div>
-                                                    <table className="table-auto w-full border-2 border-collapse border-cyan-300">
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="p-2 border border-slate-300">Tiết</th>
-                                                                <th className="p-2 border border-slate-300">Môn học</th>
-                                                                <th className="p-2 border border-slate-300">Giáo viên</th>
-                                                                <th className="p-2 border border-slate-300">Nội dung</th>
-                                                                <th className="p-2 border border-slate-300">Đánh giá</th>
-                                                                <th className="p-2 border border-slate-300">Vắng</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {[...Array(4)].map((_, j) => {
-                                                                const data = weeks.find(item => item.MaNgay == (i + 2) && item.TietDay == (j + 1));
-                                                                const vangCP = data?.diem_danh.filter(item => item.TrangThai == 2);
-                                                                const vangKP = data?.diem_danh.filter(item => item.TrangThai == 3);
-                                                                return (
-                                                                    <tr key={j}>
-                                                                        <td className="p-2 border border-slate-300">{j + 1}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? data.mon_hoc.TenMH : ""}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? data.giao_vien.TenGV : ""}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? data.NoiDung : ""}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? data.DanhGia : ""}</td>
-                                                                        <td className="p-2 border border-slate-300">{data ? `(${vangCP.length + vangKP.length}) ${vangCP.map((cp) => (`${cp.hoc_sinh.HoTen}(CP)`))} ${vangKP.map((kp) => (`${kp.hoc_sinh.HoTen}(KP)`))}` : ""}</td>
-                                                                    </tr>
-                                                                )
-                                                            })}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        </div>
-                        :
-                        <div className="min-h-[70vh] mx-auto max-w-[90%] flex justify-center items-center text-red-600 text-3xl">Bạn hiện không chủ nhiệm lớp nào</div>
-                    }
+                                }
+                            </div>
+                            :
+                            <div className="min-h-[70vh] mx-auto max-w-[90%] flex justify-center items-center text-red-600 text-3xl">Bạn hiện không chủ nhiệm lớp nào</div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

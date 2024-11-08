@@ -6,6 +6,7 @@ import { useStateContext } from "../context/Context";
 import { useUserContext } from "../context/userContext";
 import { useEffect } from "react";
 import axiosClient from "../axios-client";
+import Header from "../components/Header";
 
 export default function Class() {
     const { userName } = useUserContext();
@@ -38,13 +39,15 @@ export default function Class() {
         return <Loading />
     }
     return (
-        <div className="main-content">
+        <div>
+            <Header/>
+            <div className="main-content">
             <Menu />
             <div className="right-part">
                 <h1 className="page-name">Quản lí dạy học</h1>
-                <table className="border-2 border-slate-500 border-collapse mt-3 w-full">
+                <table className="mt-3 w-full ">
                     <thead>
-                        <tr className="bg-slate-200">
+                        <tr className="bg-slate-400">
                             <th className="text-start text-2xl p-3">Các lớp đang dạy</th>
                         </tr>
                     </thead>
@@ -52,7 +55,7 @@ export default function Class() {
                         {datas.map((data, index) => (
                             <tr
                                 key={data.MaLop}
-                                className={`hover:bg-slate-100 ${index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}`}
+                                className={`hover:bg-cyan-200 ${index % 2 === 0 ? 'bg-slate-300' : 'bg-white'}`}
                             >
                                 <td 
                                     className="hover:cursor-pointer text-2xl p-3 border-t"
@@ -68,6 +71,7 @@ export default function Class() {
                     </tbody>
                 </table>
             </div>
+        </div>
         </div>
     )
 }

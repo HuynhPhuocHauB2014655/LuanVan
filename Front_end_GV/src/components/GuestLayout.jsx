@@ -7,6 +7,7 @@ import { faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import Header from "./Header";
 export default function GuestLayout() {
     const { message, setMessage } = useStateContext();
     const { userName, setUserName } = useUserContext();
@@ -44,11 +45,9 @@ export default function GuestLayout() {
             .max(20, 'Mật khẩu có nhiều nhất 10 ký tự'),
     })
     return (
-        <div className="mx-20 bg-amber-100 relative">
+        <div className="bg-[#eceff8] relative">
             {message && <div className="fixed bg-blue-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{message}</div>}
-            <header className="bg-cyan-400 py-2 rounded header">
-                <p className="text-center text-2xl">Hệ thống quản lí <br /> Trường THPT Cần Thơ</p>
-            </header>
+            <Header/>
             <div className="main-content">
                 <Formik
                     initialValues={{
@@ -96,8 +95,8 @@ export default function GuestLayout() {
                     </Form>
                 </Formik>
             </div>
-            <footer className="footer bg-cyan-200 rounded flex items-center justify-center">
-                Footer
+            <footer className="footer bg-white border-t-2 flex px-4 items-center">
+                Copyright © Trường THPT Cần Thơ
             </footer>
             <button className="border-2 border-blue-600 px-3 py-1 text-2xl fixed bottom-1 right-1 rounded" onClick={goToTop}><FontAwesomeIcon icon={faArrowUp} color="blue" /></button>
         </div>

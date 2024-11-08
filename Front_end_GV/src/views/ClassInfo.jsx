@@ -13,6 +13,7 @@ import Draggable from 'react-draggable';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faBellSlash } from "@fortawesome/free-solid-svg-icons";
 import NotifyForm from "../components/NoitifyForm";
+import Header from "../components/Header";
 
 export default function ClassInfo() {
     const { userName } = useUserContext();
@@ -294,7 +295,7 @@ export default function ClassInfo() {
     }
     const sendTB = async (value) => {
         const nguoiNhan = value.NguoiNhan.split(';').filter(id => id !== '');
-        nguoiNhan.map( async (item)=>{
+        nguoiNhan.map(async (item) => {
             const payload = {
                 NguoiGui: info.TenGV + " - " + userName,
                 NguoiNhan: item,
@@ -302,211 +303,214 @@ export default function ClassInfo() {
                 TrangThai: 0,
                 TieuDe: value.TieuDe
             };
-            try{
-                await axiosClient.post("/tb/add",payload);
+            try {
+                await axiosClient.post("/tb/add", payload);
                 setMessage("Đã gửi thành công!");
-            }catch(error){
+            } catch (error) {
                 setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
-            }finally{
+            } finally {
                 setShowForm(0);
             }
         })
     }
     return (
-        <div className="main-content relative">
-            {showConfirm &&
-                <div className="confirm-overlay">
-                    <div className="confirm-box">
-                        <p>{content}</p>
-                        <div className="confirm-buttons">
-                            <button onClick={onConfirm} id="confirm-yes">Xác nhận</button>
-                            <button onClick={onCancel} id="confirm-no">Hủy</button>
+        <div>
+            <Header />
+            <div className="main-content relative">
+                {showConfirm &&
+                    <div className="confirm-overlay">
+                        <div className="confirm-box">
+                            <p>{content}</p>
+                            <div className="confirm-buttons">
+                                <button onClick={onConfirm} id="confirm-yes">Xác nhận</button>
+                                <button onClick={onCancel} id="confirm-no">Hủy</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-            <Menu />
-            <div className="right-part mb-2 relative">
-                {showForm == 3 &&
-                    <NotifyForm MaLop={classData.MaLop} handleSubmit={sendTB} close={()=>setShowForm(0)}/>
                 }
-                <div className="page-name relative">
-                    Thông tin lớp
-                    <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
-                </div>
-                <div className="my-2 flex">
-                    <button className={`teacher-head ${show == 1 && "bg-cyan-300"}`} onClick={() => handleShow(1)}>Danh sách lớp</button>
-                    <button className={`teacher-head ${show == 2 && "bg-cyan-300"}`} onClick={() => handleShow(2)}>Quản lí điểm</button>
-                </div>
-                <div className="flex justify-between px-2 text-xl">
-                    <p><strong>Mã lớp:</strong> {classData.lop.MaLop}</p>
-                    <p><strong>Tên lớp:</strong> {classData.lop.TenLop}</p>
-                    <p><strong>Môn dạy:</strong> {classData.mon_hoc.TenMH}</p>
-                    <p><strong>Sỉ số:</strong> {classData.lop.hoc_sinh.length}</p>
-                </div>
-                {show === 1 && <HocSinhTable datas={classData.lop.hoc_sinh} />}
-                {show === 2 && (
-                    <div>
-                        {hanSuaDiem ?
-                            <div className="flex justify-between my-2 w-full">
-                                <div className="space-x-2 flex">
-                                    <button onClick={ShowButton} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
-                                    {showButton &&
-                                        <div className="space-x-2">
-                                            <button
-                                                type="button"
-                                                className={!disableNH ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                                disabled={disableNH}
-                                                onClick={() => changeConfirm('tknh')}
-                                            >
-                                                Tổng kết năm học
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={!disableHK1 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                                disabled={disableHK1}
-                                                onClick={() => changeConfirm('tkhk1')}
-                                            >
-                                                Tổng kết học kì 1
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={!disableHK2 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
-                                                disabled={disableHK2}
-                                                onClick={() => changeConfirm('tkhk2')}
-                                            >
-                                                Tổng kết học kì 2
-                                            </button>
-                                        </div>}
-                                </div>
-                                {(classData?.MaMH === "CB4" || classData?.MaMH === "CB5") && <div className=" text-red-800 text-xl">*Điểm 0 = Chưa đạt, 1 = Đạt</div>}
-                                <div className="space-x-2 flex justify-end ">
-                                    {showForm === 2 && <div className="text-red-500 shadow-lag mt-1 text-xl">Nhấp chọn điểm cần sửa</div>}
-                                    {showForm !== 2 ? (
-                                        <button className="button button-animation border-blue-600 hover:bg-blue-600" onClick={() => setShowForm(2)}>Sửa điểm</button>
-                                    ) : (
-                                        <button className="button button-animation border-red-600 hover:bg-red-600" onClick={() => setShowForm(0)}>Hủy</button>
-                                    )}
-                                    <button className="button button-animation border-blue-600" onClick={() => setShowForm(1)}>Nhập điểm</button>
-                                </div>
-                            </div>
-                            :
-                            <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
-                        }
-                        <BangDiem
-                            hocSinh={classData.lop.hoc_sinh}
-                            loaiDiem={loaiDiemHK}
-                            diemHK1={diemHK1}
-                            diemHK2={diemHK2}
-                            diemCN={diemCN}
-                            show={showForm}
-                            _delete={handleDelete}
-                            _update={handleUpdate}
-                        />
+                <Menu />
+                <div className="right-part mb-2 relative">
+                    {showForm == 3 &&
+                        <NotifyForm MaLop={classData.MaLop} handleSubmit={sendTB} close={() => setShowForm(0)} />
+                    }
+                    <div className="page-name relative">
+                        Thông tin lớp
+                        <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
                     </div>
-                )}
-                {showForm === 1 && (
-                    <Draggable nodeRef={dragRef} handle=".drag-handle">
-                        <div className="z-10 absolute w-1/2 top-64 left-1/4" ref={dragRef}>
-                            <div className="border-2 border-black rounded-lg bg-white">
-                                <div className="absolute top-0 right-0">
-                                    <button className="X-button" onClick={() => setShowForm(0)}>X</button>
-                                </div>
-                                <div className="drag-handle cursor-move p-2 text-center text-xl border-b-2 border-slate-100 text-white bg-slate-400">Nhập điểm</div>
-                                <div className="p-4">
-                                    <Formik
-                                        initialValues={{
-                                            MSHS: '',
-                                            Diem: '',
-                                            MaHK: '',
-                                            MaLoai: '',
-                                        }}
-                                        validationSchema={Yup.object().shape({
-                                            MSHS: Yup.string().required('Bắt buộc'),
-                                            Diem: Yup.number().typeError("Không đúng định dạng")
-                                                .required('Bắt buộc')
-                                                .min(0, "Điểm không hợp lệ")
-                                                .max(classData.MaMH === "CB4" || classData.MaMH === "CB5" ? 1 : 10, "Điểm không hợp lệ"),
-                                            MaHK: Yup.string().required('Bắt buộc'),
-                                            MaLoai: Yup.string().required('Bắt buộc'),
-                                        })}
-                                        enableReinitialize={true}
-                                        onSubmit={handleSubmit}
-                                    >
-                                        <Form className="flex items-center justify-center">
-                                            <div className="w-full max-w-lg p-3 space-y-4">
-                                                <h2 className="text-2xl font-bold text-center underline underline-offset-8 decoration-4 decoration-blue-300">Nhập điểm</h2>
-                                                <div className="grid grid-rows-2 grid-flow-col">
-                                                    <div className="w-[80%] mx-auto">
-                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
-                                                            Mã học sinh
-                                                        </label>
-                                                        <Field
-                                                            type="text"
-                                                            name="MSHS"
-                                                            className="f-field"
-                                                            placeholder="Nhập mã học sinh"
-                                                        />
-                                                        <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
-                                                    </div>
-                                                    <div className="w-[80%] mx-auto">
-                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="Diem">
-                                                            Điểm
-                                                        </label>
-                                                        <Field
-                                                            type="text"
-                                                            name="Diem"
-                                                            className="f-field"
-                                                            placeholder="Nhập mã điểm"
-                                                        />
-                                                        <ErrorMessage className="text-red-700 block mb-2" name="Diem" component="div" />
-                                                    </div>
-                                                    <div className="w-[80%] mx-auto">
-                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaHK">
-                                                            Học kì
-                                                        </label>
-                                                        <Field
-                                                            as="select"
-                                                            name="MaHK"
-                                                            className="f-field"
-                                                        >
-                                                            <option value="">Chọn học kì</option>
-                                                            <option value={hocki["Học kì 1"]}>Học kì 1</option>
-                                                            <option value={hocki["Học kì 2"]}>Học kì 2</option>
-                                                        </Field>
-                                                        <ErrorMessage className="text-red-700 block mb-2" name="MaHK" component="div" />
-                                                    </div>
-                                                    <div className="w-[80%] mx-auto">
-                                                        <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaLoai">
-                                                            Loại điểm
-                                                        </label>
-                                                        <Field
-                                                            as="select"
-                                                            name="MaLoai"
-                                                            className="f-field"
-                                                        >
-                                                            <option value="">Chọn loại điểm</option>
-                                                            {loaiDiemHK.map((data) => (
-                                                                <option key={data.MaLoai} value={data.MaLoai}>{data.TenLoai}</option>
-                                                            ))}
-                                                        </Field>
-                                                        <ErrorMessage className="text-red-700 block mb-2" name="MaLoai" component="div" />
-                                                    </div>
-                                                </div>
+                    <div className="my-2 flex">
+                        <button className={`teacher-head ${show == 1 && "bg-cyan-300"}`} onClick={() => handleShow(1)}>Danh sách lớp</button>
+                        <button className={`teacher-head ${show == 2 && "bg-cyan-300"}`} onClick={() => handleShow(2)}>Quản lí điểm</button>
+                    </div>
+                    <div className="flex justify-between px-2 text-2xl my-3">
+                        <p><strong>Mã lớp:</strong> {classData.lop.MaLop}</p>
+                        <p><strong>Tên lớp:</strong> {classData.lop.TenLop}</p>
+                        <p><strong>Môn dạy:</strong> {classData.mon_hoc.TenMH}</p>
+                        <p><strong>Sỉ số:</strong> {classData.lop.hoc_sinh.length}</p>
+                    </div>
+                    {show === 1 && <HocSinhTable datas={classData.lop.hoc_sinh} />}
+                    {show === 2 && (
+                        <div>
+                            {hanSuaDiem ?
+                                <div className="flex justify-between my-2 w-full">
+                                    <div className="space-x-2 flex">
+                                        <button onClick={ShowButton} className="button button-animation border-blue-600 hover:bg-blue-600">Tổng kết</button>
+                                        {showButton &&
+                                            <div className="space-x-2">
                                                 <button
-                                                    type="submit"
-                                                    className="f-button"
+                                                    type="button"
+                                                    className={!disableNH ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                    disabled={disableNH}
+                                                    onClick={() => changeConfirm('tknh')}
                                                 >
-                                                    Lưu
+                                                    Tổng kết năm học
                                                 </button>
-                                            </div>
-                                        </Form>
-                                    </Formik>
+                                                <button
+                                                    type="button"
+                                                    className={!disableHK1 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                    disabled={disableHK1}
+                                                    onClick={() => changeConfirm('tkhk1')}
+                                                >
+                                                    Tổng kết học kì 1
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={!disableHK2 ? " button button-animation border-blue-600 hover:bg-blue-600" : " button border-slate-500 text-slate-500"}
+                                                    disabled={disableHK2}
+                                                    onClick={() => changeConfirm('tkhk2')}
+                                                >
+                                                    Tổng kết học kì 2
+                                                </button>
+                                            </div>}
+                                    </div>
+                                    {(classData?.MaMH === "CB4" || classData?.MaMH === "CB5") && <div className=" text-red-800 text-xl">*Điểm 0 = Chưa đạt, 1 = Đạt</div>}
+                                    <div className="space-x-2 flex justify-end ">
+                                        {showForm === 2 && <div className="text-red-500 shadow-lag mt-1 text-xl">Nhấp chọn điểm cần sửa</div>}
+                                        {showForm !== 2 ? (
+                                            <button className="button button-animation border-blue-600 hover:bg-blue-600" onClick={() => setShowForm(2)}>Sửa điểm</button>
+                                        ) : (
+                                            <button className="button button-animation border-red-600 hover:bg-red-600" onClick={() => setShowForm(0)}>Hủy</button>
+                                        )}
+                                        <button className="button button-animation border-blue-600" onClick={() => setShowForm(1)}>Nhập điểm</button>
+                                    </div>
+                                </div>
+                                :
+                                <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
+                            }
+                            <BangDiem
+                                hocSinh={classData.lop.hoc_sinh}
+                                loaiDiem={loaiDiemHK}
+                                diemHK1={diemHK1}
+                                diemHK2={diemHK2}
+                                diemCN={diemCN}
+                                show={showForm}
+                                _delete={handleDelete}
+                                _update={handleUpdate}
+                            />
+                        </div>
+                    )}
+                    {showForm === 1 && (
+                        <Draggable nodeRef={dragRef} handle=".drag-handle">
+                            <div className="z-10 absolute w-1/2 top-64 left-1/4" ref={dragRef}>
+                                <div className="border-2 border-black rounded-lg bg-white">
+                                    <div className="absolute top-0 right-0">
+                                        <button className="X-button" onClick={() => setShowForm(0)}>X</button>
+                                    </div>
+                                    <div className="drag-handle cursor-move p-2 text-center text-xl border-b-2 border-slate-100 text-white bg-slate-400">Nhập điểm</div>
+                                    <div className="p-4">
+                                        <Formik
+                                            initialValues={{
+                                                MSHS: '',
+                                                Diem: '',
+                                                MaHK: '',
+                                                MaLoai: '',
+                                            }}
+                                            validationSchema={Yup.object().shape({
+                                                MSHS: Yup.string().required('Bắt buộc'),
+                                                Diem: Yup.number().typeError("Không đúng định dạng")
+                                                    .required('Bắt buộc')
+                                                    .min(0, "Điểm không hợp lệ")
+                                                    .max(classData.MaMH === "CB4" || classData.MaMH === "CB5" ? 1 : 10, "Điểm không hợp lệ"),
+                                                MaHK: Yup.string().required('Bắt buộc'),
+                                                MaLoai: Yup.string().required('Bắt buộc'),
+                                            })}
+                                            enableReinitialize={true}
+                                            onSubmit={handleSubmit}
+                                        >
+                                            <Form className="flex items-center justify-center">
+                                                <div className="w-full max-w-lg p-3 space-y-4">
+                                                    <h2 className="text-2xl font-bold text-center underline underline-offset-8 decoration-4 decoration-blue-300">Nhập điểm</h2>
+                                                    <div className="grid grid-rows-2 grid-flow-col">
+                                                        <div className="w-[80%] mx-auto">
+                                                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MSHS">
+                                                                Mã học sinh
+                                                            </label>
+                                                            <Field
+                                                                type="text"
+                                                                name="MSHS"
+                                                                className="f-field"
+                                                                placeholder="Nhập mã học sinh"
+                                                            />
+                                                            <ErrorMessage className="text-red-700 block mb-2" name="MSHS" component="div" />
+                                                        </div>
+                                                        <div className="w-[80%] mx-auto">
+                                                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="Diem">
+                                                                Điểm
+                                                            </label>
+                                                            <Field
+                                                                type="text"
+                                                                name="Diem"
+                                                                className="f-field"
+                                                                placeholder="Nhập mã điểm"
+                                                            />
+                                                            <ErrorMessage className="text-red-700 block mb-2" name="Diem" component="div" />
+                                                        </div>
+                                                        <div className="w-[80%] mx-auto">
+                                                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaHK">
+                                                                Học kì
+                                                            </label>
+                                                            <Field
+                                                                as="select"
+                                                                name="MaHK"
+                                                                className="f-field"
+                                                            >
+                                                                <option value="">Chọn học kì</option>
+                                                                <option value={hocki["Học kì 1"]}>Học kì 1</option>
+                                                                <option value={hocki["Học kì 2"]}>Học kì 2</option>
+                                                            </Field>
+                                                            <ErrorMessage className="text-red-700 block mb-2" name="MaHK" component="div" />
+                                                        </div>
+                                                        <div className="w-[80%] mx-auto">
+                                                            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="MaLoai">
+                                                                Loại điểm
+                                                            </label>
+                                                            <Field
+                                                                as="select"
+                                                                name="MaLoai"
+                                                                className="f-field"
+                                                            >
+                                                                <option value="">Chọn loại điểm</option>
+                                                                {loaiDiemHK.map((data) => (
+                                                                    <option key={data.MaLoai} value={data.MaLoai}>{data.TenLoai}</option>
+                                                                ))}
+                                                            </Field>
+                                                            <ErrorMessage className="text-red-700 block mb-2" name="MaLoai" component="div" />
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="submit"
+                                                        className="f-button"
+                                                    >
+                                                        Lưu
+                                                    </button>
+                                                </div>
+                                            </Form>
+                                        </Formik>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Draggable>
-                )}
+                        </Draggable>
+                    )}
+                </div>
             </div>
         </div>
     );

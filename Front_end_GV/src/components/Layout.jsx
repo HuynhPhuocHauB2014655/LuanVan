@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useUserContext } from "../context/userContext";
 import pusher from "../pusher";
+import Header from "./Header";
 export default function Layout() {
     const { message, error, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
@@ -61,7 +62,7 @@ export default function Layout() {
         window.scrollTo(0, 0);
     }
     return (
-        <div className="mx-2 relative">
+        <div className="relative">
             {showConfirm && (
                 <div className="confirm-overlay">
                 <div className="confirm-box">
@@ -75,15 +76,11 @@ export default function Layout() {
             )}
             {message && <div className="fixed bg-blue-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{message}</div>}
             {error && <div className="fixed bg-red-600 text-white w-[90%] text-center py-3 rounded bottom-0 z-10 left-[5%]">{error}</div>}
-            <header className="bg-cyan-400 py-2 rounded header relative">
-                <button className="absolute right-2 h-[30%] top-[35%]" onClick={logOut}><FontAwesomeIcon icon={faRightFromBracket} color="white" className="h-full" /></button>
-                <p className="text-center text-2xl">Hệ thống quản lí <br /> Trường THPT Cần Thơ</p>
-            </header>
-            <div className="relative">
+            <div className="relative bg-[#eceff8]">
                 <Outlet />
             </div>
-            <footer className="footer bg-cyan-200 rounded flex items-center justify-center">
-                Footer
+            <footer className="footer bg-white border-t-2 flex px-4 items-center">
+                Copyright © Trường THPT Cần Thơ
             </footer>
             <button className="border-2 border-blue-600 px-3 py-1 text-2xl fixed bottom-1 right-1 rounded z-20" onClick={goToTop}><FontAwesomeIcon icon={faArrowUp} color="blue" /></button>
         </div>

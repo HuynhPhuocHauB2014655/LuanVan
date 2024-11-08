@@ -3,84 +3,47 @@ import { useUserContext } from "../context/userContext";
 import { useEffect, useState } from "react";
 import axiosClient from "../axios-client";
 import pusher from "../pusher";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import Calendar from "../components/Calender";
+import Header from "../components/Header";
 export default function Home() {
-    const {userName,info} = useUserContext();
-    const [tbCount,setTbCount] = useState(0);
-    const [tnCount,setTnCount] = useState(0);
-    useEffect(()=>{
-        const fetchTB = async () => {
-            const TB = await axiosClient.get(`/tb/gv/${userName}`);
-            const count = TB.data.filter(item => item.TrangThai == 0).length;
-            setTbCount(count);
-        }
-        fetchTB();
-    },[userName]);
-    const fetchTN = async () => {
-        const c = await axiosClient.get(`tn/count/${userName}`);
-        let n = 0;
-        c.data.map((data)=>{
-            n += data.unread_count;
-        })
-        setTnCount(n);
-    }
-    useEffect(()=>{
-        fetchTN();
-    },[userName]);
-    useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
-
-        channel.bind('App\\Events\\sendMessage', (data) => {
-            fetchTN();
-        });
-
-        return () => {
-            channel.unbind_all();
-            channel.unsubscribe();
-        };
-    }, [userName]);  
+    const { userName, info } = useUserContext();
+    library.add(fas);
     const menu_items = [
-        { id: 1, route: "/info", label: 'Thông tin cá nhân' },
-        { id: 2, route: "/cn", label: 'Chủ nhiệm' },
-        { id: 3, route: "/class", label: 'Quản lí lớp dạy' },
-        { id: 4, route: "/tkb", label: 'Thời khóa biểu' },
-        { id: 5, route: "/tb", label: 'Thông báo' },
-        { id: 6, route: "/ms", label: 'Tin nhắn' },
-        { id: 7, route: "/teach", label: 'Dạy học' },
+        { id: 1, route: "/info", label: 'Thông tin cá nhân', icon: <FontAwesomeIcon icon="fa-solid fa-user" /> },
+        { id: 2, route: "/cn", label: 'Chủ nhiệm', icon: <FontAwesomeIcon icon="fa-solid fa-briefcase" /> },
+        { id: 3, route: "/class", label: 'Quản lí lớp dạy', icon: <FontAwesomeIcon icon="fa-solid fa-book-open" /> },
+        { id: 4, route: "/tkb", label: 'Thời khóa biểu', icon: <FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
+        { id: 7, route: "/teach", label: 'Dạy học', icon: <FontAwesomeIcon icon="fa-solid fa-person-chalkboard" /> },
     ];
     return (
-        <div className="main-content">
-            <div className="w-full p-20 mx-auto">
-                <div className="text-center w-[60%] mx-auto">
-                    <p className="text-4xl font-extrabold text-blue-600">Chào mừng bạn đến với hệ thống quản lí Trường THPT Cần Thơ</p> <br/>
+        <div>
+            <Header />
+            <div className="main-content">
+                <div className="w-full p-10">
+                    <div className="text-center w-[60%] mx-auto">
+                        <p className="text-4xl font-extrabold text-blue-600 mb-10">Chào mừng bạn đến với hệ thống quản lí Trường THPT Cần Thơ</p> <br />
+                    </div>
+                    <div className="flex space-x-2">
+                        <div className="grid grid-cols-1 w-1/3 gap-3">
+                            {menu_items?.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    className="space-y-3 text-center relative bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300"
+                                    to={item.route}
+                                >
+                                    <p className="text-3xl">{item.icon}</p>
+                                    <p className="md:text-lg  font-semibold text-gray-700">{item.label}</p>
+                                </Link>
+                            ))}
+                        </div>
+                        <div className="w-2/3">
+                            <Calendar />
+                        </div>
+                    </div>
                 </div>
-                <p className="text-xl text-center mt-16 mb-10">Danh sách các chức năng</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-screen-lg mx-auto">
-                    {menu_items.map((item) => (
-                        <Link key={item.id}
-                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
-                            to={item.route}
-                        >
-                            <p className="text-lg font-semibold text-gray-700">{item.label}</p>
-                            {item.id == 5 && tbCount > 0 && 
-                                <span className="absolute top-0 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tbCount}</span>
-                            }
-                            {item.id == 6 && tnCount > 0 && 
-                                <span className="absolute top-1 right-0 bg-red-500 px-2 rounded-full text-white text-sm">{tnCount}</span>
-                            }
-                        </Link>
-                    ))}
-                </div>
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-screen-lg mx-auto">
-                    {menu?.map((item) => (
-                        <Link
-                            key={item.id}
-                            className="border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300 text-center"
-                            to={item.route}
-                        >
-                            <p className="text-lg font-semibold text-gray-700">{item.label}</p>
-                        </Link>
-                    ))}
-                </div> */}
             </div>
         </div>
     )
