@@ -106,10 +106,10 @@ input {
 }
 
 .class-info-head{
-  @apply hover:bg-slate-400 py-3 border-y-2 border-blue-300 text-lg
+  @apply hover:bg-cyan-300 py-3 border-y-2 border-blue-500 text-lg
 }
 .class-info-head-active{
-  @apply bg-slate-400 py-3 border-y-2 border-blue-300 text-lg text-white
+  @apply bg-cyan-400 py-3 border-y-2 border-blue-500 text-lg text-white
 }
 
 

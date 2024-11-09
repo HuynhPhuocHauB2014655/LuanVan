@@ -236,7 +236,7 @@ export default function Result() {
                                 <div className="my-2 grid grid-rows-1 grid-flow-col w-[30%] space-x-2">
                                     <button className="button border border-blue-400 hover:bg-blue-300" onClick={fetchAllClass}>Tất cả</button>
                                     <button className="button border border-blue-400 hover:bg-blue-300" onClick={() => fetchByClass(nienKhoa.NienKhoa)}>Hiện tại</button>
-                                    <select ref={NKRef} className="rounded-md border-2 px-2" onChange={fetchByNK}>
+                                    <select ref={NKRef} className="rounded-md border-2 px-2 border-slate-400" onChange={fetchByNK}>
                                         <option value="">Chọn niên khóa</option>
                                         {Nk.map((item) => (
                                             <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
@@ -246,8 +246,8 @@ export default function Result() {
                                 {classList?.map((item) => (
                                     <div key={item.MaLop} onClick={() => handleToClass(item)}
                                         className="grid grid-cols-3 grid-flow-row text-2xl
-                                     bg-white shadow-md border-2 border-collapse p-2 transition duration-300 
-                                     ease-in-out transform hover:scale-x-105 hover:shadow-lg hover:bg-slate-200 cursor-pointer"
+                                     shadow-md border-2 border-slate-300 rounded p-2 transition duration-300 
+                                     ease-in-out transform hover:scale-x-105 hover:shadow-lg my-1 cursor-pointer"
                                     >
                                         <h3 className="">Mã lớp: {item.MaLop}</h3>
                                         <p className="">Tên lớp: {item.TenLop}</p>
@@ -257,8 +257,10 @@ export default function Result() {
                                                     return <p className="text-red-500">Chưa báo cáo</p>;
                                                 case 1:
                                                     return <p className="text-yellow-600">Chờ duyệt</p>;
-                                                default:
+                                                case 2:
                                                     return <p className="text-green-500">Đã duyệt</p>;
+                                                default:
+                                                    return <p className="text-red-500">Yêu cầu chỉnh sửa</p>;
                                             }
                                         })()}
                                     </div>

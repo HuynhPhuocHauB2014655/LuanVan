@@ -18,7 +18,8 @@ class Lop extends Model
         'MaKhoi',
         'MaNK',
         'MSGV',
-        'TrangThai'
+        'TrangThai',
+        'ChinhSua'
     ];
     protected $primaryKey = 'MaLop';
     public function hocSinh(): BelongsToMany{

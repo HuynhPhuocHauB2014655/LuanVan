@@ -21,8 +21,10 @@ export default function ClassInfo() {
     const [kqht, setKqht] = useState([]);
     const [dsKhenThuong, setDsKhenThuong] = useState([]);
     const navigate = useNavigate();
+    const [showForm, setShowForm] = useState(false);
     const [showConfirm, setShowConfirm] = useState(0);
     const { userName } = useUserContext();
+    const FRef = useRef();
     useEffect(() => {
         if (userName == "nhansu") {
             setError("Bạn không có quyền truy cập trang này");
@@ -113,6 +115,20 @@ export default function ClassInfo() {
             console.error('Error fetching data:', error);
         }
     }
+    const YCChinhSua = async (e) => {
+        e.preventDefault();
+        const payload = {
+            MaLop: classData.MaLop,
+            ChinhSua: FRef.current.value,
+        }
+        try{
+            await axiosClient.post("/lop/cs",payload);
+            setMessage("Đã cập nhật thành công");
+            setShowForm(false);
+        }catch(error){
+            console.log(error);
+        }
+    }
     const onCancel = () => {
         setShowConfirm(0);
     }
@@ -126,14 +142,24 @@ export default function ClassInfo() {
                 }
                 <Menu />
                 <div className="right-part mb-2 relative">
-
+                    {showForm && 
+                        <form onSubmit={YCChinhSua} className="z-10 absolute top-64 left-1/4 w-1/2 p-5 bg-white border-2 border-slate-300 rounded-md shadow-md">
+                            <button type="button" className="absolute top-0 right-1 p-0 hover:text-red-500 font-bold" onClick={() => setShowForm(false)}>X</button>
+                            <div className="text-center bg-slate-300 p-3 text-xl font-bold rounded">Yêu cầu chỉnh sửa</div>
+                            <textarea name="ChinhSua" ref={FRef} className="resize-none w-full p-3 border-2 border-slate-300 mt-3 rounded outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="5" placeholder="Nội dung yêu cầu chỉnh sửa"></textarea>
+                            <button className="w-full border-2 border-blue-500 mt-2 rounded hover:bg-blue-300 font-bold hover:text-white">Xác nhận</button>
+                        </form>
+                    }
                     <div className="border-b-2 border-cyan-400 py-3 flex justify-between">
                         <button onClick={() => navigate(-1)} className="button border-blue-500 hover:bg-blue-500 hover:text-white">Trở về</button>
                         <h1 className="text-2xl font-bold text-center">Kết quả học tập</h1>
                         {classData.TrangThai == 2 ?
                             <div className="text-xl text-green-400">Đã duyệt</div>
                             : classData.TrangThai == 1 ?
-                                <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={() => setShowConfirm(1)}>Duyệt kết quả</button>
+                                <div className="flex items-center space-x-2">
+                                    <button className="button border-red-500 hover:bg-red-500 hover:text-white" onClick={() => setShowForm(true)}>Yêu cầu chỉnh sửa</button>
+                                    <button className="button border-green-500 hover:bg-green-500 hover:text-white" onClick={() => setShowConfirm(1)}>Duyệt kết quả</button>
+                                </div>
                                 :
                                 <div className="text-xl text-red-400">Chưa báo cáo</div>
                         }
@@ -146,13 +172,19 @@ export default function ClassInfo() {
                         <button className={view == 5 ? "class-info-head-active border-x-2" : "class-info-head border-x-2"} onClick={fiftthView}>Xét lên lớp</button>
                         <button className={view == 6 ? "class-info-head-active border-x-2 rounded-e-md" : "class-info-head border-x-2 rounded-e-md"} onClick={sixthView}>Khen Thưởng</button>
                     </div>
+                    <div className="flex justify-between px-2 text-2xl my-3">
+                        <p><strong>Mã lớp:</strong> {classData.MaLop}</p>
+                        <p><strong>Tên lớp:</strong> {classData.TenLop}</p>
+                        <p><strong>Sỉ số:</strong> {classData.hoc_sinh.length}</p>
+                        <p><strong>Chủ nhiệm:</strong> {classData.giao_vien.TenGV}</p>
+                    </div>
                     {view == 1 &&
-                        <div className="mt-3 max-w-[90%] mx-auto">
+                        <div className="mt-3">
                             <HocSinhTable datas={classData.hoc_sinh} />
                         </div>
                     }
                     {view == 2 &&
-                        <div className="max-w-[90%] mx-auto">
+                        <div className="space-y-5">
                             {subjects.map((mh) => (
                                 <div key={mh.MaMH} className="my-2">
                                     <h3 className="text-2xl font-bold text-center">Tên môn: {mh.TenMH}</h3>
@@ -168,9 +200,9 @@ export default function ClassInfo() {
                     }
                     {view == 3 &&
                         <div className="mt-3">
-                            <table className="table-auto text-center w-[90%] mx-auto">
+                            <table className="table-auto text-center ">
                                 <thead>
-                                    <tr>
+                                    <tr className='bg-slate-400'>
                                         <th className="border border-black py-3 px-2">Mã số học sinh</th>
                                         <th className="border border-black py-3 px-2">Tên học sinh</th>
                                         <th className="border border-black py-3 px-2">Điểm trung bình HK1</th>
@@ -183,10 +215,10 @@ export default function ClassInfo() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {classData.hoc_sinh.map((hs) => {
+                                    {classData.hoc_sinh.map((hs, index) => {
                                         const data = kqht.find((diem) => diem.MSHS == hs.MSHS);
                                         return (
-                                            <tr key={hs.MSHS}>
+                                            <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-200"}`}>
                                                 <td className="border border-black py-3 px-2">{hs.MSHS}</td>
                                                 <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
                                                 <td className="border border-black py-3 px-2">{data?.Diem_TB_HKI || "-"}</td>
@@ -205,9 +237,9 @@ export default function ClassInfo() {
                     }
                     {view == 4 &&
                         <div className="mt-3">
-                            <table className="table-auto text-center w-[90%] mx-auto">
+                            <table className="table-fixed text-center w-full">
                                 <thead>
-                                    <tr>
+                                    <tr className='bg-slate-400'>
                                         <th className="border border-black py-3 px-2">Mã số học sinh</th>
                                         <th className="border border-black py-3 px-2">Tên học sinh</th>
                                         <th className="border border-black py-3 px-2">Rèn luyện HK1</th>
@@ -217,11 +249,11 @@ export default function ClassInfo() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {classData.hoc_sinh.map((hs) => {
+                                    {classData.hoc_sinh.map((hs, index) => {
                                         const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
                                         if (data) {
                                             return (
-                                                <tr key={hs.MSHS}>
+                                                <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-200"}`}>
                                                     <td className="border border-black py-3 px-2">{hs.MSHS}</td>
                                                     <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
                                                     <td className="border border-black py-3 px-2">{data.ren_luyen_h_k1.TenRL}</td>
@@ -237,10 +269,10 @@ export default function ClassInfo() {
                         </div>
                     }
                     {view == 5 &&
-                        <div className="max-w-[90%] mx-auto mt-3">
+                        <div className="w-full mt-3">
                             <table className="table-auto text-center w-full">
                                 <thead>
-                                    <tr>
+                                    <tr className='bg-slate-400'>
                                         <th className="border border-black py-3 px-2">Mã số học sinh</th>
                                         <th className="border border-black py-3 px-2">Tên học sinh</th>
                                         <th className="border border-black py-3 px-2">Xếp loại cả năm</th>
@@ -251,11 +283,11 @@ export default function ClassInfo() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {classData.hoc_sinh.map((hs) => {
+                                    {classData.hoc_sinh.map((hs, index) => {
                                         const data = kqht?.find((diem) => diem.MSHS == hs.MSHS);
                                         if (data) {
                                             return (
-                                                <tr key={hs.MSHS}>
+                                                <tr key={hs.MSHS} className={`${index % 2 == 0 && "bg-slate-200"}`}>
                                                     <td className="border border-black py-3 px-2">{hs.MSHS}</td>
                                                     <td className="border border-black py-3 px-2 text-left">{hs.HoTen}</td>
                                                     <td className="border border-black py-3 px-2">{data.hoc_luc.TenHL}</td>
@@ -272,7 +304,7 @@ export default function ClassInfo() {
                         </div>
                     }
                     {view == 6 &&
-                        <div className=" w-[90%] mx-auto mt-10">
+                        <div className="mt-10">
                             {dsKhenThuong.length > 0 ?
                                 <table className="table w-full text-xl">
                                     <thead>

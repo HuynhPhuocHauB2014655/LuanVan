@@ -38,21 +38,21 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
     const generateTXCells = (grades, emptyCellsCount, student) => {
         if (grades.length == 0) {
             const cells = [...Array(4)].map((_, i) => (
-                <td key={i} className="border border-black">-</td>
+                <td key={i} className="py-3 px-2 border border-black">-</td>
             ));
             return cells;
         } else {
             const cells = grades.map((data, index) => (
                 data.Diem >= 0 ?
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="py-3 px-2 border border-black">
                         {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                     </td>
                     :
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">-
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="py-3 px-2 border border-black">-
                     </td>
             ));
             for (let i = 0; i < emptyCellsCount; i++) {
-                cells.push(<td key={`tx-empty-${student.MSHS}-${i + cells.length}`} className="border border-black">-</td>);
+                cells.push(<td key={`tx-empty-${student.MSHS}-${i + cells.length}`} className="py-3 px-2 border border-black">-</td>);
             }
             return cells;
         }
@@ -62,18 +62,18 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
         if (grades.length == 0) {
             const cells = loaiDiem.map((data) => (
                 data.MaLoai != 'tx' &&
-                <td key={data.MaLoai} className="border border-black">-
+                <td key={data.MaLoai} className="py-3 px-2 border border-black">-
                 </td>
             ))
             return cells;
         } else {
             return grades.map((data, index) => (
                 data.Diem >= 0 ?
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="py-3 px-2 border border-black">
                         {data.MaMH == 'CB4' || data.MaMH == 'CB5' ? data.Diem == 0 ? "Chưa đạt" : "Đạt" : data.Diem}
                     </td>
                     :
-                    <td key={`other-grade-${student.MSHS}-${index}`} className="border border-black">-
+                    <td key={`other-grade-${student.MSHS}-${index}`} className="py-3 px-2 border border-black">-
                     </td>
             ));
         }
@@ -96,44 +96,28 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
         <div>
             <table className="w-full text-center table-auto border border-black border-collapse">
                 <thead>
-                    <tr>
-                        <th className="border border-black p-2"></th>
-                        <th className="border border-black p-2"></th>
-                        <th className="border border-black p-2"></th>
-                        <th className="border border-black p-2" colSpan={7}>Học kì I</th>
-                        <th className="border border-black p-2" colSpan={7}>Học kì II</th>
-                        <th className="border border-black p-2" colSpan={2}>Cả năm</th>
+                    <tr className='bg-slate-400'>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black"></th>
+                        <th className="py-3 px-2 border border-black" colSpan={7}>Học kì I</th>
+                        <th className="py-3 px-2 border border-black" colSpan={7}>Học kì II</th>
+                        <th className="py-3 px-2 border border-black" colSpan={2}>Cả năm</th>
                     </tr>
-                    <tr>
-                        <th className="border border-black p-2">STT</th>
-                        <th className="border border-black p-2">Mã số học sinh</th>
-                        <th className="border border-black p-2">Tên học sinh</th>
-                        {loaiDiem.map((data) => (
-                            data.MaLoai != "rlh" &&
-                            (data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black p-2" colSpan={4}>
-                                    {data.TenLoai}
-                                </th>
-                                :
-                                <th key={data.MaLoai} className="border border-black p-2">
-                                    {data.TenLoai}
-                                </th>)
-                        ))}
-                        <th className="border border-black p-2">Trung bình học kì 1</th>
-                        {loaiDiem.map((data) => (
-                            data.MaLoai != "rlh" &&
-                            (data.MaLoai === 'tx' ?
-                                <th key={data.MaLoai} className="border border-black p-2" colSpan={4}>
-                                    {data.TenLoai}
-                                </th>
-                                :
-                                <th key={data.MaLoai} className="border border-black p-2">
-                                    {data.TenLoai}
-                                </th>)
-                        ))}
-                        <th className="border border-black p-2">Trung bình học kì 2</th>
-                        <th className="border border-black p-2">Rèn luyện hè</th>
-                        <th className="border border-black p-2">Trung bình cả năm</th>
+                    <tr className='bg-slate-300'>
+                        <th className="py-3 px-2 border border-black">STT</th>
+                        <th className="py-3 px-2 border border-black text-start">Mã số học sinh</th>
+                        <th className="py-3 px-2 border border-black text-start">Tên học sinh</th>
+                        <th className="py-3 px-2 border border-black" colSpan={4}>Thường xuyên</th>
+                        <th className="py-3 px-2 border border-black">Giữa kì</th>
+                        <th className="py-3 px-2 border border-black">Cuối kì</th>
+                        <th className="py-3 px-2 border border-black">TBHK1</th>
+                        <th className="py-3 px-2 border border-black" colSpan={4}>Thường xuyên</th>
+                        <th className="py-3 px-2 border border-black">Giữa kì</th>
+                        <th className="py-3 px-2 border border-black">Cuối kì</th>
+                        <th className="py-3 px-2 border border-black">TBHK2</th>
+                        <th className="py-3 px-2 border border-black">Rèn luyện hè</th>
+                        <th className="py-3 px-2 border border-black">TBCN</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,27 +133,27 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1, diemHK2 }) => {
                         const emptyTXCellsCount1 = 4 - (countTX1[student.MSHS] || 0);
                         const emptyTXCellsCount2 = 4 - (countTX2[student.MSHS] || 0);
                         return (
-                            <tr key={student.MSHS}>
-                                <td className="border border-black p-2">{index + 1}</td>
+                            <tr key={student.MSHS} className='bg-slate-100'>
+                                <td className="py-3 px-2 border border-black">{index + 1}</td>
 
-                                <td className="border border-black p-2">{student.MSHS}</td>
+                                <td className="py-3 px-2 border border-black text-start">{student.MSHS}</td>
 
-                                <td className="border border-black p-2 text-start">{student.HoTen}</td>
+                                <td className="py-3 px-2 border border-black text-start">{student.HoTen}</td>
 
                                 {generateTXCells(txGrades1, emptyTXCellsCount1, student)}
 
                                 {generateOtherCells(otherGrades1, student,)}
 
-                                <td className="border border-black p-2">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
+                                <td className="py-3 px-2 border border-black">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
 
                                 {generateTXCells(txGrades2, emptyTXCellsCount2, student)}
 
                                 {generateOtherCells(otherGrades2, student)}
 
-                                
-                                <td className="border border-black p-2">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-                                <td className="border border-black p-2">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
-                                <td className="border border-black p-2">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
+
+                                <td className="py-3 px-2 border border-black">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
+                                <td className="py-3 px-2 border border-black">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
+                                <td className="py-3 px-2 border border-black">{TBCN?.Diem >= 0 ? TBCN?.MaMH == 'CB4' || TBCN?.MaMH == 'CB5' ? TBCN?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBCN.Diem : "-"}</td>
                             </tr>
                         );
                     })}

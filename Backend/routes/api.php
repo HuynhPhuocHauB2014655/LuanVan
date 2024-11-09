@@ -106,6 +106,7 @@ Route::post('/lop/addHS',[LopController::class,'addToClass']);
 Route::post('/lop/change',[LopController::class,'changeClass']);
 Route::get('/lop/duyetkq/{MaLop}',[LopController::class,'DuyetKQHT']);
 Route::post('/lop/daybu',[LopController::class,'getDayBu']);
+Route::post('/lop/cs',[LopController::class,'YCCHinhSua']);
 
 //tkb route
 Route::post('/tkb/create/{nk}',[TKBController::class,'create']);

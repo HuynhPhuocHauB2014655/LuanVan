@@ -10,6 +10,7 @@ use App\Models\HocLop;
 use App\Models\GiaoVien;
 use App\Models\Diem;
 use App\Models\KhenThuong;
+use App\Models\ThongBao;
 use App\Models\TietHoc;
 use App\Models\NhomTinNhan;
 use App\Models\ThanhVienNhom;
@@ -433,5 +434,18 @@ class LopController extends Controller
     public function getDayBu(Request $rq){
         $data = TietHoc::with(['monHoc','giaoVien'])->where("MaLop",$rq->MaLop)->where("Loai",1)->whereBetween("Ngay", [$rq->start, $rq->end])->get();
         return response()->json($data, Response::HTTP_OK);
+    }
+    public function YCCHinhSua(Request $rq){
+        $lop = Lop::find($rq->MaLop);
+        $lop->TrangThai = 3;
+        $lop->ChinhSua = $rq->ChinhSua;
+        $lop->save();
+        ThongBao::create([
+            'NguoiNhan' => $lop->MSGV,
+            'NoiDung' => 'Bạn có yêu cầu chỉnh sửa kết quả học tập của lớp từ nhà trường',
+            'NguoiGui' => 'Hệ thống',
+            'TieuDe'=> 'Yêu cầu chỉnh sửa kết quả học tập'
+        ]);
+        return response()->json(Response::HTTP_OK);
     }
 }

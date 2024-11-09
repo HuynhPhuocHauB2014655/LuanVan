@@ -31,11 +31,13 @@ export default function Home() {
                             {menu_items?.map((item) => (
                                 <Link
                                     key={item.id}
-                                    className="space-y-3 text-center relative bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300"
+                                    className="space-y-3 flex justify-center items-center text-center relative bg-white border border-gray-300 rounded-lg px-3 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-transform duration-300"
                                     to={item.route}
                                 >
-                                    <p className="text-3xl">{item.icon}</p>
-                                    <p className="md:text-lg  font-semibold text-gray-700">{item.label}</p>
+                                    <div>
+                                        <p className="text-3xl">{item.icon}</p>
+                                        <p className="md:text-lg  font-semibold text-gray-700">{item.label}</p>
+                                    </div>
                                 </Link>
                             ))}
                         </div>
