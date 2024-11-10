@@ -167,11 +167,11 @@ const Calendar = () => {
                     const n = note.find(item => item.Day == day && item.Month == currentMonth + 1 && item.Year == currentYear);
                     return (
                         <div key={index}
-                            className={`calendar-cell ${(day == new Date().getDate() && currentMonth == new Date().getMonth() && currentYear == new Date().getFullYear()) && "bg-slate-400"} ${n ? "p-2" : "p-7"}`}
+                            className={`calendar-cell ${(day == new Date().getDate() && currentMonth == new Date().getMonth() && currentYear == new Date().getFullYear()) && "bg-slate-400"} p-2`}
                             onClick={day ? () => chooseCell(n || "", day, currentMonth + 1, currentYear) : undefined}
                         >
-                            <p className='text-center'>{day}</p>
-                            <p className='text-sm overflow-hidden'>{n?.Note}</p>
+                            <p className=''>{day}</p>
+                            <div className='mt-3 text-sm overflow-hidden'>{n?.Note}</div>
                         </div>
                     )
                 })}

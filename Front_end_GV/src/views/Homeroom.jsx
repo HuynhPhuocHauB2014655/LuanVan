@@ -579,7 +579,7 @@ export default function Homeroom() {
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    {classInfo?.hoc_sinh.map((hs,index) => {
+                                                                    {classInfo?.hoc_sinh.map((hs, index) => {
                                                                         const tbhk1 = diemHK1?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk1" && diem.MSHS === hs.MSHS);
                                                                         const tbhk2 = diemHK2?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbhk2" && diem.MSHS === hs.MSHS);
                                                                         const tbcn = diemCN?.find((diem) => diem.MaMH === item.MaMH && diem.MaLoai === "tbcn" && diem.MSHS === hs.MSHS);
@@ -613,31 +613,42 @@ export default function Homeroom() {
                                             </div>
                                         }
                                         {subState == 3 &&
-                                            <div>
+                                            <div className="relative">
+                                                {showForm == 4 &&
+                                                    <div onClick={()=>setShowForm(0)} className="absolute z-20 p-5 bg-red-200 border-4 border-slate-500 w-1/2 rounded top-40 min-h-40 left-1/4 cursor-pointer">
+                                                        <p className="text-xl font-bold">Nội dung</p>
+                                                        <p>{classInfo?.ChinhSua && classInfo?.ChinhSua}</p>
+                                                    </div>
+                                                }
                                                 <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Điểm trung bình</h2>
                                                 <div className="w-[97 text-start%] mx-auto">
-                                                    {classInfo?.TrangThai == 0 ? <div className="flex justify-end w-full space-x-2 mb-1">
-                                                        {showButton &&
-                                                            <div className="flex text-sm space-x-1">
-                                                                <button
-                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                    disabled={disableHK1}
-                                                                    onClick={() => TinhDiemTBHK(1)}>HK1</button>
-                                                                <button
-                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                    disabled={disableHK2}
-                                                                    onClick={() => TinhDiemTBHK(2)}>HK2</button>
-                                                                <button
-                                                                    className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
-                                                                    disabled={disableCN}
-                                                                    onClick={() => TinhDiemTBCN()}>Cả năm</button>
-                                                            </div>
-                                                        }
-                                                        <button
-                                                            className=" bg-blue-400 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                                                            onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
-                                                        </button>
-                                                    </div>
+                                                    {(classInfo?.TrangThai == 0 || classInfo?.TrangThai == 3) ?
+                                                        <div className="flex justify-end w-full space-x-2 mb-1">
+                                                            {classInfo?.TrangThai == 3 && 
+                                                                <div>
+                                                                    <button className="px-2 py-1 border-2 border-red-500 rounded hover:bg-red-500 hover:text-white" onClick={()=>setShowForm(4)}>Cần chỉnh sửa</button>
+                                                                </div>}
+                                                            {showButton &&
+                                                                <div className="flex text-sm space-x-1">
+                                                                    <button
+                                                                        className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                        disabled={disableHK1}
+                                                                        onClick={() => TinhDiemTBHK(1)}>HK1</button>
+                                                                    <button
+                                                                        className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                        disabled={disableHK2}
+                                                                        onClick={() => TinhDiemTBHK(2)}>HK2</button>
+                                                                    <button
+                                                                        className="px-1 w-[70px] border border-cyan-300 rounded hover:bg-cyan-300 hover:text-white"
+                                                                        disabled={disableCN}
+                                                                        onClick={() => TinhDiemTBCN()}>Cả năm</button>
+                                                                </div>
+                                                            }
+                                                            <button
+                                                                className=" bg-blue-400 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                                                                onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
+                                                            </button>
+                                                        </div>
                                                         :
                                                         <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
                                                     }
@@ -656,7 +667,7 @@ export default function Homeroom() {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {classInfo?.hoc_sinh.map((hs,index) => {
+                                                            {classInfo?.hoc_sinh.map((hs, index) => {
                                                                 const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                                 if (data) {
                                                                     return (
@@ -707,7 +718,7 @@ export default function Homeroom() {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {classInfo?.hoc_sinh.map((hs,index) => {
+                                                        {classInfo?.hoc_sinh.map((hs, index) => {
                                                             const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                             if (data) {
                                                                 return (
@@ -774,7 +785,7 @@ export default function Homeroom() {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {classInfo?.hoc_sinh.map((hs,index) => {
+                                                        {classInfo?.hoc_sinh.map((hs, index) => {
                                                             const data = diemTB?.find((diem) => diem.MSHS == hs.MSHS);
                                                             if (data) {
                                                                 return (
