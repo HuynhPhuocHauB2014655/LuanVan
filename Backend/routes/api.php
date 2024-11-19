@@ -53,7 +53,7 @@ Route::get('/nk/index',[NienKhoaController::class,'index']);
 Route::get('/nk/show/{maNK}',[NienKhoaController::class,'show']);
 Route::put('/nk/update/{maNK}',[NienKhoaController::class,'update']);
 Route::delete('/nk/delete/{maNK}',[NienKhoaController::class,'destroy']);
-Route::get('/nk/setNow',[NienKhoaController::class,'setNienKhoaHienTai']);
+Route::post('/nk/setNow',[NienKhoaController::class,'setNienKhoaHienTai']);
 Route::get('/nk/getNow',[NienKhoaController::class,'getNienKhoaHienTai']);
 
 //hoc ki route
@@ -164,6 +164,7 @@ Route::post('/diem/tk/namhoc',[DiemController::class,'TongKetNamHoc']);
 Route::post('/diem/mon/rlh',[DiemController::class,'monRLH']);
 Route::post('/diem/rlh',[DiemController::class,'diemRLH']);
 Route::get('/diem',[DiemController::class,'NhapDiem']);
+Route::get('/rl',[DiemController::class,'NhapRL']);
 Route::get('/tongKet/truong/{MaNK}',[DiemController::class,'TongKetTruong']);
 Route::get('/tongKet/khoi/{MaNK}',[DiemController::class,'TongKetKhoi']);
 Route::get('/tongKet/lop/{MaNK}',[DiemController::class,'TongKetLop']);

@@ -15,13 +15,19 @@ class NienKhoaController extends Controller
     }
 
     public function setNienKhoaHienTai(Request $request){
-        NienKhoaHienTai::truncate();
-        $nk_now = new NienKhoaHienTai();
-        $nk_now->NienKhoa = $request->nk;
-        $nk_now->TenNK = $request->tennk;
-        $nk_now->NgayBD = $request->ngaybd;
-        $nk_now->HanSuaDiem = $request->hansuadiem;
-        $nk_now->save();
+        if($request->NienKhoa){
+            NienKhoaHienTai::truncate();
+            NienKhoaHienTai::create($request->all());
+            return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
+        }
+        $NK = NienKhoaHienTai::first();
+        if($request->NgayBD){
+            $NK->NgayBD = $request->NgayBD;
+        }
+        if($request->HanSuaDiem){
+            $NK->HanSuaDiem = $request->HanSuaDiem;
+        }
+        $NK->save();
         return response()->json("Đã thêm niên khóa hiện tại thành công", Response::HTTP_OK);
     }
     public function getNienKhoaHienTai(Request $request){

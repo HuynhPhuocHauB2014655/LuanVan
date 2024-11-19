@@ -184,7 +184,7 @@ export default function Class() {
         setShowConfirm(0);
         setDefaultV("default")
     }
-    // console.log(classes);
+    // console.log(newStudents);
     return (
         <div>
             <Header />
@@ -436,12 +436,7 @@ export default function Class() {
                                 <Form className="">
                                     <div className="columns-3">
                                         <div>
-                                            <Field as="select" name="MaNK" className="w-full border-2 rounded-md px-2 py-1" placeholder="Mã niên khóa">
-                                                <option value='' defaultChecked disabled>Chọn niên khóa</option>
-                                                {nienKhoaList.map((data) => (
-                                                    <option key={data.MaNK} value={data.MaNK}>{data.TenNK}</option>
-                                                ))}
-                                            </Field>
+                                            <Field type="text" name="MaNK" value={nienKhoa.NienKhoa} className="form-input w-full border-2 rounded-md px-2 py-1" disabled />
                                             <ErrorMessage className="text-red-600" name="MaNK" component="p" />
                                         </div>
                                         <div>

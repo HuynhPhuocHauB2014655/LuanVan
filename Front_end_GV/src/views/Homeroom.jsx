@@ -139,11 +139,11 @@ export default function Homeroom() {
         const rlhrl = diemtb.data.filter(item => (item.MaTT == 2 && item.MaRL == 1) || item.MaRLL != 0);
         setRenLuyenHeRL(rlhrl);
 
-        getDSKhenThuong(diemtb.data);
+        // getDSKhenThuong(diemtb.data);
     }
-    const checkBCButton = () => {
+    const checkBCButton = async () => {
         if (diemTB.length > 0) {
-            const array = getDSKhenThuong(diemTB);
+            const array = await getDSKhenThuong(diemTB);
             var checkBC = false;
             diemTB.map((item) => {
                 if (item.MaTT == 0 || item.MaTT == 2) {

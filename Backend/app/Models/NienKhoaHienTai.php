@@ -13,6 +13,8 @@ class NienKhoaHienTai extends Model
     protected $primaryKey = 'NienKhoa';
     protected $fillable = [
         'NienKhoa',
-        'TenNK'
+        'TenNK',
+        'NgayBD',
+        'HanSuaDiem',
     ];
 }

@@ -5,6 +5,8 @@ import Menu from "../components/Menu";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
 import Header from "../components/Header";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 export default function HK_NK() {
     const { message, setMessage, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
@@ -98,12 +100,30 @@ export default function HK_NK() {
     }
     const submitNKHientai = async (event) => {
         event.preventDefault();
-        const MaNK = nienKhoaHienTaiRef.current.value;
-        const TenNK = datas.find((item) => item.MaNK === MaNK).TenNK;
-        const NgayBD = NgayBDRef.current.value;
-        const HanSuaDiem = HanSuaDiemRef.current.value;
+        if (nienKhoaHienTaiRef.current.value === nienKhoa.NienKhoa) {
+            setIsShow(0);
+        } else {
+            const payload = {
+                NienKhoa: nienKhoaHienTaiRef.current.value,
+                TenNK: datas.find((item) => item.MaNK === nienKhoaHienTaiRef.current.value).TenNK
+            };
+            try {
+                const response = await axiosClient.post('/nk/setNow', payload);
+                setMessage(response.data);
+                fetchData();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+            setIsShow(0);
+        }
+    }
+    const submitNgayBD = async (event) => {
+        event.preventDefault();
+        const payload = {
+            NgayBD: NgayBDRef.current.value,
+        }
         try {
-            const response = await axiosClient.get('/nk/setNow', { params: { "nk": MaNK, 'tennk': TenNK, "ngaybd": NgayBD, 'hansuadiem': HanSuaDiem } });
+            const response = await axiosClient.post('/nk/setNow', payload);
             setMessage(response.data);
             fetchData();
         } catch (error) {
@@ -111,30 +131,32 @@ export default function HK_NK() {
         }
         setIsShow(0);
     }
+    const submitHSD = async (event) => {
+        event.preventDefault();
+        const payload = {
+            HanSuaDiem: HanSuaDiemRef.current.value,
+        }
+        try {
+            const response = await axiosClient.post('/nk/setNow', payload);
+            setMessage(response.data);
+            fetchData();
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+        setIsShow(0);
+    }
+    const setShow = (id) => {
+        setIsShow(id);
+    }
     return (
         <div>
-            <Header/>
+            <Header />
             <div className="main-content">
                 <Menu />
                 <div className='right-part'>
                     <h2 className="page-name">Học kì - Niên khóa</h2>
-                    <div className="button-nav">
-                        <button onClick={() => showForm(1)} className="px-3 py-1 mt-2 bg-blue-500 text-white button-animation">Thêm niên khóa</button>
-                        <button onClick={() => showForm(2)} className="px-3 py-1 mt-2 ms-1 bg-blue-500 text-white button-animation">Đặt niên khóa hiện tại</button>
-                    </div>
-                    {isShow === 1 &&
-                        <form onSubmit={submit} className="add_nk_form">
-                            <div>
-                                <input ref={MaNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Mã niên khóa" />
-                                <input ref={TenNKRef} className="form-input rounded ms-2 mt-2" type="text" placeholder="Tên niên khóa" />
-                            </div>
-                            <label htmlFor="add" className="ms-2">Đặt làm niên khóa hiện tại</label>
-                            <input type="checkbox" className="ms-2" name="add" checked={isChecked} onChange={handleCheckboxChange} />
-                            <button className="border px-3 py-1 ms-3 mt-2 border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
-                        </form>
-                    }
-                    {isShow === 2 &&
-                        <form onSubmit={submitNKHientai} className="mt-2">
+                    {/* {isShow === 2 &&
+                        <form className="mt-2">
                             <div className="grid grid-cols-3 grid-flow-row space-x-2 w-[80%]">
                                 <div>
                                     <label className="f-label" htmlFor="nienkhoahientai">Chọn niên khóa</label>
@@ -155,32 +177,102 @@ export default function HK_NK() {
                             </div>
                             <button type="submit" className="border px-3 mt-3 py-1 border-green-600 rounded bg-white hover:bg-green-600 text-slate-950">Lưu</button>
                         </form>
-                    }
+                    } */}
                     <div className="hk_nk_content">
-                        <div>
-                            <h1 className="text-2xl font-bold text-red-600 mt-2">Năm học hiện tại hiện tại: {nienKhoa ? nienKhoa.NienKhoa : "Chưa đặt"}</h1>
-                            <p className="text-xl ms-2">- Ngày bắt đầu năm học: {nienKhoa ? nienKhoa.NgayBD : "Chưa đặt"}</p>
-                            <p className="text-xl ms-2">- Hạn cuối sửa điểm: {nienKhoa ? nienKhoa.HanSuaDiem : "Chưa đặt"}</p>
+                        <div className="grid grid-flow-row grid-cols-3 gap-3 mt-3">
+                            <div
+                                onClick={isShow !== 2 ? () => setShow(2) : undefined}
+                                className="w-full border-2 border-red-500 rounded min-h-32 relative flex items-center bg-red-300 hover:bg-red-400 shadow-lg hover:scale-105 cursor-pointer transition duration-300 ease-in-out transform"
+                            >
+                                <p className="absolute top-2 left-2 text-xl font-bold">Năm học hiện tại hiện tại:</p>
+                                {isShow == 2 ?
+                                    <form onSubmit={submitNKHientai} className="w-full flex items-center mx-10 justify-between">
+                                        <p className="absolute top-0 border border-transparent hover:border-white px-1 right-0  font-bold text-white" onClick={() => setIsShow(0)}>X</p>
+                                        <select ref={nienKhoaHienTaiRef} defaultValue={nienKhoa.NienKhoa} name="nienkhoahientai" required
+                                            className="text-2xl font-mono bg-transparent border-b-2 border-white outline-none cursor-pointer"
+                                        >
+                                            {datas.map((item) => (
+                                                <option key={item.MaNK} value={item.MaNK}>{item.TenNK}</option>
+                                            ))}
+                                        </select>
+                                        <button type="submit" className="border px-2 py-1 rounded hover:bg-white">Lưu</button>
+                                    </form>
+                                    :
+                                    <p className="text-2xl text-slate-700 font-mono ms-10">{nienKhoa ? `${nienKhoa.TenNK}` : "Chưa đặt"}</p>
+                                }
+                            </div>
+                            <div
+                                onClick={isShow !== 3 ? () => setShow(3) : undefined}
+                                className="w-full border-2 border-blue-500 rounded min-h-32 relative flex items-center bg-blue-300 hover:bg-blue-400 shadow-lg hover:scale-105 cursor-pointer transition duration-300 ease-in-out transform"
+                            >
+                                <p className="absolute top-2 left-2 text-xl font-bold">Ngày bắt đầu năm học: </p>
+                                {isShow == 3 ?
+                                    <form onSubmit={submitNgayBD} className="w-full mt-7">
+                                        <p className="absolute top-0 border border-transparent hover:border-white px-1 right-0  font-bold text-white" onClick={() => setIsShow(0)}>X</p>
+                                        <input type="datetime-local" name="startDate" className="font-mono outline-none w-[90%] mx-auto block" defaultValue={nienKhoa.NgayBD} ref={NgayBDRef} />
+                                        <button type="submit" className="border px-2 py-1 rounded hover:bg-white mt-2 w-1/2 mx-auto block">Lưu</button>
+                                    </form>
+                                    :
+                                    <p className="text-2xl text-slate-700 font-mono ms-10">{nienKhoa.NgayBD ? nienKhoa.NgayBD : "Chưa đặt"}</p>
+                                }
+                            </div>
+                            <div
+                                onClick={isShow !== 4 ? () => setShow(4) : undefined}
+                                className="w-full border-2 border-green-500 rounded min-h-32 relative flex items-center bg-green-300 hover:bg-green-400 shadow-lg hover:scale-105 cursor-pointer transition duration-300 ease-in-out transform"
+                            >
+                                <p className="absolute top-2 left-2 text-xl font-bold">Hạn cuối sửa điểm:</p>
+                                {isShow == 4 ?
+                                    <form onSubmit={submitHSD} className="w-full mt-7">
+                                        <p className="absolute top-0 border border-transparent hover:border-white px-1 right-0  font-bold text-white" onClick={() => setIsShow(0)}>X</p>
+                                        <input type="datetime-local" name="endDate" defaultValue={nienKhoa.HanSuaDiem} className="font-mono outline-none w-[90%] mx-auto block" ref={HanSuaDiemRef} />
+                                        <button type="submit" className="border px-2 py-1 rounded hover:bg-white mt-2 w-1/2 mx-auto block">Lưu</button>
+                                    </form>
+                                    :
+                                    <p className="text-2xl text-slate-700 font-mono ms-10">{nienKhoa.HanSuaDiem ? nienKhoa.HanSuaDiem : "Chưa đặt"}</p>
+                                }
+                            </div>
                         </div>
-                        <h2 className="text-2xl mt-2 font-semibold">Danh sách niên khóa</h2>
-                        <table className="table-auto border-collapse border border-slate-500 ">
-                            <thead>
-                                <tr>
-                                    <th className="border border-slate-600 p-2">Mã niên khóa</th>
-                                    <th className="border border-slate-600 p-2">Tên niên Khóa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {datas.map((data, index) => {
-                                    return (
-                                        <tr key={index}>
-                                            <td className="border border-slate-600 p-2">{data.MaNK}</td>
-                                            <td className="border border-slate-600 p-2">{data.TenNK}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                        <div className="w-[80%] mx-auto mt-3">
+                            <div className="w-1/2 mx-auto flex justify-between mb-2">
+                                <h2 className="text-2xl text-center mt-2 font-semibold">Danh sách niên khóa</h2>
+                                <button onClick={() => showForm(1)} className="px-2 py-1 rounded-full text-blue-500  mt-2 hover:bg-blue-500 hover:text-white border-blue-500 border-2"><FontAwesomeIcon icon={faPlus} /></button>
+                            </div>
+                            {isShow === 1 &&
+                                <form onSubmit={submit} className="w-1/2 mx-auto border-2 p-2 my-2 border-slate-500 shadow-md rounded ">
+                                    <div className="w-3/4 mx-auto">
+                                        <input ref={MaNKRef} className="w-full border-t-0 border-x-0 border-b border-slate-300 p-2 outline-none rounded-none" type="text" placeholder="Mã niên khóa" />
+                                    </div>
+                                    <div className="w-3/4 mx-auto">
+                                        <input ref={TenNKRef} className="w-full border-t-0 border-x-0 border-b border-slate-300 p-2 outline-none rounded-none" type="text" placeholder="Tên niên khóa" />
+                                    </div>
+                                    <div className="w-3/4 mx-auto flex items-center justify-between mt-3">
+                                        <div>
+                                            <label htmlFor="add" className="">Niên khóa hiện tại</label>
+                                            <input type="checkbox" className="ms-2" name="add" checked={isChecked} onChange={handleCheckboxChange} />
+                                        </div>
+                                        <button className="border px-3 py-1 ms-2 hover:text-white border-green-600 rounded hover:bg-green-600 text-slate-950">Lưu</button>
+                                    </div>
+                                </form>
+                            }
+                            <table className="table-auto border-collapse border border-slate-500 w-1/2 mx-auto">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-slate-600 p-2">Mã niên khóa</th>
+                                        <th className="border border-slate-600 p-2">Tên niên Khóa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {datas.map((data, index) => {
+                                        return (
+                                            <tr key={index}>
+                                                <td className="border border-slate-600 p-2">{data.MaNK}</td>
+                                                <td className="border border-slate-600 p-2">{data.TenNK}</td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

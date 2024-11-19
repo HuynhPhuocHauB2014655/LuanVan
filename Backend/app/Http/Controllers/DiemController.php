@@ -560,6 +560,107 @@ class DiemController extends Controller
 
     // Ham test nhap diem
 
+    
+    private function TongKetHK($MaLop,$HK,$MH){
+        $lop = Lop::where("MaLop","like",$MaLop)->get();
+        foreach($lop as $lop){
+            $hocsinh = HocLop::where("MaLop",$lop->MaLop)->get();
+            foreach ($hocsinh as $hs) {
+                $tongTx = 0;
+                $diemTX = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $HK)
+                    ->where('MaMH', $MH)
+                    ->where('MaLoai', 'tx')
+                    ->get();
+                $diemGK = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $HK)
+                    ->where('MaMH', $MH)
+                    ->where('MaLoai', 'gk')
+                    ->first();
+        
+                $diemCK = Diem::where('MSHS', $hs->MSHS)
+                    ->where('MaHK', $HK)
+                    ->where('MaMH', $MH)
+                    ->where('MaLoai', 'ck')
+                    ->first();
+        
+                if ($diemTX->isNotEmpty() && $diemGK && $diemCK) {
+                    $tongTx = $diemTX->sum('Diem');
+                    $tbhk = 0;
+                    if($MH == "CB4" || $MH == "CB5")
+                    {
+                        $tong = $tongTx + $diemGK->Diem + $diemCK->Diem;
+                        if($tong == $diemTX->count()+2){
+                            $tbhk = 1;
+                        }else{
+                            $tbhk = 0;
+                        }
+                    }else{
+                        $tbhk = round(($tongTx + ($diemGK->Diem * 2) + ($diemCK->Diem * 3)) / ($diemTX->count() + 5),1);
+                    }
+                    $checkDiemHK = Diem::where('MSHS',$hs->MSHS)
+                    ->where('MaHK',$HK)
+                    ->where('MaMH',$MH)
+                    ->where('MaLoai',$HK == "124-25" ? "tbhk1" : "tbhk2")->first();
+                    if($checkDiemHK){
+                        $checkDiemHK->Diem = $tbhk;
+                        $checkDiemHK->save();
+                    }else{
+                        $diemHk = new Diem();
+                        $diemHk->MSHS = $hs->MSHS;
+                        $diemHk->MaHK = $HK;
+                        $diemHk->MaMH = $MH;
+                        $diemHk->MaLoai = $HK == "124-25" ? "tbhk1" : "tbhk2";
+                        $diemHk->Diem = $tbhk;
+                        $diemHk->save();
+                    }
+                }
+            }
+        }
+    }
+    private function TongKetCN($MaLop,$MH){
+        $lop = Lop::where("MaLop","like",$MaLop)->get();
+        foreach($lop as $lop){
+            $hocsinh = HocLop::where("MaLop",$lop->MaLop)->get();
+            foreach ($hocsinh as $hs){
+                $tbhk1 = Diem::where('MSHS', $hs->MSHS)
+                ->where('MaHK','1'. "24-25")
+                ->where('MaMH', $MH)
+                ->where('MaLoai', 'tbhk1')
+                ->first();
+                $tbhk2 = Diem::where('MSHS', $hs->MSHS)
+                ->where('MaHK','2' . "24-25")
+                ->where('MaMH', $MH)
+                ->where('MaLoai', 'tbhk2')
+                ->first();
+                if ($tbhk1 && $tbhk2) {
+                    $tbcn=0;
+                    if($MH == "CB4" || $MH == "CB5"){
+                    $tbcn = $tbhk2->Diem;
+                    }else{
+                        $tbcn = round(($tbhk1->Diem + $tbhk2->Diem*2)/3,1);
+                    };
+                    $checkCN = Diem::where('MSHS',$hs->MSHS)
+                    ->where('MaHK','2' . "24-25")
+                    ->where('MaMH',$MH)
+                    ->where('MaLoai','tbcn')->first();
+                    if($checkCN){
+                        $checkCN->Diem = $tbcn;
+                        $checkCN->save();
+                    }else
+                    {
+                        $diemCN = new Diem();
+                        $diemCN->MSHS = $hs->MSHS;
+                        $diemCN->MaHK = '2' . "24-25";
+                        $diemCN->MaMH = $MH;
+                        $diemCN->Diem = $tbcn;
+                        $diemCN->MaLoai = "tbcn";
+                        $diemCN->save();
+                    }
+                }
+            }
+        }
+    }
     public function NhapDiem(){
         $hs = HocSinh::has('lop')->get();
         foreach ($hs as $hs){
@@ -569,51 +670,96 @@ class DiemController extends Controller
                 ->orWhere('MaMH', '=', 'TN1')
                 ->orWhere('MaMH', '=', 'TC1')->get();
                 foreach($monhoc as $mh){
-                    $diemtx = new Diem();
-                    $diemtx->MSHS = $hs->MSHS;
-                    $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "223-24";
-                    $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(6,10);
-                    $diemtx->save();
-                    $diemgk = new Diem();
-                    $diemgk->MSHS = $hs->MSHS;
-                    $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "223-24";
-                    $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(6,10);
-                    $diemgk->save();
-                    $diemck = new Diem();
-                    $diemck->MSHS = $hs->MSHS;
-                    $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "223-24";
-                    $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(6,10);
-                    $diemck->save();
+                    $diemtx1 = new Diem();
+                    $diemtx1->MSHS = $hs->MSHS;
+                    $diemtx1->MaMH = $mh->MaMH;
+                    $diemtx1->MaHK = "124-25";
+                    $diemtx1->MaLoai = "tx";
+                    $diemtx1->Diem = rand(6,10);
+                    $diemtx1->save();
+                    $diemgk1 = new Diem();
+                    $diemgk1->MSHS = $hs->MSHS;
+                    $diemgk1->MaMH = $mh->MaMH;
+                    $diemgk1->MaHK = "124-25";
+                    $diemgk1->MaLoai = "gk";
+                    $diemgk1->Diem = rand(6,10);
+                    $diemgk1->save();
+                    $diemck1 = new Diem();
+                    $diemck1->MSHS = $hs->MSHS;
+                    $diemck1->MaMH = $mh->MaMH;
+                    $diemck1->MaHK = "124-25";
+                    $diemck1->MaLoai = "ck";
+                    $diemck1->Diem = rand(6,10);
+                    $diemck1->save();
+
+                
+                    $diemtx2 = new Diem();
+                    $diemtx2->MSHS = $hs->MSHS;
+                    $diemtx2->MaMH = $mh->MaMH;
+                    $diemtx2->MaHK = "224-25";
+                    $diemtx2->MaLoai = "tx";
+                    $diemtx2->Diem = rand(6,10);
+                    $diemtx2->save();
+                    $diemgk2 = new Diem();
+                    $diemgk2->MSHS = $hs->MSHS;
+                    $diemgk2->MaMH = $mh->MaMH;
+                    $diemgk2->MaHK = "224-25";
+                    $diemgk2->MaLoai = "gk";
+                    $diemgk2->Diem = rand(6,10);
+                    $diemgk2->save();
+                    $diemck2 = new Diem();
+                    $diemck2->MSHS = $hs->MSHS;
+                    $diemck2->MaMH = $mh->MaMH;
+                    $diemck2->MaHK = "224-25";
+                    $diemck2->MaLoai = "ck";
+                    $diemck2->Diem = rand(6,10);
+                    $diemck2->save();
                 }
                 $monhocDG = MonHoc::whereIn('MaMH',['CB4','CB5'])->get();
                 foreach($monhocDG as $mh){
-                    $diemtx = new Diem();
-                    $diemtx->MSHS = $hs->MSHS;
-                    $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "223-24";
-                    $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = 1;
-                    $diemtx->save();
-                    $diemgk = new Diem();
-                    $diemgk->MSHS = $hs->MSHS;
-                    $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "223-24";
-                    $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = 1;
-                    $diemgk->save();
-                    $diemck = new Diem();
-                    $diemck->MSHS = $hs->MSHS;
-                    $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "223-24";
-                    $diemck->MaLoai = "ck";
-                    $diemck->Diem = 1;
-                    $diemck->save();
+                    $diemtx1 = new Diem();
+                    $diemtx1->MSHS = $hs->MSHS;
+                    $diemtx1->MaMH = $mh->MaMH;
+                    $diemtx1->MaHK = "124-25";
+                    $diemtx1->MaLoai = "tx";
+                    $diemtx1->Diem = 1;
+                    $diemtx1->save();
+                    $diemgk1 = new Diem();
+                    $diemgk1->MSHS = $hs->MSHS;
+                    $diemgk1->MaMH = $mh->MaMH;
+                    $diemgk1->MaHK = "124-25";
+                    $diemgk1->MaLoai = "gk";
+                    $diemgk1->Diem = 1;
+                    $diemgk1->save();
+                    $diemck1 = new Diem();
+                    $diemck1->MSHS = $hs->MSHS;
+                    $diemck1->MaMH = $mh->MaMH;
+                    $diemck1->MaHK = "124-25";
+                    $diemck1->MaLoai = "ck";
+                    $diemck1->Diem = 1;
+                    $diemck1->save();
+
+                    $diemtx2 = new Diem();
+                    $diemtx2->MSHS = $hs->MSHS;
+                    $diemtx2->MaMH = $mh->MaMH;
+                    $diemtx2->MaHK = "224-25";
+                    $diemtx2->MaLoai = "tx";
+                    $diemtx2->Diem = 1;
+                    $diemtx2->save();
+                    $diemgk2 = new Diem();
+                    $diemgk2->MSHS = $hs->MSHS;
+                    $diemgk2->MaMH = $mh->MaMH;
+                    $diemgk2->MaHK = "224-25";
+                    $diemgk2->MaLoai = "gk";
+                    $diemgk2->Diem = 1;
+                    $diemgk2->save();
+                    $diemck2 = new Diem();
+                    $diemck2->MSHS = $hs->MSHS;
+                    $diemck2->MaMH = $mh->MaMH;
+                    $diemck2->MaHK = "224-25";
+                    $diemck2->MaLoai = "ck";
+                    $diemck2->Diem = 1;
+                    $diemck2->save();
                 }
             }else{
                 $monhoc = MonHoc::whereIn('MaMH',['CB1','CB2','CB3'])
@@ -621,53 +767,125 @@ class DiemController extends Controller
                 ->orWhere('MaMH', '=', 'XH1')
                 ->orWhere('MaMH', '=', 'TC2')->get();
                 foreach($monhoc as $mh){
-                    $diemtx = new Diem();
-                    $diemtx->MSHS = $hs->MSHS;
-                    $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "223-24";
-                    $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = rand(6,10);
-                    $diemtx->save();
-                    $diemgk = new Diem();
-                    $diemgk->MSHS = $hs->MSHS;
-                    $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "223-24";
-                    $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = rand(6,10);
-                    $diemgk->save();
-                    $diemck = new Diem();
-                    $diemck->MSHS = $hs->MSHS;
-                    $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "223-24";
-                    $diemck->MaLoai = "ck";
-                    $diemck->Diem = rand(6,10);
-                    $diemck->save();
+                    $diemtx1 = new Diem();
+                    $diemtx1->MSHS = $hs->MSHS;
+                    $diemtx1->MaMH = $mh->MaMH;
+                    $diemtx1->MaHK = "124-25";
+                    $diemtx1->MaLoai = "tx";
+                    $diemtx1->Diem = rand(6,10);
+                    $diemtx1->save();
+                    $diemgk1 = new Diem();
+                    $diemgk1->MSHS = $hs->MSHS;
+                    $diemgk1->MaMH = $mh->MaMH;
+                    $diemgk1->MaHK = "124-25";
+                    $diemgk1->MaLoai = "gk";
+                    $diemgk1->Diem = rand(6,10);
+                    $diemgk1->save();
+                    $diemck1 = new Diem();
+                    $diemck1->MSHS = $hs->MSHS;
+                    $diemck1->MaMH = $mh->MaMH;
+                    $diemck1->MaHK = "124-25";
+                    $diemck1->MaLoai = "ck";
+                    $diemck1->Diem = rand(6,10);
+                    $diemck1->save();
+
+
+                    $diemtx2 = new Diem();
+                    $diemtx2->MSHS = $hs->MSHS;
+                    $diemtx2->MaMH = $mh->MaMH;
+                    $diemtx2->MaHK = "224-25";
+                    $diemtx2->MaLoai = "tx";
+                    $diemtx2->Diem = rand(6,10);
+                    $diemtx2->save();
+                    $diemgk2 = new Diem();
+                    $diemgk2->MSHS = $hs->MSHS;
+                    $diemgk2->MaMH = $mh->MaMH;
+                    $diemgk2->MaHK = "224-25";
+                    $diemgk2->MaLoai = "gk";
+                    $diemgk2->Diem = rand(6,10);
+                    $diemgk2->save();
+                    $diemck2 = new Diem();
+                    $diemck2->MSHS = $hs->MSHS;
+                    $diemck2->MaMH = $mh->MaMH;
+                    $diemck2->MaHK = "224-25";
+                    $diemck2->MaLoai = "ck";
+                    $diemck2->Diem = rand(6,10);
+                    $diemck2->save();
                 }
                 $monhocDG = MonHoc::whereIn("MaMH",['CB4','CB5'])->get();
                 foreach($monhocDG as $mh){
-                    $diemtx = new Diem();
-                    $diemtx->MSHS = $hs->MSHS;
-                    $diemtx->MaMH = $mh->MaMH;
-                    $diemtx->MaHK = "223-24";
-                    $diemtx->MaLoai = "tx";
-                    $diemtx->Diem = 1;
-                    $diemtx->save();
-                    $diemgk = new Diem();
-                    $diemgk->MSHS = $hs->MSHS;
-                    $diemgk->MaMH = $mh->MaMH;
-                    $diemgk->MaHK = "223-24";
-                    $diemgk->MaLoai = "gk";
-                    $diemgk->Diem = 1;
-                    $diemgk->save();
-                    $diemck = new Diem();
-                    $diemck->MSHS = $hs->MSHS;
-                    $diemck->MaMH = $mh->MaMH;
-                    $diemck->MaHK = "223-24";
-                    $diemck->MaLoai = "ck";
-                    $diemck->Diem = 1;
-                    $diemck->save();
+                    $diemtx1 = new Diem();
+                    $diemtx1->MSHS = $hs->MSHS;
+                    $diemtx1->MaMH = $mh->MaMH;
+                    $diemtx1->MaHK = "124-25";
+                    $diemtx1->MaLoai = "tx";
+                    $diemtx1->Diem = 1;
+                    $diemtx1->save();
+                    $diemgk1 = new Diem();
+                    $diemgk1->MSHS = $hs->MSHS;
+                    $diemgk1->MaMH = $mh->MaMH;
+                    $diemgk1->MaHK = "124-25";
+                    $diemgk1->MaLoai = "gk";
+                    $diemgk1->Diem = 1;
+                    $diemgk1->save();
+                    $diemck1 = new Diem();
+                    $diemck1->MSHS = $hs->MSHS;
+                    $diemck1->MaMH = $mh->MaMH;
+                    $diemck1->MaHK = "124-25";
+                    $diemck1->MaLoai = "ck";
+                    $diemck1->Diem = 1;
+                    $diemck1->save();
+
+                    $diemtx2 = new Diem();
+                    $diemtx2->MSHS = $hs->MSHS;
+                    $diemtx2->MaMH = $mh->MaMH;
+                    $diemtx2->MaHK = "224-25";
+                    $diemtx2->MaLoai = "tx";
+                    $diemtx2->Diem = 1;
+                    $diemtx2->save();
+                    $diemgk2 = new Diem();
+                    $diemgk2->MSHS = $hs->MSHS;
+                    $diemgk2->MaMH = $mh->MaMH;
+                    $diemgk2->MaHK = "224-25";
+                    $diemgk2->MaLoai = "gk";
+                    $diemgk2->Diem = 1;
+                    $diemgk2->save();
+                    $diemck2 = new Diem();
+                    $diemck2->MSHS = $hs->MSHS;
+                    $diemck2->MaMH = $mh->MaMH;
+                    $diemck2->MaHK = "224-25";
+                    $diemck2->MaLoai = "ck";
+                    $diemck2->Diem = 1;
+                    $diemck2->save();
                 }
             }
+        }
+        $monhocTN = MonHoc::where('MaMH', 'like', 'CB%')
+                ->orWhere('MaMH', 'like', 'TN%')
+                ->orWhere('MaMH', '=', 'XH1')
+                ->orWhere('MaMH', '=', 'TC2')->get();
+        $monhocXH = MonHoc::where('MaMH', 'like', 'CB%')
+            ->orWhere('MaMH', 'like', 'XH%')
+            ->orWhere('MaMH', '=', 'TN1')
+            ->orWhere('MaMH', '=', 'TC1')->get();
+        foreach($monhocTN as $mh){
+            $this->TongKetHK("%A2425%","124-25",$mh->MaMH);
+            $this->TongKetHK("%A2425%","224-25",$mh->MaMH);
+            $this->TongKetCN("%A2425%",$mh->MaMH);
+        }
+        foreach($monhocXH as $mh){
+            $this->TongKetHK("%C2425%","124-25",$mh->MaMH);
+            $this->TongKetHK("%C2425%","224-25",$mh->MaMH);
+            $this->TongKetCN("%C2425%",$mh->MaMH);
+        }
+        return response()->json("OK",200);
+    }
+    public function NhapRL(){
+        $hs = HocLop::where("MaNK","24-25")->get();
+        foreach($hs as $hs){
+            $hs->MaRL_HK1 = 4;
+            $hs->MaRL_HK2 = 4;
+            $hs->save();
         }
         return response()->json("OK",200);
     }
