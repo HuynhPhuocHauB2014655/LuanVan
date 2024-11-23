@@ -6,6 +6,7 @@ import axiosClient from "../axios-client";
 import { useLocation, useNavigate } from "react-router-dom";
 import AlterConfirm from "../components/Confirm";
 import Header from "../components/Header";
+import moment from 'moment';
 export default function Result() {
     const { userName } = useUserContext();
     const { nienKhoa } = useStateContext();
@@ -168,6 +169,10 @@ export default function Result() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+    const getDate = (date) => {
+        const d = moment(date).format("hh:mm:ss DD/MM/YYYY");
+        return d;
+    }
     return (
         <div>
             <Header />
@@ -176,6 +181,13 @@ export default function Result() {
                 <div className="right-part mb-2 relative">
                     <div className="page-name">
                         Kết quả học tập
+                    </div>
+                    <div>
+                        {new Date(nienKhoa.HanSuaDiem) > new Date() ? 
+                            <p className="text-2xl text-center text-blue-500 font-semibold">Hạn cuối sửa điểm {getDate(new Date(nienKhoa.HanSuaDiem))}</p> 
+                            : 
+                            <p className="text-2xl text-center text-red-500 font-semibold">Điểm chính thức</p>
+                        }
                     </div>
                     <div className="max-w-[90%] mx-auto">
                         <div className="mt-3 md:flex md:justify-between md:text-start text-center space-y-3">

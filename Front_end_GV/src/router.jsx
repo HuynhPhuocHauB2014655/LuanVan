@@ -12,6 +12,7 @@ import Message from "./views/Message.jsx";
 import StudentResult from "./views/StudentResult.jsx";
 import StudentInfo from "./views/StudentInfo.jsx";
 import Teaching from "./views/Teach.jsx";
+import NienKhoa from "./views/NienKhoa.jsx";
 
 
 const router = createBrowserRouter([
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
                 path: "/student-info",
                 element: <StudentInfo/>,
             },
+            {
+                path: "/nk",
+                element: <NienKhoa/>
+            }
         ]
     },
     {

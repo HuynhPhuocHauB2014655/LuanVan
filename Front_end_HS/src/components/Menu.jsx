@@ -42,8 +42,9 @@ export default function Menu({ update }) {
     const menu_items = [
         { id: 1, route: "/", label: 'Trang chủ',icon:<FontAwesomeIcon icon="fa-solid fa-home" /> },
         { id: 2, route: "/info", label: 'Thông tin cá nhân',icon:<FontAwesomeIcon icon="fa-solid fa-user" /> },
-        { id: 3, route: "/result", label: 'Kết quả học tập',icon:<FontAwesomeIcon icon="fa-solid fa-book-open-reader" /> },
-        { id: 4, route: "/tkb", label: 'Thời khóa biểu',icon:<FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
+        { id: 3, route: "/nk", label: "Niên Khóa", icon: <FontAwesomeIcon icon="fa-solid fa-calendar" /> },
+        { id: 4, route: "/result", label: 'Kết quả học tập',icon:<FontAwesomeIcon icon="fa-solid fa-book-open-reader" /> },
+        { id: 5, route: "/tkb", label: 'Thời khóa biểu',icon:<FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
     ];
     const activeItem = (id) => {
         setActive(id);

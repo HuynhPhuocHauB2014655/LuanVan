@@ -91,7 +91,7 @@ export default function Class() {
         window.scrollTo(0, 0);
     }
     const validationSchema = Yup.object({
-        MaNK: Yup.string().required("Trường bắt buộc"),
+        MaNK: Yup.string(),
         soLopTN: Yup.number()
             .max(Math.floor(TNCount / 10), `Số lớp tối đa ${Math.floor(TNCount / 10)}`)
             .min(Math.ceil(TNCount / 40), `Số lớp tối thiểu ${Math.ceil(TNCount / 40)}`)
@@ -105,6 +105,7 @@ export default function Class() {
     });
     const handleSubmit = async (value) => {
         try {
+            value.MaNK = nienKhoa.NienKhoa;
             const response = await axiosClient.post("/lop/add", value);
             setShowForm(0);
             setMessage(response.data);

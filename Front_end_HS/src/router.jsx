@@ -9,6 +9,7 @@ import Notification from "./views/Notification.jsx";
 import Message from "./views/Message.jsx";
 import LoginPH from "./views/LoginPH.jsx";
 import GroupChatPH from "./views/GroupChatPH.jsx";
+import NienKhoa from "./views/NienKhoa.jsx";
 
 
 const router = createBrowserRouter([
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
                 path: "/ph",
                 element: <GroupChatPH />,
             },
+            {
+                path: "/nk",
+                element: <NienKhoa/>
+            }
         ]
     },
     {

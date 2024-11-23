@@ -13,10 +13,11 @@ export default function Home() {
     library.add(fas);
     const menu_items = [
         { id: 1, route: "/info", label: 'Thông tin cá nhân', icon: <FontAwesomeIcon icon="fa-solid fa-user" /> },
-        { id: 2, route: "/cn", label: 'Chủ nhiệm', icon: <FontAwesomeIcon icon="fa-solid fa-briefcase" /> },
-        { id: 3, route: "/class", label: 'Quản lí lớp dạy', icon: <FontAwesomeIcon icon="fa-solid fa-book-open" /> },
-        { id: 4, route: "/tkb", label: 'Thời khóa biểu', icon: <FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
-        { id: 7, route: "/teach", label: 'Dạy học', icon: <FontAwesomeIcon icon="fa-solid fa-person-chalkboard" /> },
+        { id: 2, route: "/nk", label: "Niên Khóa", icon: <FontAwesomeIcon icon="fa-solid fa-calendar" /> },
+        { id: 3, route: "/cn", label: 'Chủ nhiệm', icon: <FontAwesomeIcon icon="fa-solid fa-briefcase" /> },
+        { id: 4, route: "/class", label: 'Quản lí lớp dạy', icon: <FontAwesomeIcon icon="fa-solid fa-book-open" /> },
+        { id: 5, route: "/tkb", label: 'Thời khóa biểu', icon: <FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
+        { id: 6, route: "/teach", label: 'Dạy học', icon: <FontAwesomeIcon icon="fa-solid fa-person-chalkboard" /> },
     ];
     return (
         <div>

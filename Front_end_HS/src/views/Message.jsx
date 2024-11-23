@@ -337,7 +337,7 @@ export default function Message() {
                                         </div>
                                     </div>
                                     {show &&
-                                        <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">
+                                        <div className="absolute z-10 right-0 top-0 h-full md:w-1/2 w-2/3 bg-white border-s-2 border-slate-300">
                                             <div className="relative justify-center text-xl font-bold border-b-2 border-slate-300 flex items-center h-[14%]">
                                                 <div>Thông tin nhóm</div>
                                                 <button className="text-2xl absolute left-2 h-full flex justify-center items-center"><FontAwesomeIcon icon={faCaretRight} onClick={() => setShow(!show)} /></button>

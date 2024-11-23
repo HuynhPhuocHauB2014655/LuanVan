@@ -478,6 +478,7 @@ export default function Homeroom() {
             setError(typeof error.response.data == 'string' ? error.response.data : 'Lỗi không xác định');
         }
     }
+    console.log(monRLH)
     return (
         <div>
             <Header />
@@ -493,6 +494,13 @@ export default function Homeroom() {
                     <div className="page-name relative">
                         Quản lí lớp chủ nhiệm
                         <button className="absolute right-2" title="Gửi thông báo" onClick={() => setShowForm(3)}> <FontAwesomeIcon icon={faBell} color="blue" /> </button>
+                    </div>
+                    <div>
+                        {new Date(nienKhoa.HanSuaDiem) > new Date() ? 
+                            <p className="text-2xl text-center text-blue-500 font-semibold">Hạn cuối sửa điểm {getDate(new Date(nienKhoa.HanSuaDiem))}</p> 
+                            : 
+                            <p className="text-2xl text-center text-red-500 font-semibold">Điểm chính thức</p>
+                        }
                     </div>
                     <div>
                         {Object.keys(datas).length > 0 ?
@@ -808,33 +816,29 @@ export default function Homeroom() {
                                                 <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Rèn luyện hè</h2>
                                                 {renLuyenHeHT.length > 0 || renLuyenHeRL.length > 0 ?
                                                     <div>
-                                                        <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện kết quả học tập trong hè</h1>
+                                                        <h1 className="text-2xl my-2 font-semibold text-center">Học sinh phải đánh giá lại kết quả học tập trong hè</h1>
                                                         {renLuyenHeHT.length > 0 &&
                                                             <div>
-                                                                <table className="table-auto w-[70%]">
+                                                                <table className="table-auto w-[70%] mx-auto">
                                                                     <thead>
                                                                         <tr>
-                                                                            <th className="p-3 border border-slate-300">Mã số học sinh</th>
-                                                                            <th className="p-3 border border-slate-300">Tên học sinh</th>
-                                                                            <th className="p-3 border border-slate-300">Môn học cần rèn luyện lại</th>
+                                                                            <th className="p-3 border border-slate-500">Mã số học sinh</th>
+                                                                            <th className="p-3 border border-slate-500">Tên học sinh</th>
+                                                                            <th className="p-3 border border-slate-500">Môn học cần rèn luyện lại</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
                                                                         {renLuyenHeHT?.map((hs) => {
-                                                                            const data = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && diem.MaMH != "CB4" && diem.MaMH != "CB5");
-                                                                            const data1 = monRLH?.filter((diem) => diem.MSHS == hs.MSHS && (diem.MaMH == "CB4" || diem.MaMH == "CB5") && diem.Diem == 0);
+                                                                            const data = monRLH?.filter((diem) => diem.MSHS == hs.MSHS);
                                                                             if (data) {
                                                                                 return (
                                                                                     <tr key={hs.MSHS}>
-                                                                                        <td className="p-3 border border-slate-300">{hs?.hoc_sinh.MSHS}</td>
-                                                                                        <td className="p-3 border border-slate-300">{hs?.hoc_sinh.HoTen}</td>
-                                                                                        <td className="p-3 border border-slate-300">
+                                                                                        <td className="p-3 border border-slate-500">{hs?.hoc_sinh.MSHS}</td>
+                                                                                        <td className="p-3 border border-slate-500">{hs?.hoc_sinh.HoTen}</td>
+                                                                                        <td className="p-3 border border-slate-500">
                                                                                             <div className=" space-x-2">
                                                                                                 {data.map((item, index) => (
-                                                                                                    <span key={index}>{item?.mon_hoc.TenMH}</span>
-                                                                                                ))}
-                                                                                                {data1.map((item, index) => (
-                                                                                                    <span key={index}>{item?.mon_hoc.TenMH}</span>
+                                                                                                    <span key={index}>{item?.mon_hoc.TenMH},</span>
                                                                                                 ))}
                                                                                             </div>
                                                                                         </td>
@@ -844,35 +848,33 @@ export default function Homeroom() {
                                                                         })}
                                                                     </tbody>
                                                                 </table>
-                                                                <h1 className="text-2xl my-2 font-semibold">Kết quả rèn luyện hè</h1>
-                                                                <div className="grid grid-cols-4 grid-flow-row space-x-1 space-y-1 mx-3">
+                                                                <h1 className="text-2xl my-2 font-semibold text-center">Kết quả rèn luyện hè</h1>
+                                                                <div className="grid grid-cols-4 grid-flow-row gap-1 mx-3">
                                                                     {renLuyenHeHT.map((hs) => (
                                                                         <div key={hs.MSHS} style={{ margin: 0 }} className="space-x-1 space-y-1">
-                                                                            <h1 className="text-lg my-2">{hs.hoc_sinh.HoTen}</h1>
+                                                                            <h1 className="text-lg my-2 font-bold text-center">{hs.hoc_sinh.HoTen}</h1>
                                                                             <table className="table-fixed" style={{ margin: 0 }}>
                                                                                 <thead>
                                                                                     <tr>
-                                                                                        <th className="p-3 ">Tên môn</th>
-                                                                                        <th className="p-3 ">Điểm rèn luyện lại</th>
+                                                                                        <th className="p-3 border border-slate-500">Tên môn</th>
+                                                                                        <th className="p-3 border border-slate-500">Điểm rèn luyện lại</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    {monRLH?.filter((diem) => diem.MSHS == hs.MSHS).map((data) => (
+                                                                                    {monRLH?.filter((diem) => diem.MSHS === hs.MSHS).map((data) => (
                                                                                         <tr key={data.MaMH}>
-                                                                                            <td className="p-3 ">{data?.mon_hoc.TenMH}</td>
-                                                                                            <td className="p-3  text-center">{diemRLH.find(item => item.MaMH == data.MaMH)?.Diem || "-"}</td>
+                                                                                            <td className="p-3 border border-slate-500">{data?.mon_hoc.TenMH}</td>
+                                                                                            <td className="p-3 border border-slate-500 text-center">{diemRLH.find(item => item.MSHS === data.MSHS && item.MaMH === data.MaMH)?.Diem}</td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
                                                                     ))}
-
-
                                                                 </div>
                                                             </div>
                                                         }
-                                                        <h1 className="text-2xl my-2 font-semibold">Học sinh phải rèn luyện lại điểm rèn luyện trong hè</h1>
+                                                        <h1 className="text-2xl my-2 font-semibold text-center">Học sinh phải đánh giá lại điểm rèn luyện trong hè</h1>
                                                         {renLuyenHeRL.length > 0 &&
                                                             <table className="table-auto text-center  w-[70%]">
                                                                 <thead>

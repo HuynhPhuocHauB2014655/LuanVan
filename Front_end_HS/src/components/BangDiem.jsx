@@ -121,19 +121,19 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                         <th className="border border-black">Tên học sinh</th>
                         {loaiDiem.map((data) => (
                             data.MaLoai != "rlh" &&
-                                (data.MaLoai === 'tx' ?
-                                    <th key={data.MaLoai} className="border border-black" colSpan={4}>
-                                        {data.TenLoai}
-                                    </th>
-                                    :
-                                    <th key={data.MaLoai} className="border border-black">
-                                        {data.TenLoai}
-                                    </th>)
+                            (data.MaLoai === 'tx' ?
+                                <th key={data.MaLoai} className="border border-black" colSpan={4}>
+                                    {data.TenLoai}
+                                </th>
+                                :
+                                <th key={data.MaLoai} className="border border-black">
+                                    {data.TenLoai}
+                                </th>)
                         ))}
                         <th className="border border-black">Trung bình học kì 1</th>
                         {loaiDiem.map((data) => (
                             data.MaLoai != "rlh" &&
-                                (data.MaLoai === 'tx' ?
+                            (data.MaLoai === 'tx' ?
                                 <th key={data.MaLoai} className="border border-black" colSpan={4}>
                                     {data.TenLoai}
                                 </th>
@@ -169,7 +169,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
 
                                 {generateTXCells(txGrades1, emptyTXCellsCount1, student)}
 
-                                {generateOtherCells(otherGrades1, student, )}
+                                {generateOtherCells(otherGrades1, student,)}
 
                                 <td className="bd-td-normal">{TBHK1?.Diem >= 0 ? TBHK1?.MaMH == "CB4" || TBHK1?.MaMH == "CB5" ? TBHK1?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK1.Diem : "-"}</td>
 
@@ -178,7 +178,7 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                 {generateOtherCells(otherGrades2, student)}
 
                                 <td className="bd-td-normal">{TBHK2?.Diem >= 0 ? TBHK2?.MaMH == 'CB4' || TBHK2?.MaMH == 'CB5' ? TBHK2?.Diem == 0 ? "Chưa đạt" : "Đạt" : TBHK2.Diem : "-"}</td>
-                                {show == 2 ? 
+                                {show == 2 ?
                                     <td onClick={() => showEdit(RLH)} className="bd-td-edit">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
                                     :
                                     <td className="bd-td-normal">{RLH?.Diem >= 0 ? RLH?.MaMH == 'CB4' || RLH?.MaMH == 'CB5' ? RLH?.Diem == 0 ? "Chưa đạt" : "Đạt" : RLH.Diem : "-"}</td>
@@ -277,9 +277,9 @@ const BangDiem = ({ hocSinh, loaiDiem, diemHK1,
                                         className="f-field"
                                     >
                                         <option value="">Chọn loại điểm</option>
-                                        {loaiDiem.map((data) => (
-                                            <option key={data.MaLoai} value={data.MaLoai}>{data.TenLoai}</option>
-                                        ))}
+                                        <option value="tx">Đánh giá thường xuyên</option>
+                                        <option value="gk">Đánh giá giữa kì</option>
+                                        <option value="ck">Đánh giá cuối kì</option>
                                     </Field>
                                     <ErrorMessage className="text-red-700 block mb-2" name="MaLoai" component="div" />
                                 </div>

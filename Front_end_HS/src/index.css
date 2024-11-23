@@ -133,3 +133,4 @@ input[type="number"] {
 .sub-head-active{
   @apply border-2 border-collapse px-2 text-xl py-1  w-full border-cyan-400 bg-cyan-300 text-white
 }
+

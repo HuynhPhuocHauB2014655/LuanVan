@@ -19,10 +19,11 @@ export default function Menu({ update }) {
     const menu_items = [
         { id: 1, route: "/", label: 'Trang chủ', icon:<FontAwesomeIcon icon="fa-solid fa-house"/> },
         { id: 2, route: "/info", label: 'Thông tin cá nhân',icon: <FontAwesomeIcon icon="fa-solid fa-user" />},
-        { id: 3, route: "/cn", label: 'Chủ nhiệm',icon: <FontAwesomeIcon icon="fa-solid fa-briefcase" />},
-        { id: 4, route: "/class", label: 'Quản lí lớp dạy',icon:<FontAwesomeIcon icon="fa-solid fa-book-open" /> },
-        { id: 5, route: "/tkb", label: 'Thời khóa biểu',icon: <FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
-        { id: 6, route: "/teach", label: 'Dạy học',icon:<FontAwesomeIcon icon="fa-solid fa-person-chalkboard" /> },
+        { id: 3, route: "/nk", label: "Niên Khóa", icon: <FontAwesomeIcon icon="fa-solid fa-calendar" /> },
+        { id: 4, route: "/cn", label: 'Chủ nhiệm',icon: <FontAwesomeIcon icon="fa-solid fa-briefcase" />},
+        { id: 5, route: "/class", label: 'Quản lí lớp dạy',icon:<FontAwesomeIcon icon="fa-solid fa-book-open" /> },
+        { id: 6, route: "/tkb", label: 'Thời khóa biểu',icon: <FontAwesomeIcon icon="fa-solid fa-calendar-days" /> },
+        { id: 7, route: "/teach", label: 'Dạy học',icon:<FontAwesomeIcon icon="fa-solid fa-person-chalkboard" /> },
     ];
     const activeItem = (id) => {
         setActive(id);

@@ -21,6 +21,7 @@ export default function StudentInfo() {
     const [showConfirm, setShowConfirm] = useState(0);
     const [initialValues, setInitialValues] = useState({});
     const formRef = useRef();
+    const phRef = useRef();
     const { userName } = useUserContext();
     const fetchData = async () => {
         const res = await axiosClient.get(`hs/show/${Mshs}`);
@@ -48,6 +49,7 @@ export default function StudentInfo() {
             setInitialValues(data);
         }
         setShow(value);
+        document.getElementById("phForm").scrollIntoView();
     }
     const handleSubmit = async (value) => {
         value.MSHS = Mshs;
@@ -93,7 +95,7 @@ export default function StudentInfo() {
     // console.log(info);
     return (
         <div>
-            <Header/>
+            <Header />
             <div className="main-content">
                 <Menu />
                 <div className="right-part relative">
@@ -106,6 +108,52 @@ export default function StudentInfo() {
                                     <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => showForm(3)}><FontAwesomeIcon icon={faScrewdriverWrench} title="Sửa thông tin " /></button>
                                 </div>
                                 <button className="button border-cyan-500 hover:bg-cyan-400 hover:text-white" onClick={() => navigate('/student-result', { state: { studentData: info } })}>Thành tích học tập <FontAwesomeIcon icon={faChevronRight} /></button>
+                            </div>
+                            <div id="phForm">
+                                {(show == 1 || show == 2) &&
+                                    <Formik
+                                        initialValues={initialValues}
+                                        validationSchema={
+                                            Yup.object().shape({
+                                                TenCha: Yup.string().required('Tên cha không được để trống'),
+                                                SDTCha: Yup.string().matches(/^\d{10}$/, 'Số điện thoại không hợp lệ.').required('Số điện thoại cha không được để trống'),
+                                                TenMe: Yup.string().required('Tên mẹ không được để trống'),
+                                                SDTMe: Yup.string().matches(/^\d{10}$/, 'Số điện thoại không hợp lệ.').required('Số điện thoại mẹ không được để trống')
+                                            })
+                                        }
+                                        onSubmit={handleSubmit}
+                                    >
+                                        <Form className="absolute p-10 border-2 border-blue-500 py-4 rounded-lg top-44 left-[25%] w-[50%] bg-white shadow-lg">
+                                            <button type='button' onClick={() => showForm(0)} className='top-0 right-0 absolute px-1 hover:text-red-400'><FontAwesomeIcon icon={faX} /></button>
+                                            <div className="w-full mx-auto space-y-2">
+                                                <div className="text-2xl font-bold text-center py-2 bg-slate-300">Thông tin phụ huynh</div>
+                                                <div>
+                                                    <label className="text-xl font-medium" htmlFor="TenCha">Họ tên Cha:</label>
+                                                    <Field type="text" name="TenCha" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập họ tên cha" />
+                                                    <ErrorMessage className="text-red-700" name="TenCha" component="div" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xl font-medium" htmlFor="SDTCha">Số điện thoại Cha:</label>
+                                                    <Field type="text" name="SDTCha" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập số điện thoại cha" />
+                                                    <ErrorMessage className="text-red-700" name="SDTCha" component="div" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xl font-medium" htmlFor="TenMe">Họ tên Mẹ:</label>
+                                                    <Field type="text" name="TenMe" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập họ tên mệ" />
+                                                    <ErrorMessage className="text-red-700" name="TenMe" component="div" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xl font-medium" htmlFor="SDTMe">Số điện thoại Mẹ:</label>
+                                                    <Field type="text" name="SDTMe" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập số điện thoại mẹ" />
+                                                    <ErrorMessage className="text-red-700" name="SDTMe" component="div" />
+                                                </div>
+                                                <div className="w-1/2 mx-auto">
+                                                    <button type="submit" className="w-full border-2 rounded-md px-3 py-2 bg-blue-500 hover:bg-blue-700 hover:text-white">Lưu</button>
+                                                </div>
+                                            </div>
+                                        </Form>
+                                    </Formik>
+                                }
                             </div>
                             <div className="text-2xl font-semibold my-2 text-center bg-slate-300 py-5 mt-10">Học sinh</div>
                             <table className="table-fixed text-left text-xl w-full">
@@ -194,56 +242,12 @@ export default function StudentInfo() {
                                 </table>
                                 :
                                 <div>
-                                    <div className="text-red-500 text-3xl">Chưa có thông tin</div>
+                                    <div className="text-red-500 text-3xl text-center">Chưa có thông tin</div>
                                 </div>
                             }
                         </div>
                     }
-                    {(show == 1 || show == 2) &&
-                        <div>
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={
-                                    Yup.object().shape({
-                                        TenCha: Yup.string().required('Tên cha không được để trống'),
-                                        SDTCha: Yup.string().matches(/^\d{10}$/, 'Số điện thoại không hợp lệ.').required('Số điện thoại cha không được để trống'),
-                                        TenMe: Yup.string().required('Tên mẹ không được để trống'),
-                                        SDTMe: Yup.string().matches(/^\d{10}$/, 'Số điện thoại không hợp lệ.').required('Số điện thoại mẹ không được để trống')
-                                    })
-                                }
-                                onSubmit={handleSubmit}
-                            >
-                                <Form className="absolute border-2 border-blue-500 py-4 rounded-lg top-20 left-[10%] w-[80%] bg-white shadow-lg">
-                                    <button type='button' onClick={() => showForm(0)} className='top-0 right-0 absolute px-1 hover:text-red-400'><FontAwesomeIcon icon={faX} /></button>
-                                    <div className="w-1/2 mx-auto space-y-2">
-                                        <div>
-                                            <label className="text-xl font-medium" htmlFor="TenCha">Họ tên Cha:</label>
-                                            <Field type="text" name="TenCha" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập họ tên cha" />
-                                            <ErrorMessage className="text-red-700" name="TenCha" component="div" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xl font-medium" htmlFor="SDTCha">Số điện thoại Cha:</label>
-                                            <Field type="text" name="SDTCha" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập số điện thoại cha" />
-                                            <ErrorMessage className="text-red-700" name="SDTCha" component="div" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xl font-medium" htmlFor="TenMe">Họ tên Mẹ:</label>
-                                            <Field type="text" name="TenMe" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập họ tên mệ" />
-                                            <ErrorMessage className="text-red-700" name="TenMe" component="div" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xl font-medium" htmlFor="SDTMe">Số điện thoại Mẹ:</label>
-                                            <Field type="text" name="SDTMe" className="w-full mb-1 rounded border-2 border-black p-2" placeholder="Nhập số điện thoại mẹ" />
-                                            <ErrorMessage className="text-red-700" name="SDTMe" component="div" />
-                                        </div>
-                                        <div className="w-1/2 mx-auto">
-                                            <button type="submit" className="w-full border-2 rounded-md px-3 py-2 bg-blue-500 hover:bg-blue-700 hover:text-white">Lưu</button>
-                                        </div>
-                                    </div>
-                                </Form>
-                            </Formik>
-                        </div>
-                    }
+
                     {show == 3 &&
                         <div className="absolute z-10 w-[70%] left-[15%] top-10 bg-white shadow-lg rounded-lg border-2 border-black p-10">
                             <button className="absolute top-0 right-0 me-2 text-red-700 border border-black px-2 mt-2 hover:border-red-600" onClick={() => showForm(0)}>X</button>

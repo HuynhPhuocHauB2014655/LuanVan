@@ -177,8 +177,8 @@ class DiemController extends Controller
     }
     public function updateDiem(Request $request)
     {
-        $tenMH = MonHoc::find($request->MaMH)->TenMH;
         $diem = Diem::find($request->id);
+        $tenMH = MonHoc::find($diem->MaMH)->TenMH;
         if($diem){
             $diem->update($request->all());
             ThongBao::create([

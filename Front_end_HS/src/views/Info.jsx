@@ -107,7 +107,7 @@ export default function Info() {
                             </Formik>
                         }
                     </div>
-                    <div className=" mt-5">
+                    <div className="mt-5">
                         <div className="flex place-content-center">
                             <table className="w-[80%] my-3 border-collapse text-base md:text-2xl">
                                 <tbody>
@@ -154,7 +154,7 @@ export default function Info() {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="text-sm">*Nếu thông tin có sai xót liên hệ với nhà trường để chỉnh sửa</div>
+                        <div className="text-xs ms-2 text-red-500 mt-2">*Nếu thông tin có sai xót liên hệ với nhà trường để chỉnh sửa</div>
                     </div>
                 </div>
             </div>

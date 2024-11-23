@@ -64,7 +64,7 @@ export default function Notification() {
                         Thông báo
                     </div>
                     <div className="h-[70vh] mt-2 border-2 border-black flex bg-[#ffffff] relative">
-                        <div className={`md:w-[20%] w-full border-e-2 border-black overflow-auto hover:overflow-contain ${(onMd && reading) && "hidden"}`}>
+                        <div className={`md:w-[20%] w-full md:border-e-2 border-black overflow-auto hover:overflow-contain ${(onMd && reading) && "hidden"}`}>
                             {tb?.map((tb) => (
                                 <div key={tb.id}
                                     className={reading?.id == tb.id ? "p-2 bg-cyan-300 cursor-pointer border-b-2 border-slate-500 relative" : (tb.TrangThai == 1 ? "p-2 hover:bg-sky-500 cursor-pointer border-b-2 border-slate-500 relative" : "p-2 hover:bg-gray-100 bg-slate-200 cursor-pointer border-b-2 border-slate-500 relative")}
