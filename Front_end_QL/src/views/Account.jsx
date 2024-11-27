@@ -16,7 +16,7 @@ import Header from "../components/Header";
 export default function Account() {
     const [time, setTime] = useState();
     const [showForm, setShowForm] = useState("");
-    const [show, setShow] = useState(0);
+    const [show, setShow] = useState(1);
     const { setMessage, setError } = useStateContext();
     const { userName, setUserName } = useUserContext();
     const navigate = useNavigate();
@@ -102,6 +102,9 @@ export default function Account() {
         }
         setShow(id);
     }
+    useEffect(()=>{
+        checkTime();
+    },[])
     const searchGV = async () => {
         const search = searchString.current.value.toUpperCase();
         try {

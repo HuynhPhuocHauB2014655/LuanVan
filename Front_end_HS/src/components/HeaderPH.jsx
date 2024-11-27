@@ -10,35 +10,16 @@ import pusher from "../pusher";
 export default function Header({ update }) {
     const { message, setMessage, error, setError } = useStateContext();
     const { nienKhoa, setNienKhoa } = useStateContext();
-    const { userName,userNamePH, setUserName } = useUserContext();
+    const { userNamePH, setUserNamePH } = useUserContext();
     const [showConfirm, setShowConfirm] = useState(0);
     const navigate = useNavigate();
     const [onMd, setOnMd] = useState(false);
     const [tnCount, setTnCount] = useState(0);
     const [tbCount, setTbCount] = useState(0);
-    const fetchTN = async () => {
-        const c = await axiosClient.get(`tn/count/${userName}`);
-        let n = 0;
-        c.data.map((data) => {
-            n += data.unread_count;
-        })
-        setTnCount(n);
-    }
-    const fetchTB = async () => {
-        const TB = await axiosClient.get(`/tb/hs/${userName}`);
-        const count = TB.data.filter(item => item.TrangThai == 0).length;
-        setTbCount(count);
-    }
-    useEffect(() => {
-        if(userName){
-            fetchTN();
-            fetchTB();
-        }
-    }, [userName]);
-    if(update == 2){
+    if (update == 2) {
         fetchTN();
     }
-    if(update == 1){
+    if (update == 1) {
         fetchTB();
     }
     useEffect(() => {
@@ -54,7 +35,7 @@ export default function Header({ update }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
     useEffect(() => {
-        const channel = pusher.subscribe(`chat.${userName}`);
+        const channel = pusher.subscribe(`chat.${userNamePH}`);
 
         channel.bind('App\\Events\\sendMessage', (data) => {
             fetchTN();
@@ -64,13 +45,13 @@ export default function Header({ update }) {
             channel.unbind_all();
             channel.unsubscribe();
         };
-    }, [userName]);
+    }, [userNamePH]);
     const showConfrim = () => {
         setShowConfirm(1);
     }
     const onConfirm = () => {
-        setUserName("");
-        navigate("/login");
+        setUserNamePH("");
+        navigate("/loginPH");
     }
     const onCancel = () => {
         setShowConfirm(0);
@@ -86,34 +67,17 @@ export default function Header({ update }) {
                     :
                     <FontAwesomeIcon icon={faGraduationCap} title="Hệ thống quản lí Trường THPT Cần Thơ" className="text-4xl" />}
             </Link>
-            {(userName) ? <div className="space-x-5 text-sm md:text-xl">
-                <button
-                    className="relative p-2 transform hover:scale-125 transition-transform duration-300" title="Tin nhắn"
-                    onClick={() => navigate("/tn")}
-                >
-                    {tnCount > 0 &&
-                        <span className="absolute top-0 right-0 bg-red-500 rounded-full px-1 text-white text-sm ">{tnCount}</span>
-                    }
-                    <FontAwesomeIcon icon={faMessage} color="white" />
-                </button>
-                <button
-                    className="relative p-2 transform hover:scale-125 transition-transform duration-300" title="Thông báo"
-                    onClick={() => navigate("/notify")}
-                >
-                    {tbCount > 0 &&
-                        <span className="absolute top-0 right-0 bg-red-500 rounded-full px-1 text-white text-sm ">{tbCount}</span>
-                    }
-                    <FontAwesomeIcon icon={faEnvelope} color="white" />
-                </button>
-                <button
-                    className="relative p-2 transform hover:scale-125 transition-transform duration-300" title="Đăng xuất"
-                    onClick={showConfrim}
-                >
-                    <FontAwesomeIcon icon={faRightFromBracket} color="white" className="" />
-                </button>
-            </div>
-            :
-            <div className="text-white">Vui lòng đăng nhập</div>
+            {(userNamePH) ?
+                <div className="space-x-5 text-sm md:text-xl">
+                    <button
+                        className="relative p-2 transform hover:scale-125 transition-transform duration-300" title="Đăng xuất"
+                        onClick={showConfrim}
+                    >
+                        <FontAwesomeIcon icon={faRightFromBracket} color="white" className="" />
+                    </button>
+                </div>
+                :
+                <div className="text-white">Vui lòng đăng nhập</div>
             }
         </header>
     )

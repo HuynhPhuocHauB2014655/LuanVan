@@ -9,7 +9,7 @@ import AlterConfirm from "../components/Confirm";
 import Header from "../components/Header";
 export default function Class() {
     const [classes, setClasses] = useState([]);
-    const [show, setShow] = useState(0);
+    const [show, setShow] = useState(1);
     const [newStudents, setNewStudents] = useState([]);
     const [studentCount, setStudentCount] = useState(0);
     const [TNCount, setTNCount] = useState(0);
@@ -71,6 +71,9 @@ export default function Class() {
             console.log(error);
         }
     }
+    useEffect(()=>{
+        fetchNewStudent();
+    },[])
     const _setShow = (id) => {
         if (id == 1) {
             fetchNewStudent();
@@ -185,7 +188,7 @@ export default function Class() {
         setShowConfirm(0);
         setDefaultV("default")
     }
-    // console.log(newStudents);
+    console.log(classes);
     return (
         <div>
             <Header />
@@ -195,8 +198,8 @@ export default function Class() {
                     {showConfirm == 1 && <AlterConfirm message={confMessage} onCancel={onCancel} onConfirm={onConfirm} />}
                     <h2 className="page-name">Quản lí Lớp học</h2>
                     <div className="flex items-center my-2">
-                        <button type="button" className="px-2 py-3 hover:bg-cyan-400 w-full border-2 border-e-0 border-black bg-white font-bold" onClick={() => _setShow(1)}>Học sinh mới</button>
-                        <button type="button" className="px-2 py-3 hover:bg-cyan-400 w-full border-2 border-black bg-white font-bold" onClick={() => _setShow(2)}>Danh sách lớp</button>
+                        <button type="button" className={`px-2 py-3 hover:bg-cyan-400 w-full border-2 border-e-0 border-black bg-white font-bold ${show == 1 && "bg-cyan-400"}`} onClick={() => _setShow(1)}>Học sinh mới</button>
+                        <button type="button" className={`px-2 py-3 hover:bg-cyan-400 w-full border-2 border-black bg-white font-bold ${show == 2 && "bg-cyan-400"}`} onClick={() => _setShow(2)}>Danh sách lớp</button>
                     </div>
                     {show == 1 &&
                         <div>
@@ -402,12 +405,16 @@ export default function Class() {
                                                                 <td className="border border-gray-400 p-2">{data.NgaySinh}</td>
                                                                 <td className="border border-gray-400 p-2">{data.GioiTinh}</td>
                                                                 <td className="border border-gray-400 p-2">
-                                                                    <select className="w-full" value={defaultV} onChange={(e) => triggerConfirm(e, data, classItem.MaLop, classItem.TenLop)}>
-                                                                        <option disabled value="default">{classItem.TenLop}</option>
-                                                                        {listClass(classItem).map((item) => (
-                                                                            <option key={item.MaLop} value={item.MaLop}>{item.TenLop}</option>
-                                                                        ))}
-                                                                    </select>
+                                                                    {classItem.MaNK == nienKhoa.NienKhoa ?
+                                                                        <select className="w-full" value={defaultV} onChange={(e) => triggerConfirm(e, data, classItem.MaLop, classItem.TenLop)}>
+                                                                            <option disabled value="default">{classItem.TenLop}</option>
+                                                                            {listClass(classItem).map((item) => (
+                                                                                <option key={item.MaLop} value={item.MaLop}>{item.TenLop}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                        :
+                                                                        <div>{classItem.TenLop}</div>
+                                                                    }
                                                                 </td>
                                                             </tr>
                                                         ))}

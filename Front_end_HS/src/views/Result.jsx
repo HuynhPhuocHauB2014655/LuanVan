@@ -22,7 +22,7 @@ export default function Result() {
     const [NK, setNK] = useState([]);
     const [HK, setHK] = useState(1);
     const [onMd, setOnMd] = useState(false);
-    const [selectedClass, setSelectedClass] = useState('');
+    const [selectedClass, setSelectedClass] = useState();
     const NKRef = useRef();
     const HKRef = useRef();
     useEffect(() => {
@@ -151,9 +151,9 @@ export default function Result() {
         if (selectedMaNK) {
             const selectedLop = info?.lop.find(item => item.MaNK === selectedMaNK);
             if (selectedLop) {
-                setSelectedClass(selectedLop.TenLop);
+                setSelectedClass(selectedLop);
             } else {
-                setSelectedClass('');
+                setSelectedClass(null);
             }
         }
     }, [info, NK, NKRef.current?.value]);
@@ -221,7 +221,7 @@ export default function Result() {
                                 </button>
                             </div>
                             <div className="text-3xl font-bold text-blue-500">
-                                Lớp: {selectedClass || ''}
+                                Lớp: {`${selectedClass ? `${selectedClass?.MaLop} - ${selectedClass?.TenLop}` : "Chưa xếp"} `}
                             </div>
                             <div className="flex items-center space-x-2 justify-center">
                                 <div className="text-xl">Niên khóa:</div>

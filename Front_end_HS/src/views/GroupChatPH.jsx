@@ -12,6 +12,7 @@ import { useRef } from "react";
 import pusher from "../pusher";
 import { Navigate } from "react-router-dom";
 import moment from 'moment';
+import HeaderPH from "../components/HeaderPH";
 export default function GroupChatPH() {
     const { userNamePH } = useUserContext();
     const [info, setInfo] = useState();
@@ -227,131 +228,134 @@ export default function GroupChatPH() {
     const changeToogleResult = (state) => {
         setToggleResult(state);
     }
-    // console.log(groups);
+    console.log(userNamePH);
     return (
-        <div className="main-content">
-            <div className="w-full mx-auto my-2">
-                <div className="page-name relative">
-                    <button className={`absolute left-2 hover:text-blue-300 ${(!onMd || isGroupListVisible) && "hidden"}`} onClick={showListGroup}><FontAwesomeIcon icon={faArrowLeft} /></button>
-                    Tin nhắn
-                </div>
-                <div className="md:flex h-[80vh] bg-white shadow-lg mt-2 mx-2 relative">
-                    {(showResult && !toggleResult) &&
-                        <button type="button" onClick={() => changeToogleResult(true)} className="absolute top-1/2 text-xl z-10"><FontAwesomeIcon icon={faAnglesRight} /></button>
-                    }
-                    {showResult &&
-                        <div className={`w-1/2 h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden ${!toggleResult && "hidden"}`}>
-                            <div className="text-center font-bold my-3 relative">
-                                Kết quả tìm kiếm
-                                <button type="button" onClick={() => changeToogleResult(false)} className="absolute right-1 text-xl"><FontAwesomeIcon icon={faAnglesLeft} /></button>
-                            </div>
-                            {resultSearch?.length == 0 ?
-                                <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
-                                :
-                                resultSearch?.map((item) => (
-                                    <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
-                                        <div className="">{item.NguoiGui}</div>
-                                        <div className="">{item.TinNhan}</div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    }
-                    <div
-                        className={`
-                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
-                            ${(!isGroupListVisible && onMd) && 'hidden'}
-                        `}>
-                        {groups?.map((gr) => (
-                            <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
-                                <div>
-                                    <div className="text-lg">{gr.TenNhom}</div>
-                                    <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0].NguoiGui}: ${gr.tin_nhan[0].TinNhan.length > 10 ? `${gr.tin_nhan[0].TinNhan.substring(0, 10)}...` : gr.tin_nhan[0].TinNhan}`}</div>
-                                </div>
-                                {countNotSeen(gr.id) > 0 &&
-                                    <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{countNotSeen(gr.id)}</div>
-                                }
-                            </div>
-                        ))}
+        <div>
+            <HeaderPH />
+            <div className="main-content">
+                <div className="w-full mx-auto my-2">
+                    <div className="page-name relative">
+                        <button className={`absolute left-2 hover:text-blue-300 ${(!onMd || isGroupListVisible) && "hidden"}`} onClick={showListGroup}><FontAwesomeIcon icon={faArrowLeft} /></button>
+                        Tin nhắn
                     </div>
-                    <div className={`md:w-[70%] h-full w-full ${(onMd && isGroupListVisible) && "hidden"}`}>
-                        {selectedGroup &&
-                            <div className="h-full relative">
-                                <div className="relative h-full w-full">
-                                    <div className="border-b-2 border-slate-300 px-2 py-2 flex justify-between items-center h-[14%]">
-                                        <div >
-                                            <div className="text-xl font-bold">{selectedGroup.TenNhom}</div>
-                                            <div>{countMem(selectedGroup?.thanh_vien)} thành viên</div>
-                                        </div>
-                                        <div className="space-x-2 w-1/2 flex justify-end">
-                                            {showSearch &&
-                                                <input type="text" className="w-full border-2 border-slate-400 rounded-full px-5 py-2" placeholder="Nhập từ khóa tìm kiếm..." onChange={search} />
-                                            }
-                                            <button className="text-xl hover:text-blue-500"><FontAwesomeIcon icon={showSearch ? faXmark : faMagnifyingGlass} onClick={() => ShowSearch(!showSearch)} /></button>
-                                            <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
-                                        </div>
-                                    </div>
-                                    <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
-                                        {personalMessage().map((tn) => (
-                                            <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? '' : 'ml-auto text-end'}`}>
-                                                <div className="mx-2">{tn.NguoiGui}</div>
-                                                <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
-                                                    {tn.TinNhan}
-                                                    <div className={tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {fakeMessage &&
-                                            <div className={`w-[50%] mx-2 ml-auto text-end`}>
-                                                <div className="mx-2">{`${userNamePH}-Phụ huynh ${std.HoTen}`}</div>
-                                                <div className="w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5">
-                                                    {fakeMessage}
-                                                    <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
-                                                </div>
-                                            </div>
-                                        }
-                                        <div ref={messageEndRef} />
-                                    </div>
-                                    <div className="absolute bottom-0 w-full h-[10%]">
-                                        <textarea type="text" name="TinNhan"
-                                            placeholder="Nhập nội dung tin nhắn"
-                                            onKeyDown={pressKey}
-                                            onChange={handleChange}
-                                            value={value}
-                                            className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
-                                        {showButton &&
-                                            <button
-                                                className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
-                                                onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
-                                                    className="h-full" />
-                                            </button>
-                                        }
-                                    </div>
+                    <div className="md:flex h-[80vh] bg-white shadow-lg mt-2 mx-2 relative">
+                        {(showResult && !toggleResult) &&
+                            <button type="button" onClick={() => changeToogleResult(true)} className="absolute top-1/2 text-xl z-10"><FontAwesomeIcon icon={faAnglesRight} /></button>
+                        }
+                        {showResult &&
+                            <div className={`w-1/2 h-full absolute left-0 bg-white z-10 border-2 border-slate-300 overflow-x-hidden ${!toggleResult && "hidden"}`}>
+                                <div className="text-center font-bold my-3 relative">
+                                    Kết quả tìm kiếm
+                                    <button type="button" onClick={() => changeToogleResult(false)} className="absolute right-1 text-xl"><FontAwesomeIcon icon={faAnglesLeft} /></button>
                                 </div>
-                                {show &&
-                                    <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">
-                                        <div className="relative justify-center text-xl font-bold border-b-2 border-slate-300 flex items-center h-[14%]">
-                                            <div>Thông tin nhóm</div>
-                                            <button className="text-2xl absolute left-2 h-full flex justify-center items-center"><FontAwesomeIcon icon={faCaretRight} onClick={() => setShow(!show)} /></button>
+                                {resultSearch?.length == 0 ?
+                                    <div className="text-center text-red-400">Không tìm thấy kết quả trùng khớp</div>
+                                    :
+                                    resultSearch?.map((item) => (
+                                        <div key={item.id} className="p-2 hover:bg-slate-100 cursor-pointer text-sm" onClick={() => scrollTo(item.id)}>
+                                            <div className="">{item.NguoiGui}</div>
+                                            <div className="">{item.TinNhan}</div>
                                         </div>
-                                        <div className="text-center text-xl font-bold border-b-2 border-slate-300 py-5">{selectedGroup.TenNhom}</div>
-                                        <div className="border-b-2 border-slate-300 px-2 py-5 min-h-[80%]">
-                                            <div className="flex justify-between items-center hover:bg-slate-200 hover:cursor-pointer px-2 py-3" onClick={() => setShowMem(!showMem)}>
-                                                <div>Thành viên nhóm ({countMem(selectedGroup?.thanh_vien)})</div>
-                                                <button><FontAwesomeIcon icon={showMem ? faChevronUp : faChevronDown} /></button>
-                                            </div>
-                                            {showMem &&
-                                                <div className="max-h-80 overflow-y-auto hover:overflow-contain">
-                                                    {groupsMember.map((item, index) => (
-                                                        <div className="ms-3 px-2 py-3 hover:bg-slate-200 hover:cursor-pointer" key={index}>{item.name}</div>
-                                                    ))}
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
+                                    ))
                                 }
                             </div>
                         }
+                        <div
+                            className={`
+                            md:w-[30%] w-full border-e-2 border-slate-300 overflow-y-auto hover:overflow-contain relative
+                            ${(!isGroupListVisible && onMd) && 'hidden'}
+                        `}>
+                            {groups?.map((gr) => (
+                                <div key={gr.id} className={`px-2 py-5 overflow-hidden hover:cursor-pointer hover:bg-slate-200 flex justify-between items-center ${selectedGroup?.id == gr.id && "bg-slate-400"} `} onClick={() => select(gr)}>
+                                    <div>
+                                        <div className="text-lg">{gr.TenNhom}</div>
+                                        <div className="text-sm">{!gr.tin_nhan[0] ? "" : `${gr.tin_nhan[0].NguoiGui}: ${gr.tin_nhan[0].TinNhan.length > 10 ? `${gr.tin_nhan[0].TinNhan.substring(0, 10)}...` : gr.tin_nhan[0].TinNhan}`}</div>
+                                    </div>
+                                    {countNotSeen(gr.id) > 0 &&
+                                        <div className="border border-red-500 rounded-full w-5 h-5 text-xs flex items-center justify-center text-white bg-red-500">{countNotSeen(gr.id)}</div>
+                                    }
+                                </div>
+                            ))}
+                        </div>
+                        <div className={`md:w-[70%] h-full w-full ${(onMd && isGroupListVisible) && "hidden"}`}>
+                            {selectedGroup &&
+                                <div className="h-full relative">
+                                    <div className="relative h-full w-full">
+                                        <div className="border-b-2 border-slate-300 px-2 py-2 flex justify-between items-center h-[14%]">
+                                            <div >
+                                                <div className="text-xl font-bold">{selectedGroup.TenNhom}</div>
+                                                <div>{countMem(selectedGroup?.thanh_vien)} thành viên</div>
+                                            </div>
+                                            <div className="space-x-2 w-1/2 flex justify-end">
+                                                {showSearch &&
+                                                    <input type="text" className="w-full border-2 border-slate-400 rounded-full px-5 py-2" placeholder="Nhập từ khóa tìm kiếm..." onChange={search} />
+                                                }
+                                                <button className="text-xl hover:text-blue-500"><FontAwesomeIcon icon={showSearch ? faXmark : faMagnifyingGlass} onClick={() => ShowSearch(!showSearch)} /></button>
+                                                <button className="text-2xl hover:text-blue-500"><FontAwesomeIcon icon={faCaretLeft} onClick={() => setShow(!show)} /></button>
+                                            </div>
+                                        </div>
+                                        <div className="h-[76%] overflow-y-scroll w-full space-y-7 py-2" ref={messageRef} onScroll={checkBottom}>
+                                            {personalMessage().map((tn) => (
+                                                <div key={tn.id} id={tn.id} className={`w-[50%] mx-2 ${tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? '' : 'ml-auto text-end'}`}>
+                                                    <div className="mx-2">{tn.NguoiGui}</div>
+                                                    <div className={`w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5 ${focus === tn.id ? "bg-red-200" : ""}`}>
+                                                        {tn.TinNhan}
+                                                        <div className={tn.NguoiGui !== `${userNamePH}-Phụ huynh ${std.HoTen}` ? `absolute text-xs bottom-1 right-1` : `absolute text-xs bottom-1 left-1`}>{getDate(tn.created_at)}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {fakeMessage &&
+                                                <div className={`w-[50%] mx-2 ml-auto text-end`}>
+                                                    <div className="mx-2">{`${userNamePH}-Phụ huynh ${std.HoTen}`}</div>
+                                                    <div className="w-full relative whitespace-pre-wrap break-words rounded-md shadow-md border-2 border-slate-300 px-2 py-5">
+                                                        {fakeMessage}
+                                                        <div className="absolute text-xs bottom-1 left-1">{getDate(new Date())}</div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div ref={messageEndRef} />
+                                        </div>
+                                        <div className="absolute bottom-0 w-full h-[10%]">
+                                            <textarea type="text" name="TinNhan"
+                                                placeholder="Nhập nội dung tin nhắn"
+                                                onKeyDown={pressKey}
+                                                onChange={handleChange}
+                                                value={value}
+                                                className="outline-none h-full w-full px-2 border-y-2 py-3 resize-none" />
+                                            {showButton &&
+                                                <button
+                                                    className="absolute right-2 h-[40%] top-[30%] hover:text-blue-400"
+                                                    onClick={scrollBottom}><FontAwesomeIcon icon={faArrowDown}
+                                                        className="h-full" />
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                    {show &&
+                                        <div className="absolute z-10 right-0 top-0 h-full w-1/2 bg-white border-s-2 border-slate-300">
+                                            <div className="relative justify-center text-xl font-bold border-b-2 border-slate-300 flex items-center h-[14%]">
+                                                <div>Thông tin nhóm</div>
+                                                <button className="text-2xl absolute left-2 h-full flex justify-center items-center"><FontAwesomeIcon icon={faCaretRight} onClick={() => setShow(!show)} /></button>
+                                            </div>
+                                            <div className="text-center text-xl font-bold border-b-2 border-slate-300 py-5">{selectedGroup.TenNhom}</div>
+                                            <div className="border-b-2 border-slate-300 px-2 py-5 min-h-[80%]">
+                                                <div className="flex justify-between items-center hover:bg-slate-200 hover:cursor-pointer px-2 py-3" onClick={() => setShowMem(!showMem)}>
+                                                    <div>Thành viên nhóm ({countMem(selectedGroup?.thanh_vien)})</div>
+                                                    <button><FontAwesomeIcon icon={showMem ? faChevronUp : faChevronDown} /></button>
+                                                </div>
+                                                {showMem &&
+                                                    <div className="max-h-80 overflow-y-auto hover:overflow-contain">
+                                                        {groupsMember.map((item, index) => (
+                                                            <div className="ms-3 px-2 py-3 hover:bg-slate-200 hover:cursor-pointer" key={index}>{item.name}</div>
+                                                        ))}
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

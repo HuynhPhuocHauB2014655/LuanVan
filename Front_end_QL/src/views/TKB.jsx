@@ -18,7 +18,7 @@ export default function TKB() {
     const { setMessage, setError } = useStateContext();
     const { nienKhoa } = useStateContext(false);
     const [disable, setDisable] = useState(true);
-    const [state, setState] = useState(0);
+    const [state, setState] = useState(2);
     const [TKB, setTKB] = useState([]);
     const [changeTKB, setChangeTKB] = useState();
     const [change1, setChange1] = useState();
@@ -263,8 +263,8 @@ export default function TKB() {
                 }
                 <h1 className="page-name">Quản lí thời khóa biểu</h1>
                 <div className="flex my-2">
-                    <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(2)}>Xếp TKB</button>
-                    <button className="button border-slate-400 hover:border-cyan-500 hover:bg-cyan-200 button-animation" onClick={() => _setState(1)}>Danh sách TKB</button>
+                    <button className={`px-2 py-3 hover:bg-cyan-400 w-full border-2 border-e-0 border-black bg-white font-bold ${state == 2 && "bg-cyan-400"}`} onClick={() => _setState(2)}>Xếp TKB</button>
+                    <button className={`px-2 py-3 hover:bg-cyan-400 w-full border-2 border-e-0 border-black bg-white font-bold ${state == 1 && "bg-cyan-400"}`} onClick={() => _setState(1)}>Danh sách TKB</button>
                 </div>
                 {state === 1 &&
                     <div className="mb-2">

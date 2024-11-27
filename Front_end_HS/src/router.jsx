@@ -42,10 +42,6 @@ const router = createBrowserRouter([
                 element: <Message/>
             },
             {
-                path: "/ph",
-                element: <GroupChatPH />,
-            },
-            {
                 path: "/nk",
                 element: <NienKhoa/>
             }
@@ -58,6 +54,10 @@ const router = createBrowserRouter([
     {
         path: "/loginPH",
         element: <LoginPH />,
+    },
+    {
+        path: "/ph",
+        element: <GroupChatPH />,
     },
     {
         path: "*",

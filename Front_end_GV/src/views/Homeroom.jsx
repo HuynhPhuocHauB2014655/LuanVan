@@ -657,6 +657,8 @@ export default function Homeroom() {
                                                                 onClick={() => changeShowButton(!showButton)}> {!showButton ? "Tính điểm" : "Hủy"}
                                                             </button>
                                                         </div>
+                                                        : classInfo?.TrangThai == 2 ?
+                                                        <div className="text-green-500 font-bold">Đã duyệt</div>
                                                         :
                                                         <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
                                                     }
@@ -712,7 +714,10 @@ export default function Homeroom() {
                                                     </div>
                                                     :
                                                     !hanSuaDiem ? <div className="text-center text-red-500 text-xl my-2">Đã hết hạn sửa điểm và đánh giá rèn luyện</div>
-                                                        : <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
+                                                        : classInfo?.TrangThai == 2 ?
+                                                        <div className="text-green-500 font-bold">Đã duyệt</div>
+                                                        :
+                                                        <div className="text-green-500 font-bold">Đã nộp báo cáo</div>
                                                 }
                                                 <table className="table-auto text-center w-full">
                                                     <thead>
@@ -776,6 +781,8 @@ export default function Homeroom() {
                                                 <h2 className="text-2xl font-bold text-center my-2 border-b-2 w-1/3 mx-auto border-blue-400">Xét lên lớp</h2>
                                                 {classInfo.TrangThai == 1 ?
                                                     <div className="text-green-500 font-bold ">Đã nộp báo cáo</div>
+                                                    : classInfo?.TrangThai == 2 ?
+                                                    <div className="text-green-500 font-bold">Đã duyệt</div>
                                                     :
                                                     <div className="my-2 flex justify-between">
                                                         <button className="button border-green-500 hover:bg-green-400 hover:text-white" disabled={disableTT} onClick={xetLenLop}>Xét lên lớp</button>
